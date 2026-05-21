@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第二章：Vue2 CRUD开发实战 - 从原理到实战</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1; --secondary: #f59e0b; --bg-dark: #0f172a;
+            --bg-card: #1e293b; --text-light: #f8fafc; --text-gray: #94a3b8;
+            --border: #334155; --success: #22c55e; --danger: #ef4444; --info: #3b82f6;
+            --vue2: #42b883; --vue3: #409eff; --java: #f89820;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.8; }
+        .chapter { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .chapter-title { font-size: 36px; margin-bottom: 20px; background: linear-gradient(135deg, #42b883 0%, #35495e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .chapter-desc { color: var(--text-gray); font-size: 16px; margin-bottom: 40px; line-height: 1.8; padding: 20px; background: var(--bg-card); border-radius: 10px; border-left: 4px solid var(--vue2); }
+        .card { background: var(--bg-card); border-radius: 15px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .card h3 { font-size: 22px; margin-bottom: 20px; color: var(--vue2); display: flex; align-items: center; gap: 10px; }
+        .card h4 { font-size: 18px; margin: 20px 0 15px; color: var(--info); }
+        .card ul { list-style: none; padding-left: 0; }
+        .card ul li { padding: 10px 0 10px 25px; position: relative; color: var(--text-gray); line-height: 1.6; }
+        .card ul li::before { content: '→'; position: absolute; left: 0; color: var(--vue2); font-weight: bold; }
+        .mermaid-container { background: #fff; border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .mermaid-title { text-align: center; color: var(--text-gray); margin-bottom: 15px; font-size: 14px; }
+        .code-block { background: #0f0f1a; padding: 20px; border-radius: 10px; margin: 20px 0; overflow-x: auto; border: 1px solid var(--border); }
+        .code-block code { font-family: 'Courier New', monospace; font-size: 13px; color: var(--text-light); line-height: 1.6; white-space: pre; }
+        .highlight-box { background: linear-gradient(135deg, rgba(66, 184, 131, 0.1) 0%, rgba(64, 158, 255, 0.1) 100%); border-left: 4px solid var(--vue2); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .highlight-box h4 { margin-bottom: 10px; color: var(--vue2); }
+        .warning-box { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border-left: 4px solid var(--danger); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .warning-box h4 { margin-bottom: 10px; color: var(--danger); }
+        .table-wrapper { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(66, 184, 131, 0.2); color: var(--vue2); font-weight: 600; }
+        td { color: var(--text-gray); }
+        .analogy-box { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border: 2px dashed var(--secondary); padding: 25px; border-radius: 12px; margin: 25px 0; }
+        .analogy-box h4 { color: var(--secondary); margin-bottom: 12px; font-size: 18px; }
+        .analogy-box p { color: var(--text-gray); line-height: 1.8; }
+        .self-check { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .self-check h3 { color: var(--secondary); margin-bottom: 15px; font-size: 20px; }
+        .self-check .q { margin-bottom: 12px; padding: 10px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .self-check .q strong { color: var(--info); }
+        .self-check .q p { color: var(--text-gray); margin: 5px 0 0 0; font-size: 14px; }
+        .why-box { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%); border-left: 4px solid var(--info); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .why-box h4 { margin-bottom: 10px; color: var(--info); }
+        .why-box p { color: var(--text-gray); line-height: 1.8; }
+        .mnemonic { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; }
+        .mnemonic h4 { color: var(--secondary); margin-bottom: 12px; }
+        .mnemonic .chant { font-size: 22px; font-weight: bold; color: #fff; letter-spacing: 3px; margin: 10px 0; }
+        .mnemonic p { color: var(--text-gray); font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="chapter">
+        <h2 class="chapter-title">第二章：Vue2 CRUD开发实战 — 像搭积木一样搭建后台系统</h2>
+        <div class="chapter-desc">
+            <strong>费曼学习法</strong>：如果你不能向一个刚学编程的朋友解释清楚Vue是怎么工作的，说明你还没真正掌握。<br><br>
+            本章用<strong>最直观的代码+最生动的类比</strong>，带你从零搭建一个完整的用户管理系统。你会惊奇地发现：原来所有后台页面都是<strong>同一套模板</strong>的变体。<br><br>
+            <strong>本章目标</strong>：学完之后，你能在1小时内徒手写出任何一个CRUD页面。
+        </div>
+
+        <div class="analogy-box">
+            <h4>🏗️ 费曼类比：Vue页面 = 乐高城堡</h4>
+            <p>
+                搭建一个CRUD页面，就像用乐高搭一个城堡：<br><br>
+                <strong>地基（API层）</strong> = 运输通道，负责从"仓库"（数据库）搬运"积木"（数据）<br>
+                <strong>骨架（组件）</strong> = 城堡的结构框架，决定每个房间（页面区域）长什么样<br>
+                <strong>管道（Axios请求）</strong> = 传送带，把积木从仓库运到城堡<br>
+                <strong>开关（按钮/事件）</strong> = 触发机关，"点击新增" → 打开一扇门 → 放入新积木<br><br>
+                一旦你掌握了这四个部分，任何CRUD页面都只是换一套积木颜色而已。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>📁 2.1 项目目录结构</h3>
+            <div class="code-block">
+                <code>
+src/
+├── api/                    # API接口管理
+│   ├── user.js            # 用户相关接口
+│   ├── role.js            # 角色相关接口
+│   └── menu.js            # 菜单相关接口
+├── views/                  # 页面组件
+│   ├── user/
+│   │   └── index.vue      # 用户管理页面
+│   ├── role/
+│   │   └── index.vue      # 角色管理页面
+│   └── dashboard/
+│       └── index.vue      # 仪表盘页面
+├── components/             # 公共组件
+│   ├── UserForm.vue       # 用户表单组件
+│   ├── Pagination.vue     # 分页组件
+│   └── UploadImage.vue    # 图片上传组件
+├── utils/                  # 工具函数
+│   ├── request.js         # Axios封装
+│   ├── auth.js            # 认证工具函数
+│   └── validate.js        # 表单验证工具
+├── store/                  # Vuex状态管理
+│   ├── index.js
+│   └── modules/
+│       ├── user.js
+│       └── app.js
+├── router/                 # 路由配置
+│   └── index.js
+├── styles/                 # 全局样式
+│   ├── index.scss
+│   └── variables.scss
+├── assets/                 # 静态资源
+│   ├── icons/             # SVG图标
+│   └── images/            # 图片资源
+├── App.vue                 # 根组件
+└── main.js                 # 入口文件
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🌐 2.2 Axios请求封装</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">统一封装Axios，处理请求拦截、响应拦截、错误处理等通用逻辑。</p>
+            
+            <div class="code-block">
+<code>// utils/request.js
+import axios from 'axios'
+import { Message } from 'element-ui'
+
+// 创建axios实例
+const service = axios.create({
+  baseURL: process.env.VUE_APP_BASE_API,  // API基础地址
+  timeout: 10000  // 请求超时时间
+})
+
+// 请求拦截器
+service.interceptors.request.use(
+  config => {
+    // 添加Token
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
+    // 防重复提交：POST/PUT请求添加时间戳
+    if (['post', 'put'].includes(config.method?.toLowerCase())) {
+      config.headers['X-Request-Timestamp'] = Date.now()
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
+
+// 响应拦截器
+service.interceptors.response.use(
+  response => {
+    const res = response.data
+    // 根据后端约定的code判断
+    if (res.code !== 200) {
+      Message.error(res.msg || '请求失败')
+      // Token过期，跳转登录页
+      if (res.code === 401) {
+        localStorage.removeItem('token')
+        window.location.href = '/login'
+      }
+      return Promise.reject(new Error(res.msg))
+    }
+    return res
+  },
+  error => {
+    let message = '网络异常'
+    if (error.response) {
+      switch (error.response.status) {
+        case 400: message = '请求参数错误'; break
+        case 401: message = '未授权，请重新登录'; break
+        case 403: message = '拒绝访问'; break
+        case 404: message = '请求地址不存在'; break
+        case 500: message = '服务器内部错误'; break
+        case 502: message = '网关错误'; break
+        case 503: message = '服务不可用'; break
+        case 504: message = '网关超时'; break
+        default: message = `连接错误${error.response.status}`
+      }
+    } else if (error.code === 'ECONNABORTED') {
+      message = '请求超时，请稍后重试'
+    }
+    Message.error(message)
+    return Promise.reject(error)
+  }
+)
+
+export default service</code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📡 2.3 API接口封装</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">将API接口统一管理，按模块分类，便于维护和复用。</p>
+            
+            <div class="code-block">
+                <code>
+// api/user.js
+import request from '@/utils/request'
+
+// 查询用户列表（分页+条件筛选）
+export function getUserList(params) {
+  return request({
+    url: '/api/users',
+    method: 'get',
+    params
+  })
+}
+
+// 新增用户
+export function createUser(data) {
+  return request({
+    url: '/api/users',
+    method: 'post',
+    data
+  })
+}
+
+// 更新用户
+export function updateUser(id, data) {
+  return request({
+    url: `/api/users/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+// 删除用户
+export function deleteUser(id) {
+  return request({
+    url: `/api/users/${id}`,
+    method: 'delete'
+  })
+}
+
+// 批量删除用户
+export function batchDeleteUsers(ids) {
+  return request({
+    url: '/api/users/batch',
+    method: 'delete',
+    data: { ids }
+  })
+}
+
+// 获取用户详情
+export function getUserDetail(id) {
+  return request({
+    url: `/api/users/${id}`,
+    method: 'get'
+  })
+}
+
+// 更新用户状态（启用/禁用）
+export function updateUserStatus(id, status) {
+  return request({
+    url: `/api/users/${id}/status`,
+    method: 'patch',
+    data: { status }
+  })
+}
+
+// 重置用户密码
+export function resetUserPassword(id) {
+  return request({
+    url: `/api/users/${id}/reset-password`,
+    method: 'post'
+  })
+}
+
+// 导入用户（Excel）
+export function importUsers(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request({
+    url: '/api/users/import',
+    method: 'post',
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+// 导出用户列表
+export function exportUsers(params) {
+  return request({
+    url: '/api/users/export',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📄 2.4 完整CRUD页面实现</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">使用Element UI实现一个完整的用户管理页面，包含搜索、表格、分页、表单、对话框等功能。</p>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;div class="user-container"&gt;
+    &lt;!-- 搜索区域 --&gt;
+    &lt;el-card class="search-card"&gt;
+      &lt;el-form :model="queryParams" :inline="true"&gt;
+        &lt;el-form-item label="用户名"&gt;
+          &lt;el-input v-model="queryParams.username" placeholder="请输入用户名" clearable /&gt;
+        &lt;/el-form-item&gt;
+        &lt;el-form-item label="状态"&gt;
+          &lt;el-select v-model="queryParams.status" placeholder="请选择" clearable&gt;
+            &lt;el-option label="启用" :value="1" /&gt;
+            &lt;el-option label="禁用" :value="0" /&gt;
+          &lt;/el-select&gt;
+        &lt;/el-form-item&gt;
+        &lt;el-form-item&gt;
+          &lt;el-button type="primary" icon="el-icon-search" @click="handleSearch"&gt;搜索&lt;/el-button&gt;
+          &lt;el-button icon="el-icon-refresh" @click="handleReset"&gt;重置&lt;/el-button&gt;
+        &lt;/el-form-item&gt;
+      &lt;/el-form&gt;
+    &lt;/el-card&gt;
+
+    &lt;!-- 操作按钮 --&gt;
+    &lt;el-card class="table-card"&gt;
+      &lt;div class="toolbar"&gt;
+        &lt;div class="left"&gt;
+          &lt;el-button type="primary" icon="el-icon-plus" @click="handleAdd"&gt;新增&lt;/el-button&gt;
+          &lt;el-button type="danger" icon="el-icon-delete" :disabled="selectedIds.length === 0" @click="handleBatchDelete"&gt;批量删除&lt;/el-button&gt;
+          &lt;el-button icon="el-icon-download" @click="handleExport"&gt;导出&lt;/el-button&gt;
+        &lt;/div&gt;
+        &lt;div class="right"&gt;
+          &lt;el-button icon="el-icon-upload2" @click="handleImport"&gt;导入&lt;/el-button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- 数据表格 --&gt;
+      &lt;el-table 
+        v-loading="loading" 
+        :data="userList" 
+        border 
+        stripe
+        @selection-change="handleSelectionChange"
+        @sort-change="handleSortChange"
+      &gt;
+        &lt;el-table-column type="selection" width="55" /&gt;
+        &lt;el-table-column type="index" label="序号" width="60" /&gt;
+        &lt;el-table-column prop="username" label="用户名" sortable="custom" /&gt;
+        &lt;el-table-column prop="email" label="邮箱" /&gt;
+        &lt;el-table-column prop="phone" label="手机号" /&gt;
+        &lt;el-table-column prop="roleName" label="角色" /&gt;
+        &lt;el-table-column prop="status" label="状态" width="100"&gt;
+          &lt;template slot-scope="{ row }"&gt;
+            &lt;el-switch 
+              v-model="row.status" 
+              :active-value="1" 
+              :inactive-value="0"
+              @change="handleStatusChange(row)"
+            /&gt;
+          &lt;/template&gt;
+        &lt;/el-table-column&gt;
+        &lt;el-table-column prop="createTime" label="创建时间" width="180" sortable="custom" /&gt;
+        &lt;el-table-column label="操作" width="220" fixed="right"&gt;
+          &lt;template slot-scope="{ row }"&gt;
+            &lt;el-button type="text" icon="el-icon-edit" @click="handleEdit(row)"&gt;编辑&lt;/el-button&gt;
+            &lt;el-button type="text" icon="el-icon-key" @click="handleResetPwd(row)"&gt;重置密码&lt;/el-button&gt;
+            &lt;el-button type="text" style="color: #f56c6c" icon="el-icon-delete" @click="handleDelete(row)"&gt;删除&lt;/el-button&gt;
+          &lt;/template&gt;
+        &lt;/el-table-column&gt;
+      &lt;/el-table&gt;
+
+      &lt;!-- 分页 --&gt;
+      &lt;el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handlePageChange"
+        :current-page="queryParams.pageNum"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="queryParams.pageSize"
+        :total="total"
+        layout="total, sizes, prev, pager, next, jumper"
+      /&gt;
+    &lt;/el-card&gt;
+
+    &lt;!-- 新增/编辑对话框 --&gt;
+    &lt;el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="600px" :close-on-click-modal="false"&gt;
+      &lt;el-form ref="userForm" :model="userForm" :rules="rules" label-width="100px"&gt;
+        &lt;el-form-item label="用户名" prop="username"&gt;
+          &lt;el-input v-model="userForm.username" placeholder="请输入用户名" :disabled="isEdit" /&gt;
+        &lt;/el-form-item&gt;
+        &lt;el-form-item label="邮箱" prop="email"&gt;
+          &lt;el-input v-model="userForm.email" placeholder="请输入邮箱" /&gt;
+        &lt;/el-form-item&gt;
+        &lt;el-form-item label="手机号" prop="phone"&gt;
+          &lt;el-input v-model="userForm.phone" placeholder="请输入手机号" /&gt;
+        &lt;/el-form-item&gt;
+        &lt;el-form-item label="角色" prop="roleId"&gt;
+          &lt;el-select v-model="userForm.roleId" placeholder="请选择角色" style="width: 100%"&gt;
+            &lt;el-option 
+              v-for="role in roleList" 
+              :key="role.id" 
+              :label="role.name" 
+              :value="role.id" 
+            /&gt;
+          &lt;/el-select&gt;
+        &lt;/el-form-item&gt;
+        &lt;el-form-item label="状态" prop="status"&gt;
+          &lt;el-radio-group v-model="userForm.status"&gt;
+            &lt;el-radio :label="1"&gt;启用&lt;/el-radio&gt;
+            &lt;el-radio :label="0"&gt;禁用&lt;/el-radio&gt;
+          &lt;/el-radio-group&gt;
+        &lt;/el-form-item&gt;
+        &lt;el-form-item label="备注" prop="remark"&gt;
+          &lt;el-input v-model="userForm.remark" type="textarea" :rows="3" placeholder="请输入备注" /&gt;
+        &lt;/el-form-item&gt;
+      &lt;/el-form&gt;
+      &lt;span slot="footer"&gt;
+        &lt;el-button @click="dialogVisible = false"&gt;取消&lt;/el-button&gt;
+        &lt;el-button type="primary" @click="handleSubmit" :loading="submitLoading"&gt;确定&lt;/el-button&gt;
+      &lt;/span&gt;
+    &lt;/el-dialog&gt;
+
+    &lt;!-- 导入对话框 --&gt;
+    &lt;el-dialog title="导入用户" :visible.sync="importVisible" width="500px"&gt;
+      &lt;el-upload
+        ref="upload"
+        action="/api/users/import"
+        :headers="{ Authorization: `Bearer ${token}` }"
+        :limit="1"
+        accept=".xlsx,.xls"
+        :on-success="handleImportSuccess"
+        :on-error="handleImportError"
+        :before-upload="beforeUpload"
+      &gt;
+        &lt;el-button size="small" type="primary"&gt;选择文件&lt;/el-button&gt;
+        &lt;div slot="tip" class="el-upload__tip"&gt;只能上传xlsx/xls文件&lt;/div&gt;
+      &lt;/el-upload&gt;
+    &lt;/el-dialog&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+import { 
+  getUserList, createUser, updateUser, deleteUser, 
+  batchDeleteUsers, updateUserStatus, resetUserPassword,
+  importUsers, exportUsers 
+} from '@/api/user'
+import { getRoleList } from '@/api/role'
+
+export default {
+  name: 'UserManagement',
+  data() {
+    // 自定义验证器
+    const validatePhone = (rule, value, callback) => {
+      if (!value) {
+        callback()
+      } else if (!/^1[3-9]\d{9}$/.test(value)) {
+        callback(new Error('手机号格式不正确'))
+      } else {
+        callback()
+      }
+    }
+    const validateUsername = (rule, value, callback) => {
+      if (!/^[a-zA-Z0-9_]{4,16}$/.test(value)) {
+        callback(new Error('用户名必须是4-16位字母数字下划线'))
+      } else {
+        callback()
+      }
+    }
+
+    return {
+      loading: false,
+      submitLoading: false,
+      userList: [],
+      total: 0,
+      selectedIds: [],
+      dialogVisible: false,
+      importVisible: false,
+      isEdit: false,
+      roleList: [],
+      token: localStorage.getItem('token'),
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        username: '',
+        status: undefined,
+        sortBy: '',
+        sortOrder: ''
+      },
+      userForm: {
+        id: undefined,
+        username: '',
+        email: '',
+        phone: '',
+        roleId: '',
+        status: 1,
+        remark: ''
+      },
+      rules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { validator: validateUsername, trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
+        ],
+        phone: [
+          { validator: validatePhone, trigger: 'blur' }
+        ],
+        roleId: [
+          { required: true, message: '请选择角色', trigger: 'change' }
+        ]
+      }
+    }
+  },
+  computed: {
+    dialogTitle() {
+      return this.isEdit ? '编辑用户' : '新增用户'
+    }
+  },
+  created() {
+    this.fetchData()
+    this.fetchRoles()
+  },
+  methods: {
+    // 查询数据
+    async fetchData() {
+      this.loading = true
+      try {
+        const res = await getUserList(this.queryParams)
+        this.userList = res.data.list
+        this.total = res.data.total
+      } finally {
+        this.loading = false
+      }
+    },
+    // 获取角色列表
+    async fetchRoles() {
+      const res = await getRoleList()
+      this.roleList = res.data
+    },
+    // 选择变化
+    handleSelectionChange(selection) {
+      this.selectedIds = selection.map(item => item.id)
+    },
+    // 排序变化
+    handleSortChange({ prop, order }) {
+      this.queryParams.sortBy = prop
+      this.queryParams.sortOrder = order === 'ascending' ? 'asc' : order === 'descending' ? 'desc' : ''
+      this.fetchData()
+    },
+    // 搜索
+    handleSearch() {
+      this.queryParams.pageNum = 1
+      this.fetchData()
+    },
+    // 重置
+    handleReset() {
+      this.queryParams = { pageNum: 1, pageSize: 10, username: '', status: undefined, sortBy: '', sortOrder: '' }
+      this.fetchData()
+    },
+    // 分页大小变化
+    handleSizeChange(size) {
+      this.queryParams.pageSize = size
+      this.queryParams.pageNum = 1
+      this.fetchData()
+    },
+    // 分页
+    handlePageChange(page) {
+      this.queryParams.pageNum = page
+      this.fetchData()
+    },
+    // 新增
+    handleAdd() {
+      this.isEdit = false
+      this.userForm = { id: undefined, username: '', email: '', phone: '', roleId: '', status: 1, remark: '' }
+      this.dialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.userForm.clearValidate()
+      })
+    },
+    // 编辑
+    handleEdit(row) {
+      this.isEdit = true
+      this.userForm = { ...row }
+      this.dialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.userForm.clearValidate()
+      })
+    },
+    // 提交表单
+    handleSubmit() {
+      this.$refs.userForm.validate(async (valid) => {
+        if (!valid) return
+        this.submitLoading = true
+        try {
+          if (this.isEdit) {
+            await updateUser(this.userForm.id, this.userForm)
+            this.$message.success('更新成功')
+          } else {
+            await createUser(this.userForm)
+            this.$message.success('新增成功')
+          }
+          this.dialogVisible = false
+          this.fetchData()
+        } finally {
+          this.submitLoading = false
+        }
+      })
+    },
+    // 删除
+    handleDelete(row) {
+      this.$confirm(`确认删除用户"${row.username}"吗？`, '提示', {
+        type: 'warning'
+      }).then(async () => {
+        await deleteUser(row.id)
+        this.$message.success('删除成功')
+        this.fetchData()
+      }).catch(() => {})
+    },
+    // 批量删除
+    handleBatchDelete() {
+      this.$confirm(`确认删除选中的 ${this.selectedIds.length} 个用户吗？`, '提示', {
+        type: 'warning'
+      }).then(async () => {
+        await batchDeleteUsers(this.selectedIds)
+        this.$message.success('批量删除成功')
+        this.fetchData()
+      }).catch(() => {})
+    },
+    // 状态切换
+    async handleStatusChange(row) {
+      try {
+        await updateUserStatus(row.id, row.status)
+        this.$message.success('状态更新成功')
+      } catch {
+        row.status = row.status === 1 ? 0 : 1
+      }
+    },
+    // 重置密码
+    handleResetPwd(row) {
+      this.$confirm(`确认重置用户"${row.username}"的密码吗？`, '提示', {
+        type: 'warning'
+      }).then(async () => {
+        await resetUserPassword(row.id)
+        this.$message.success('密码重置成功，默认密码为：123456')
+      }).catch(() => {})
+    },
+    // 导出
+    async handleExport() {
+      const res = await exportUsers(this.queryParams)
+      const blob = new Blob([res.data])
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `用户列表_${new Date().getTime()}.xlsx`
+      link.click()
+      URL.revokeObjectURL(link.href)
+    },
+    // 导入
+    handleImport() {
+      this.importVisible = true
+    },
+    beforeUpload(file) {
+      const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+                      file.type === 'application/vnd.ms-excel'
+      if (!isExcel) {
+        this.$message.error('只能上传 Excel 文件!')
+      }
+      return isExcel
+    },
+    handleImportSuccess(response) {
+      this.$message.success('导入成功')
+      this.importVisible = false
+      this.fetchData()
+    },
+    handleImportError() {
+      this.$message.error('导入失败，请检查文件格式')
+    }
+  }
+}
+&lt;/script&gt;
+
+&lt;style scoped&gt;
+.user-container { padding: 20px; }
+.search-card { margin-bottom: 20px; }
+.table-card { padding: 20px; }
+.toolbar { display: flex; justify-content: space-between; margin-bottom: 20px; }
+.el-pagination { margin-top: 20px; text-align: right; }
+&lt;/style&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🎯 2.5 Vue2 CRUD核心知识点</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>知识点</th>
+                        <th>说明</th>
+                        <th>使用场景</th>
+                    </tr>
+                    <tr>
+                        <td>data() 函数</td>
+                        <td>返回组件的响应式数据</td>
+                        <td>定义表单数据、列表数据、loading状态等</td>
+                    </tr>
+                    <tr>
+                        <td>methods</td>
+                        <td>定义组件方法</td>
+                        <td>CRUD操作函数、事件处理函数</td>
+                    </tr>
+                    <tr>
+                        <td>computed</td>
+                        <td>计算属性，缓存依赖结果</td>
+                        <td>对话框标题动态切换</td>
+                    </tr>
+                    <tr>
+                        <td>created 生命周期</td>
+                        <td>组件创建时调用</td>
+                        <td>初始化加载数据</td>
+                    </tr>
+                    <tr>
+                        <td>slot-scope</td>
+                        <td>作用域插槽，获取行数据</td>
+                        <td>表格列自定义渲染、操作按钮</td>
+                    </tr>
+                    <tr>
+                        <td>$refs</td>
+                        <td>访问子组件或DOM元素</td>
+                        <td>表单验证、重置表单</td>
+                    </tr>
+                    <tr>
+                        <td>async/await</td>
+                        <td>异步操作同步化</td>
+                        <td>API请求处理、简化Promise链</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📊 2.6 Element UI表格高级用法</h3>
+            
+            <h4>表格多选与全选</h4>
+            <div class="code-block">
+                <code>
+&lt;!-- 多选列 --&gt;
+&lt;el-table :data="tableData" @selection-change="handleSelectionChange"&gt;
+  &lt;el-table-column type="selection" width="55" /&gt;
+  &lt;el-table-column prop="name" label="名称" /&gt;
+&lt;/el-table&gt;
+
+&lt;script&gt;
+export default {
+  methods: {
+    handleSelectionChange(selection) {
+      // selection 是所有选中行的数组
+      this.selectedIds = selection.map(row => row.id)
+    },
+    // 手动设置某行选中
+    toggleRowSelection(row) {
+      this.$refs.table.toggleRowSelection(row)
+    },
+    // 清空所有选中
+    clearSelection() {
+      this.$refs.table.clearSelection()
+    },
+    // 切换全选
+    toggleAllSelection() {
+      this.$refs.table.toggleAllSelection()
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h4>表格排序与过滤</h4>
+            <div class="code-block">
+                <code>
+&lt;el-table :data="tableData" @sort-change="handleSortChange"&gt;
+  &lt;!-- 前端排序 --&gt;
+  &lt;el-table-column prop="age" label="年龄" sortable /&gt;
+  
+  &lt;!-- 后端排序 --&gt;
+  &lt;el-table-column prop="createTime" label="创建时间" sortable="custom" /&gt;
+  
+  &lt;!-- 列过滤 --&gt;
+  &lt;el-table-column 
+    prop="status" 
+    label="状态" 
+    :filters="[{ text: '启用', value: 1 }, { text: '禁用', value: 0 }]"
+    :filter-method="filterStatus"
+    filter-placement="bottom-end"
+  /&gt;
+&lt;/el-table&gt;
+
+&lt;script&gt;
+export default {
+  methods: {
+    // 后端排序
+    handleSortChange({ prop, order }) {
+      this.queryParams.sortBy = prop
+      this.queryParams.sortOrder = order === 'ascending' ? 'asc' : 'desc'
+      this.fetchData()
+    },
+    // 前端过滤
+    filterStatus(value, row) {
+      return row.status === value
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h4>表格行合并与固定列</h4>
+            <div class="code-block">
+                <code>
+&lt;el-table :data="tableData" :span-method="arraySpanMethod"&gt;
+  &lt;!-- 固定左侧列 --&gt;
+  &lt;el-table-column prop="name" label="名称" fixed /&gt;
+  
+  &lt;!-- 固定右侧操作列 --&gt;
+  &lt;el-table-column label="操作" fixed="right" width="150"&gt;
+    &lt;template slot-scope="{ row }"&gt;
+      &lt;el-button type="text" @click="handleEdit(row)"&gt;编辑&lt;/el-button&gt;
+    &lt;/template&gt;
+  &lt;/el-table-column&gt;
+&lt;/el-table&gt;
+
+&lt;script&gt;
+export default {
+  methods: {
+    // 合并行/列
+    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+      // 合并第一列的相同数据
+      if (columnIndex === 0) {
+        if (rowIndex % 2 === 0) {
+          return [2, 1]  // 合并2行1列
+        } else {
+          return [0, 0]  // 被合并，返回0
+        }
+      }
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h4>表格展开行与树形数据</h4>
+            <div class="code-block">
+                <code>
+&lt;!-- 展开行 --&gt;
+&lt;el-table :data="tableData"&gt;
+  &lt;el-table-column type="expand"&gt;
+    &lt;template slot-scope="{ row }"&gt;
+      &lt;el-descriptions :column="2" border&gt;
+        &lt;el-descriptions-item label="创建者"&gt;{{ row.creator }}&lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item label="更新时间"&gt;{{ row.updateTime }}&lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item label="备注" :span="2"&gt;{{ row.remark }}&lt;/el-descriptions-item&gt;
+      &lt;/el-descriptions&gt;
+    &lt;/template&gt;
+  &lt;/el-table-column&gt;
+  &lt;el-table-column prop="name" label="名称" /&gt;
+&lt;/el-table&gt;
+
+&lt;!-- 树形数据 --&gt;
+&lt;el-table 
+  :data="treeData" 
+  row-key="id" 
+  :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+&gt;
+  &lt;el-table-column prop="name" label="名称" /&gt;
+&lt;/el-table&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📝 2.7 Element UI表单高级用法</h3>
+            
+            <h4>自定义表单验证</h4>
+            <div class="code-block">
+                <code>
+&lt;script&gt;
+export default {
+  data() {
+    // 自定义验证函数
+    const validateUsername = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入用户名'))
+      } else if (!/^[a-zA-Z0-9_]{4,16}$/.test(value)) {
+        callback(new Error('用户名必须是4-16位字母数字下划线'))
+      } else {
+        // 异步校验：检查用户名是否存在
+        checkUsernameExists(value).then(exists => {
+          if (exists) {
+            callback(new Error('用户名已存在'))
+          } else {
+            callback()
+          }
+        })
+      }
+    }
+    
+    const validatePassword = (rule, value, callback) => {
+      if (value.length &lt; 8) {
+        callback(new Error('密码长度不能少于8位'))
+      } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+        callback(new Error('密码必须包含大小写字母和数字'))
+      } else {
+        callback()
+      }
+    }
+
+    const validateConfirmPassword = (rule, value, callback) => {
+      if (value !== this.form.password) {
+        callback(new Error('两次输入密码不一致'))
+      } else {
+        callback()
+      }
+    }
+
+    return {
+      form: { username: '', password: '', confirmPassword: '' },
+      rules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { validator: validateUsername, trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { validator: validatePassword, trigger: 'blur' }
+        ],
+        confirmPassword: [
+          { required: true, message: '请确认密码', trigger: 'blur' },
+          { validator: validateConfirmPassword, trigger: 'blur' }
+        ]
+      }
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h4>动态表单项</h4>
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;el-form :model="form" :rules="rules" ref="form"&gt;
+    &lt;!-- 动态列表：如多个邮箱、多个标签 --&gt;
+    &lt;el-form-item label="邮箱列表"&gt;
+      &lt;div v-for="(email, index) in form.emails" :key="index" style="display: flex; gap: 10px; margin-bottom: 10px"&gt;
+        &lt;el-form-item 
+          :prop="'emails.' + index + '.value'" 
+          :rules="{ required: true, message: '邮箱不能为空', trigger: 'blur' }"
+          style="flex: 1; margin-bottom: 0"
+        &gt;
+          &lt;el-input v-model="email.value" placeholder="请输入邮箱" /&gt;
+        &lt;/el-form-item&gt;
+        &lt;el-button icon="el-icon-delete" circle @click="removeEmail(index)"&gt;&lt;/el-button&gt;
+      &lt;/div&gt;
+      &lt;el-button icon="el-icon-plus" @click="addEmail"&gt;添加邮箱&lt;/el-button&gt;
+    &lt;/el-form-item&gt;
+
+    &lt;!-- 条件显示表单项 --&gt;
+    &lt;el-form-item label="类型"&gt;
+      &lt;el-radio-group v-model="form.type"&gt;
+        &lt;el-radio label="link"&gt;链接&lt;/el-radio&gt;
+        &lt;el-radio label="upload"&gt;上传&lt;/el-radio&gt;
+      &lt;/el-radio-group&gt;
+    &lt;/el-form-item&gt;
+
+    &lt;el-form-item v-if="form.type === 'link'" label="链接地址"&gt;
+      &lt;el-input v-model="form.url" placeholder="请输入链接地址" /&gt;
+    &lt;/el-form-item&gt;
+
+    &lt;el-form-item v-if="form.type === 'upload'" label="上传文件"&gt;
+      &lt;el-upload action="/api/upload"&gt;
+        &lt;el-button size="small" type="primary"&gt;点击上传&lt;/el-button&gt;
+      &lt;/el-upload&gt;
+    &lt;/el-form-item&gt;
+  &lt;/el-form&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  data() {
+    return {
+      form: {
+        emails: [{ value: '' }],
+        type: 'link',
+        url: ''
+      }
+    }
+  },
+  methods: {
+    addEmail() {
+      this.form.emails.push({ value: '' })
+    },
+    removeEmail(index) {
+      if (this.form.emails.length === 1) {
+        this.$message.warning('至少保留一个邮箱')
+        return
+      }
+      this.form.emails.splice(index, 1)
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h4>表单嵌套与分组</h4>
+            <div class="code-block">
+                <code>
+&lt;el-form :model="form" label-width="100px"&gt;
+  &lt;el-tabs type="border-card"&gt;
+    &lt;el-tab-pane label="基本信息"&gt;
+      &lt;el-form-item label="用户名" prop="username"&gt;
+        &lt;el-input v-model="form.username" /&gt;
+      &lt;/el-form-item&gt;
+      &lt;el-form-item label="邮箱" prop="email"&gt;
+        &lt;el-input v-model="form.email" /&gt;
+      &lt;/el-form-item&gt;
+    &lt;/el-tab-pane&gt;
+
+    &lt;el-tab-pane label="详细信息"&gt;
+      &lt;el-form-item label="地址" prop="address"&gt;
+        &lt;el-input v-model="form.address" type="textarea" /&gt;
+      &lt;/el-form-item&gt;
+      &lt;el-form-item label="城市"&gt;
+        &lt;el-cascader 
+          v-model="form.city" 
+          :options="cityOptions"
+          placeholder="请选择省/市/区"
+        /&gt;
+      &lt;/el-form-item&gt;
+    &lt;/el-tab-pane&gt;
+
+    &lt;el-tab-pane label="其他设置"&gt;
+      &lt;el-form-item label="个人签名"&gt;
+        &lt;el-input v-model="form.signature" type="textarea" :rows="4" /&gt;
+      &lt;/el-form-item&gt;
+    &lt;/el-tab-pane&gt;
+  &lt;/el-tabs&gt;
+
+  &lt;el-form-item style="margin-top: 20px"&gt;
+    &lt;el-button type="primary" @click="handleSubmit"&gt;提交&lt;/el-button&gt;
+    &lt;el-button @click="handleReset"&gt;重置&lt;/el-button&gt;
+  &lt;/el-form-item&gt;
+&lt;/el-form&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🌳 2.8 Element UI树形组件</h3>
+            
+            <h4>基础树形控件</h4>
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;!-- 搜索框 --&gt;
+    &lt;el-input v-model="filterText" placeholder="输入关键字过滤" clearable prefix-icon="el-icon-search" style="margin-bottom: 15px" /&gt;
+
+    &lt;el-tree
+      ref="tree"
+      :data="treeData"
+      :props="defaultProps"
+      :filter-node-method="filterNode"
+      show-checkbox
+      node-key="id"
+      default-expand-all
+      :expand-on-click-node="false"
+      @check-change="handleCheckChange"
+      @node-click="handleNodeClick"
+    &gt;
+      &lt;span class="custom-tree-node" slot-scope="{ node, data }"&gt;
+        &lt;span&gt;
+          &lt;i :class="data.icon"&gt;&lt;/i&gt;
+          {{ node.label }}
+        &lt;/span&gt;
+        &lt;span&gt;
+          &lt;el-button type="text" size="mini" @click.stop="handleEdit(data)"&gt;编辑&lt;/el-button&gt;
+          &lt;el-button type="text" size="mini" style="color: #f56c6c" @click.stop="handleDelete(data)"&gt;删除&lt;/el-button&gt;
+        &lt;/span&gt;
+      &lt;/span&gt;
+    &lt;/el-tree&gt;
+
+    &lt;!-- 操作按钮 --&gt;
+    &lt;div style="margin-top: 15px"&gt;
+      &lt;el-button size="small" @click="setCheckedNodes"&gt;设置选中节点&lt;/el-button&gt;
+      &lt;el-button size="small" @click="getCheckedNodes"&gt;获取选中节点&lt;/el-button&gt;
+      &lt;el-button size="small" @click="expandAll"&gt;展开全部&lt;/el-button&gt;
+      &lt;el-button size="small" @click="collapseAll"&gt;收起全部&lt;/el-button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  data() {
+    return {
+      filterText: '',
+      treeData: [
+        {
+          id: 1,
+          label: '系统管理',
+          icon: 'el-icon-setting',
+          children: [
+            { id: 11, label: '用户管理', icon: 'el-icon-user' },
+            { id: 12, label: '角色管理', icon: 'el-icon-s-custom' },
+            { id: 13, label: '菜单管理', icon: 'el-icon-menu' }
+          ]
+        },
+        {
+          id: 2,
+          label: '业务管理',
+          icon: 'el-icon-s-order',
+          children: [
+            { id: 21, label: '订单管理', icon: 'el-icon-s-goods' },
+            { id: 22, label: '商品管理', icon: 'el-icon-s-shop' }
+          ]
+        }
+      ],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      }
+    }
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val)
+    }
+  },
+  methods: {
+    filterNode(value, data) {
+      if (!value) return true
+      return data.label.toLowerCase().indexOf(value.toLowerCase()) !== -1
+    },
+    handleCheckChange(data, checked, indeterminate) {
+      console.log('选中状态变化:', data, checked)
+    },
+    handleNodeClick(data) {
+      console.log('节点点击:', data)
+    },
+    getCheckedNodes() {
+      const nodes = this.$refs.tree.getCheckedNodes()
+      console.log('选中的节点:', nodes)
+    },
+    setCheckedNodes() {
+      this.$refs.tree.setCheckedKeys([11, 12])
+    },
+    expandAll() {
+      const nodes = this.$refs.tree.store._getAllNodes()
+      nodes.forEach(node => { node.expanded = true })
+    },
+    collapseAll() {
+      const nodes = this.$refs.tree.store._getAllNodes()
+      nodes.forEach(node => { node.expanded = false })
+    },
+    handleEdit(data) {
+      this.$message.info(`编辑: ${data.label}`)
+    },
+    handleDelete(data) {
+      this.$confirm(`确认删除"${data.label}"吗？`, '提示', { type: 'warning' })
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📅 2.9 Element UI常用组件速查</h3>
+            
+            <h4>选择器组件</h4>
+            <div class="code-block">
+                <code>
+&lt;!-- 基础选择器 --&gt;
+&lt;el-select v-model="value" placeholder="请选择" clearable filterable&gt;
+  &lt;el-option label="选项1" value="1" /&gt;
+  &lt;el-option label="选项2" value="2" /&gt;
+&lt;/el-select&gt;
+
+&lt;!-- 多选选择器 --&gt;
+&lt;el-select v-model="values" multiple placeholder="请选择" style="width: 100%"&gt;
+  &lt;el-option 
+    v-for="item in options" 
+    :key="item.value" 
+    :label="item.label" 
+    :value="item.value" 
+  /&gt;
+&lt;/el-select&gt;
+
+&lt;!-- 分组选择器 --&gt;
+&lt;el-select v-model="value"&gt;
+  &lt;el-option-group v-for="group in groups" :key="group.label" :label="group.label"&gt;
+    &lt;el-option 
+      v-for="item in group.options" 
+      :key="item.value" 
+      :label="item.label" 
+      :value="item.value" 
+    /&gt;
+  &lt;/el-option-group&gt;
+&lt;/el-select&gt;
+
+&lt;!-- 级联选择器（省市区三级联动）--&gt;
+&lt;el-cascader 
+  v-model="selectedCity" 
+  :options="cityOptions"
+  :props="{ checkStrictly: true }"
+  clearable
+  filterable
+  placeholder="请选择省/市/区"
+/&gt;
+
+&lt;!-- 日期选择器 --&gt;
+&lt;el-date-picker
+  v-model="dateValue"
+  type="date"
+  placeholder="选择日期"
+  format="yyyy-MM-dd"
+  value-format="yyyy-MM-dd"
+  :picker-options="{ disabledDate: time => time.getTime() > Date.now() }"
+/&gt;
+
+&lt;!-- 日期范围选择器 --&gt;
+&lt;el-date-picker
+  v-model="dateRange"
+  type="daterange"
+  range-separator="至"
+  start-placeholder="开始日期"
+  end-placeholder="结束日期"
+  format="yyyy-MM-dd"
+  value-format="yyyy-MM-dd"
+/&gt;
+
+&lt;!-- 时间选择器 --&gt;
+&lt;el-time-picker
+  v-model="timeValue"
+  :picker-options="{ start: '08:00', end: '18:00', step: '00:30' }"
+  placeholder="选择时间"
+/&gt;
+
+&lt;!-- 日期时间范围 --&gt;
+&lt;el-date-picker
+  v-model="dateTimeRange"
+  type="datetimerange"
+  range-separator="至"
+  start-placeholder="开始时间"
+  end-placeholder="结束时间"
+  format="yyyy-MM-dd HH:mm:ss"
+  value-format="yyyy-MM-dd HH:mm:ss"
+/&gt;
+                </code>
+            </div>
+
+            <h4>上传组件</h4>
+            <div class="code-block">
+                <code>
+&lt;!-- 单图片上传 --&gt;
+&lt;el-upload
+  class="avatar-uploader"
+  action="/api/upload/image"
+  :show-file-list="false"
+  :on-success="handleAvatarSuccess"
+  :before-upload="beforeAvatarUpload"
+  :headers="{ Authorization: `Bearer ${token}` }"
+&gt;
+  &lt;img v-if="imageUrl" :src="imageUrl" class="avatar"&gt;
+  &lt;i v-else class="el-icon-plus avatar-uploader-icon"&gt;&lt;/i&gt;
+&lt;/el-upload&gt;
+
+&lt;!-- 多文件上传 --&gt;
+&lt;el-upload
+  class="upload-demo"
+  action="/api/upload/files"
+  :on-preview="handlePreview"
+  :on-remove="handleRemove"
+  :before-remove="beforeRemove"
+  multiple
+  :limit="5"
+  :on-exceed="handleExceed"
+  :file-list="fileList"
+&gt;
+  &lt;el-button size="small" type="primary"&gt;点击上传&lt;/el-button&gt;
+  &lt;div slot="tip" class="el-upload__tip"&gt;最多上传5个文件&lt;/div&gt;
+&lt;/el-upload&gt;
+
+&lt;!-- 手动上传 --&gt;
+&lt;el-upload
+  ref="upload"
+  action="/api/upload"
+  :auto-upload="false"
+  :on-change="handleChange"
+  :file-list="fileList"
+&gt;
+  &lt;el-button slot="trigger" size="small" type="primary"&gt;选取文件&lt;/el-button&gt;
+  &lt;el-button style="margin-left: 10px" size="small" type="success" @click="submitUpload"&gt;上传到服务器&lt;/el-button&gt;
+&lt;/el-upload&gt;
+
+&lt;script&gt;
+export default {
+  methods: {
+    beforeAvatarUpload(file) {
+      const isImage = file.type.startsWith('image/')
+      const isLt2M = file.size / 1024 / 1024 &lt; 2
+      if (!isImage) this.$message.error('只能上传图片文件!')
+      if (!isLt2M) this.$message.error('图片大小不能超过 2MB!')
+      return isImage && isLt2M
+    },
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw)
+    },
+    handleRemove(file, fileList) {
+      console.log('删除文件:', file)
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`最多只能上传5个文件`)
+    },
+    submitUpload() {
+      this.$refs.upload.submit()
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h4>消息提示与通知</h4>
+            <div class="code-block">
+                <code>
+&lt;script&gt;
+export default {
+  methods: {
+    // Message 消息提示（自动消失）
+    showMessage() {
+      this.$message('这是一条普通消息')
+      this.$message.success('成功提示')
+      this.$message.warning('警告提示')
+      this.$message.error('错误提示')
+      this.$message.info('信息提示')
+      
+      // 自定义配置
+      this.$message({
+        message: '自定义配置',
+        type: 'success',
+        duration: 5000,
+        showClose: true,
+        offset: 100
+      })
+    },
+
+    // MessageBox 弹框（需要用户操作）
+    showMessageBox() {
+      // 确认框
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message.success('删除成功!')
+      }).catch(() => {
+        this.$message.info('已取消删除')
+      })
+
+      // 输入框
+      this.$prompt('请输入邮箱', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+        inputErrorMessage: '邮箱格式不正确'
+      }).then(({ value }) => {
+        this.$message.success(`你的邮箱是: ${value}`)
+      }).catch(() => {})
+    },
+
+    // Notification 通知（右上角弹出，停留时间更长）
+    showNotification() {
+      this.$notify({
+        title: '提示',
+        message: '这是一条通知消息',
+        type: 'success',
+        duration: 4500,
+        position: 'top-right',
+        offset: 100
+      })
+
+      // HTML内容通知
+      this.$notify({
+        title: '系统通知',
+        dangerouslyUseHTMLString: true,
+        message: '&lt;strong&gt;系统将于今晚22:00维护&lt;/strong&gt;',
+        duration: 0  // 不自动关闭
+      })
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h4>图表集成（ECharts）</h4>
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;el-card&gt;
+    &lt;div ref="chart" style="width: 100%; height: 400px"&gt;&lt;/div&gt;
+  &lt;/el-card&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+import * as echarts from 'echarts'
+
+export default {
+  data() {
+    return { chart: null }
+  },
+  mounted() {
+    this.initChart()
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize)
+    if (this.chart) {
+      this.chart.dispose()
+    }
+  },
+  methods: {
+    initChart() {
+      this.chart = echarts.init(this.$refs.chart)
+      const option = {
+        title: { text: '用户增长趋势' },
+        tooltip: { trigger: 'axis' },
+        legend: { data: ['新增用户', '活跃用户'] },
+        xAxis: { type: 'category', data: ['1月', '2月', '3月', '4月', '5月', '6月'] },
+        yAxis: { type: 'value' },
+        series: [
+          { name: '新增用户', type: 'line', data: [120, 200, 150, 80, 70, 110], smooth: true },
+          { name: '活跃用户', type: 'bar', data: [100, 150, 120, 60, 50, 90] }
+        ]
+      }
+      this.chart.setOption(option)
+    },
+    handleResize() {
+      this.chart?.resize()
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🎨 2.10 Element UI常用组件速查表</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>组件</th>
+                        <th>用途</th>
+                        <th>关键属性</th>
+                    </tr>
+                    <tr>
+                        <td>el-table</td>
+                        <td>数据表格展示</td>
+                        <td>:data, border, stripe, v-loading, @selection-change</td>
+                    </tr>
+                    <tr>
+                        <td>el-form</td>
+                        <td>表单容器</td>
+                        <td>:model, :rules, label-width, :inline</td>
+                    </tr>
+                    <tr>
+                        <td>el-dialog</td>
+                        <td>对话框</td>
+                        <td>:visible.sync, :title, width, :close-on-click-modal</td>
+                    </tr>
+                    <tr>
+                        <td>el-pagination</td>
+                        <td>分页组件</td>
+                        <td>:total, :current-page, :page-sizes, layout</td>
+                    </tr>
+                    <tr>
+                        <td>el-tree</td>
+                        <td>树形控件</td>
+                        <td>:data, :props, show-checkbox, node-key, default-expand-all</td>
+                    </tr>
+                    <tr>
+                        <td>el-select</td>
+                        <td>下拉选择器</td>
+                        <td>filterable, clearable, multiple</td>
+                    </tr>
+                    <tr>
+                        <td>el-cascader</td>
+                        <td>级联选择器</td>
+                        <td>:options, :props, filterable, clearable</td>
+                    </tr>
+                    <tr>
+                        <td>el-date-picker</td>
+                        <td>日期选择器</td>
+                        <td>type, format, value-format, :picker-options</td>
+                    </tr>
+                    <tr>
+                        <td>el-upload</td>
+                        <td>文件上传</td>
+                        <td>action, :limit, :before-upload, :on-success</td>
+                    </tr>
+                    <tr>
+                        <td>el-switch</td>
+                        <td>开关组件</td>
+                        <td>:active-value, :inactive-value, @change</td>
+                    </tr>
+                    <tr>
+                        <td>el-tabs</td>
+                        <td>标签页</td>
+                        <td>type, v-model(activeName)</td>
+                    </tr>
+                    <tr>
+                        <td>el-steps</td>
+                        <td>步骤条</td>
+                        <td>:active, finish-status, simple</td>
+                    </tr>
+                    <tr>
+                        <td>el-drawer</td>
+                        <td>抽屉面板</td>
+                        <td>:visible.sync, :title, direction, size</td>
+                    </tr>
+                    <tr>
+                        <td>el-descriptions</td>
+                        <td>描述列表</td>
+                        <td>:column, border, :column, size</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h4>💡 Vue2开发技巧</h4>
+            <p>1. <strong>深拷贝表单数据</strong>：编辑时使用 {...row} 避免直接修改表格数据<br/>
+            2. <strong>统一loading状态</strong>：表格loading和按钮loading分开管理<br/>
+            3. <strong>搜索后重置页码</strong>：搜索时 pageNum=1，避免页码超出范围<br/>
+            4. <strong>删除确认</strong>：使用 $confirm 二次确认，防止误操作<br/>
+            5. <strong>错误处理</strong>：使用 try...finally 确保loading状态正确重置<br/>
+            6. <strong>动态表单</strong>：使用 v-for 渲染表单项，注意动态 prop 的写法 'items.' + index + '.field'<br/>
+            7. $nextTick使用</strong>：在数据变化后需要操作DOM时使用，如对话框打开后清除验证</p>
+        </div>
+        
+        <div class="card">
+            <h3>🔄 2.11 Keep-alive 页面缓存</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">列表页进入详情再返回时，避免重新加载数据和重置搜索条件。</p>
+            <div class="code-block">
+                <code>&lt;!-- App.vue --&gt;
+&lt;template&gt;
+  &lt;div id="app"&gt;
+    &lt;!-- 只有被 include 的组件名会被缓存 --&gt;
+    &lt;keep-alive :include="cachedViews"&gt;
+      &lt;router-view /&gt;
+    &lt;/keep-alive&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  data() {
+    return { cachedViews: [] }
+  },
+  methods: {
+    addCache(name) {
+      if (!this.cachedViews.includes(name)) {
+        this.cachedViews.push(name)
+      }
+    },
+    removeCache(name) {
+      const idx = this.cachedViews.indexOf(name)
+      if (idx > -1) this.cachedViews.splice(idx, 1)
+    }
+  }
+}
+&lt;/script&gt;
+
+&lt;!-- router/index.js --&gt;
+{
+  path: '/user',
+  name: 'UserList',
+  component: () => import('@/views/user/list.vue'),
+  meta: { keepAlive: true, title: '用户列表' }
+}
+
+&lt;!-- 导航守卫中根据meta设置缓存 --&gt;
+router.beforeEach((to, from, next) => {
+  if (to.meta.keepAlive) {
+    store.dispatch('addCachedView', to.name)
+  }
+  next()
+})
+
+&lt;!-- 缓存的页面可以监听 activated/deactivated --&gt;
+export default {
+  activated() { /* 从缓存激活时触发 */ },
+  deactivated() { /* 被缓存时触发，可清理定时器等 */ }
+}
+
+&lt;!-- 注意：缓存后 created/mounted 只执行一次 --&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔐 2.12 动态路由与权限控制</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">根据用户角色动态生成路由，实现页面级别的权限控制。</p>
+            <div class="code-block">
+                <code>&lt;!-- router/index.js --&gt;
+// 公共路由（所有用户可见）
+export const constantRoutes = [
+  { path: '/login', component: () => import('@/views/login') },
+  { path: '/404', component: () => import('@/views/404') }
+]
+
+// 动态路由（根据权限加载）
+export const asyncRoutes = [
+  {
+    path: '/user',
+    component: Layout,
+    meta: { title: '用户管理', icon: 'user', roles: ['admin', 'user'] },
+    children: [
+      { path: 'list', component: () => import('@/views/user/list'), meta: { title: '用户列表' } }
+    ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    meta: { title: '系统管理', icon: 'setting', roles: ['admin'] },
+    children: [
+      { path: 'role', component: () => import('@/views/system/role'), meta: { title: '角色管理' } }
+    ]
+  }
+]
+
+// 递归过滤有权限的路由
+function filterAsyncRoutes(routes, roles) {
+  return routes.filter(route => {
+    if (route.meta?.roles) {
+      if (!route.meta.roles.some(r => roles.includes(r))) return false
+    }
+    if (route.children) {
+      route.children = filterAsyncRoutes(route.children, roles)
+    }
+    return true
+  })
+}
+
+// store 中动态添加路由
+// router.addRoutes(filteredRoutes)
+
+&lt;!-- 侧边栏菜单 --&gt;
+&lt;el-menu&gt;
+  &lt;template v-for="route in permissionRoutes"&gt;
+    &lt;el-menu-item v-if="!route.children" :key="route.path" :index="route.path"&gt;
+      &lt;i :class="route.meta.icon"&gt;&lt;/i&gt;
+      &lt;span&gt;{{ route.meta.title }}&lt;/span&gt;
+    &lt;/el-menu-item&gt;
+  &lt;/template&gt;
+&lt;/el-menu&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📑 2.13 标签页（Tags View）管理</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">中后台系统常用多标签页，方便用户在已打开的页面间快速切换。</p>
+            <div class="code-block">
+                <code>&lt;!-- views/layout/TagsView.vue --&gt;
+&lt;template&gt;
+  &lt;div class="tags-view"&gt;
+    &lt;div 
+      v-for="tag in visitedViews" 
+      :key="tag.path"
+      :class="{ active: isActive(tag) }"
+      class="tag-item"
+      @click="goTo(tag)"
+    &gt;
+      &lt;span&gt;{{ tag.title }}&lt;/span&gt;
+      &lt;i v-if="!isAffix(tag)" class="el-icon-close" @click.stop="closeTag(tag)"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+    &lt;el-dropdown @command="handleCommand"&gt;
+      &lt;i class="el-icon-arrow-down tag-action"&gt;&lt;/i&gt;
+      &lt;el-dropdown-menu slot="dropdown"&gt;
+        &lt;el-dropdown-item command="closeOthers"&gt;关闭其他&lt;/el-dropdown-item&gt;
+        &lt;el-dropdown-item command="closeAll"&gt;关闭所有&lt;/el-dropdown-item&gt;
+      &lt;/el-dropdown-menu&gt;
+    &lt;/el-dropdown&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  computed: {
+    visitedViews() { return this.$store.state.tagsView.visitedViews }
+  },
+  watch: {
+    '$route'() { this.addTags() }
+  },
+  methods: {
+    addTags() {
+      const { name, meta, path } = this.$route
+      if (name) {
+        this.$store.dispatch('addVisitedView', { name, title: meta.title, path })
+      }
+    },
+    isActive(tag) { return tag.path === this.$route.path },
+    goTo(tag) { this.$router.push(tag.path) },
+    closeTag(tag) { this.$store.dispatch('delVisitedView', tag).then(views => {
+      if (this.isActive(tag)) {
+        const lastView = views.slice(-1)[0]
+        if (lastView) this.$router.push(lastView.path)
+      }
+    })},
+    isAffix(tag) { return tag.meta?.affix },
+    handleCommand(command) {
+      if (command === 'closeOthers') this.$store.dispatch('delOthersViews', this.$route)
+      if (command === 'closeAll') this.$store.dispatch('delAllViews')
+    }
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🖨️ 2.14 打印与PDF导出</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">将页面内容导出为PDF，常用于报表打印、单据打印等场景。</p>
+            <div class="code-block">
+                <code>// 方案1：window.print() 原生打印
+&lt;template&gt;
+  &lt;el-button @click="printPage"&gt;打印&lt;/el-button&gt;
+  &lt;div id="print-area"&gt;
+    &lt;!-- 要打印的内容 --&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+export default {
+  methods: {
+    printPage() {
+      window.print()  // 调用浏览器打印
+    }
+  }
+}
+
+// 方案2：html2canvas + jsPDF 导出PDF
+npm install html2canvas jspdf
+
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
+
+export default {
+  methods: {
+    async exportPDF() {
+      const el = this.$refs.printArea
+      const canvas = await html2canvas(el, {
+        scale: 2,           // 2倍清晰度
+        useCORS: true,      // 允许跨域图片
+        backgroundColor: '#ffffff'
+      })
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.9)
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const imgWidth = 210   // A4宽度(mm)
+      const imgHeight = canvas.height * imgWidth / canvas.width
+      
+      let heightLeft = imgHeight
+      let position = 0
+      
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight)
+      heightLeft -= 297  // A4高度(mm)
+      
+      // 多页PDF
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight)
+        heightLeft -= 297
+      }
+      
+      pdf.save('用户列表.pdf')
+    }
+  }
+}
+
+// 方案3：服务端生成PDF + 前端下载
+export function downloadPDF(params) {
+  return request({
+    url: '/api/report/pdf',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+                </code>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ 常见错误</h4>
+            <p>1. <strong>忘记重置表单</strong>：关闭对话框后表单数据未清空，使用 this.$refs.form.resetFields()<br/>
+            2. <strong>响应式失效</strong>：直接通过索引修改数组或添加对象属性，应使用 this.$set<br/>
+            3. <strong>内存泄漏</strong>：组件销毁时未取消未完成的请求，在 beforeDestroy 中处理<br/>
+            4. <strong>表单验证失效</strong>：rules的prop与v-model绑定的字段不一致<br/>
+            5. <strong>表格数据不更新</strong>：直接修改数组引用，应使用新数组替换</p>
+        </div>
+
+        <div class="self-check">
+            <h3>🧠 费曼自测：你能解释给同学听吗？</h3>
+            <div class="q"><strong>Q1：一个CRUD页面由哪四层组成？</strong><p>A：API层（接口定义）→ Axios请求层（数据传输）→ 组件层（表格/表单/对话框）→ 事件处理层（按钮操作）。每一层各司其职，就像快递包裹从仓库（数据库）经过分拣中心（API）、快递员（Axios）、最终送到你家（页面）。</p></div>
+            <div class="q"><strong>Q2：为什么搜索后要把页码设为1？</strong><p>A：想象你在看一本书——当你换了搜索词，书的厚度变了，页码还是原来的那页可能已经不存在了。同理，新搜索条件可能导致总页数减少，保留旧页码可能返回空数据。</p></div>
+            <div class="q"><strong>Q3：table和form的核心绑定模式分别是什么？</strong><p>A：table = :data + slot-scope(获取行数据) + @事件(响应用户操作)。form = :model(数据绑定) + :rules(规则) + @validate(提交验证)。记住：表格看数据，表单收发数据。</p></div>
+        </div>
+
+        <div class="mnemonic">
+            <h4>🧠 记忆口诀：页面制造四步曲</h4>
+            <div class="chant">搜 → 列 → 弹 → 存</div>
+            <p>搜索（Search Form）→ 列表（Data Table）→ 弹窗（Dialog Form）→ 存储（API调用）<br>任何CRUD页面都逃不出这四个步骤的排列组合。</p>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+        });
+    </script>
+    <script>
+        function convertCodeBlocks(lang) {
+            document.querySelectorAll('.code-block').forEach(block => {
+                const oldCode = block.querySelector('code');
+                if (!oldCode || oldCode.parentElement.tagName === 'PRE') return;
+                let html = oldCode.innerHTML;
+                let text = html.replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/gi, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.className = `language-${lang}`;
+                code.textContent = text;
+                pre.appendChild(code);
+                block.appendChild(pre);
+                oldCode.remove();
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            convertCodeBlocks('javascript');
+            if (window.Prism) Prism.highlightAll();
+        });
+    </script>
+</body>
+</html>

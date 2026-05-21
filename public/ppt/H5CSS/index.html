@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML & CSS 完全指南 — 费曼学习法</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --html-orange: #f97316;
+            --css-blue: #38bdf8;
+            --primary: #f97316;
+            --secondary: #e879f9;
+            --accent: #38bdf8;
+            --bg-dark: #0c0f1a;
+            --bg-card: #161925;
+            --text-light: #f1f5f9;
+            --text-gray: #94a3b8;
+            --border: #2d3148;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --info: #38bdf8;
+            --warning: #f59e0b;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); }
+        .app-container { display: flex; height: 100vh; overflow: hidden; }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #0c0f1a 0%, #1a1025 100%);
+            border-right: 1px solid var(--border);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .sidebar-header h1 {
+            font-size: 22px;
+            background: linear-gradient(135deg, #f97316 0%, #e879f9 60%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .sidebar-header p { color: var(--text-gray); font-size: 12px; line-height: 1.5; }
+
+        .nav-section { margin-bottom: 15px; }
+        .nav-section-title {
+            padding: 10px 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-gray);
+            font-weight: 700;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            gap: 12px;
+        }
+        .nav-item:hover { background: rgba(249, 115, 22, 0.08); border-left-color: var(--html-orange); }
+        .nav-item.active { background: rgba(249, 115, 22, 0.12); border-left-color: var(--html-orange); }
+        .nav-item-icon { width: 24px; text-align: center; font-size: 16px; flex-shrink: 0; }
+        .nav-item-text { font-size: 14px; font-weight: 500; }
+        .nav-item-badge {
+            background: var(--success);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .main-content { margin-left: 280px; flex: 1; height: 100vh; display: flex; flex-direction: column; }
+
+        .toc-bar {
+            position: sticky;
+            top: 0;
+            background: rgba(12, 15, 26, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border);
+            z-index: 50;
+            flex-shrink: 0;
+        }
+        .toc-bar h3 { font-size: 13px; color: var(--text-gray); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .toc-bar h3 .current-chapter { color: var(--html-orange); }
+        .toc-links { display: flex; gap: 8px; flex-wrap: wrap; }
+        .toc-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            background: rgba(56, 189, 248, 0.08);
+        }
+        .toc-link:hover { background: rgba(56, 189, 248, 0.18); }
+
+        .content-frame {
+            width: 100%;
+            flex: 1;
+            border: none;
+        }
+
+        @media (max-width: 1024px) { .sidebar { width: 240px; } .main-content { margin-left: 240px; } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>HTML & CSS</h1>
+                <p>费曼学习法 · 从"为什么"到"怎么做"<br>重点攻克布局难题</p>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">🌱 基础入门</div>
+                <div class="nav-item active" onclick="loadChapter('chapter1-html-basics')">
+                    <span class="nav-item-icon">🏗️</span>
+                    <span class="nav-item-text">HTML基础：骨架</span>
+                </div>
+                <div class="nav-item" onclick="loadChapter('chapter2-css-basics')">
+                    <span class="nav-item-icon">🎨</span>
+                    <span class="nav-item-text">CSS基础：皮肤</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">📐 布局核心（重点）</div>
+                <div class="nav-item" onclick="loadChapter('chapter3-layout-core')">
+                    <span class="nav-item-icon">📏</span>
+                    <span class="nav-item-text">布局核心：文档流</span>
+                    <span class="nav-item-badge">核心</span>
+                </div>
+                <div class="nav-item" onclick="loadChapter('chapter4-flexbox')">
+                    <span class="nav-item-icon">🔲</span>
+                    <span class="nav-item-text">Flexbox弹性布局</span>
+                    <span class="nav-item-badge">重点</span>
+                </div>
+                <div class="nav-item" onclick="loadChapter('chapter5-grid')">
+                    <span class="nav-item-icon">📊</span>
+                    <span class="nav-item-text">Grid网格布局</span>
+                    <span class="nav-item-badge">重点</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">🚀 实战进阶</div>
+                <div class="nav-item" onclick="loadChapter('chapter6-responsive')">
+                    <span class="nav-item-icon">📱</span>
+                    <span class="nav-item-text">响应式 & 实战</span>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="toc-bar">
+                <h3>📑 当前章节：<span class="current-chapter" id="current-chapter-name">HTML基础：骨架</span></h3>
+                <div class="toc-links" id="toc-links">
+                    <a href="javascript:void(0)" class="toc-link" onclick="loadChapter('chapter1-html-basics')">HTML基础</a>
+                </div>
+            </div>
+            <iframe class="content-frame" id="content-frame" src="chapter1-html-basics.html"></iframe>
+        </main>
+    </div>
+
+    <script>
+        const chapterMap = {
+            'chapter1-html-basics': 'chapter1-html-basics.html',
+            'chapter2-css-basics': 'chapter2-css-basics.html',
+            'chapter3-layout-core': 'chapter3-layout-core.html',
+            'chapter4-flexbox': 'chapter4-flexbox.html',
+            'chapter5-grid': 'chapter5-grid.html',
+            'chapter6-responsive': 'chapter6-responsive.html'
+        };
+
+        const chapterNames = {
+            'chapter1-html-basics': 'HTML基础：骨架',
+            'chapter2-css-basics': 'CSS基础：皮肤',
+            'chapter3-layout-core': '布局核心：文档流',
+            'chapter4-flexbox': 'Flexbox弹性布局',
+            'chapter5-grid': 'Grid网格布局',
+            'chapter6-responsive': '响应式 & 实战'
+        };
+
+        function loadChapter(chapterId) {
+            var frame = document.getElementById('content-frame');
+            frame.src = chapterMap[chapterId];
+
+            var items = document.querySelectorAll('.nav-item');
+            items.forEach(function(item) { item.classList.remove('active'); });
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+
+            document.getElementById('current-chapter-name').textContent = chapterNames[chapterId];
+
+            var tocLinks = document.getElementById('toc-links');
+            tocLinks.innerHTML = '<a href="javascript:void(0)" class="toc-link" onclick="loadChapter(\'' + chapterId + '\')">' + chapterNames[chapterId] + '</a>';
+        }
+    </script>
+</body>
+</html>

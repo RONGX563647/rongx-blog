@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第一章：HTML基础 — 网页的骨架 | 费曼学习法</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #f97316; --secondary: #e879f9; --accent: #38bdf8;
+            --bg-dark: #0c0f1a; --bg-card: #161925; --text-light: #f1f5f9;
+            --text-gray: #94a3b8; --border: #2d3148; --success: #22c55e;
+            --danger: #ef4444; --info: #38bdf8; --warning: #f59e0b;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.8; }
+        .chapter { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .chapter-title { font-size: 34px; margin-bottom: 20px; background: linear-gradient(135deg, #f97316 0%, #e879f9 70%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .chapter-desc { color: var(--text-gray); font-size: 16px; margin-bottom: 40px; line-height: 1.8; padding: 20px 25px; background: var(--bg-card); border-radius: 10px; border-left: 4px solid var(--primary); }
+        .chapter-desc strong { color: var(--primary); }
+        .card { background: var(--bg-card); border-radius: 15px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .card h3 { font-size: 22px; margin-bottom: 20px; color: var(--info); display: flex; align-items: center; gap: 10px; }
+        .card h4 { font-size: 18px; margin: 20px 0 15px; color: var(--primary); }
+        .card p { color: var(--text-gray); margin-bottom: 12px; }
+        .card ul, .card ol { list-style: none; padding-left: 0; }
+        .card ul li, .card ol li { padding: 10px 0 10px 25px; position: relative; color: var(--text-gray); line-height: 1.7; }
+        .card ul li::before { content: '→'; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+        .card ol { counter-reset: item; }
+        .card ol li { padding-left: 30px; }
+        .card ol li::before { content: counter(item) "."; counter-increment: item; position: absolute; left: 0; color: var(--secondary); font-weight: bold; }
+
+        .code-block { background: #0d1117; padding: 20px; border-radius: 10px; margin: 20px 0; overflow-x: auto; border: 1px solid var(--border); }
+        .code-block pre { margin: 0; }
+        .code-block code { font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; font-size: 13px; color: #e6edf3; line-height: 1.7; white-space: pre; }
+        .code-block .tag { color: #ff7b72; }
+        .code-block .attr { color: #79c0ff; }
+        .code-block .val { color: #a5d6ff; }
+        .code-block .comment { color: #8b949e; font-style: italic; }
+
+        .analogy-box { background: linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, rgba(232, 121, 249, 0.08) 100%); border: 2px dashed var(--secondary); padding: 25px; border-radius: 12px; margin: 25px 0; }
+        .analogy-box h4 { color: var(--secondary); margin-bottom: 12px; font-size: 18px; }
+        .analogy-box p { color: var(--text-gray); line-height: 1.8; font-style: italic; }
+        .analogy-box strong { color: var(--primary); font-style: normal; }
+
+        .highlight-box { background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 211, 238, 0.08) 100%); border-left: 4px solid var(--success); padding: 25px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .highlight-box h4 { margin-bottom: 12px; color: var(--success); font-size: 18px; }
+        .highlight-box p { color: var(--text-gray); line-height: 1.8; }
+
+        .info-box { background: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%); border-left: 4px solid var(--info); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .info-box h4 { margin-bottom: 10px; color: var(--info); }
+        .info-box p { color: var(--text-gray); }
+
+        .warning-box { background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%); border-left: 4px solid var(--danger); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .warning-box h4 { margin-bottom: 10px; color: var(--danger); }
+        .warning-box p { color: var(--text-gray); }
+
+        .mnemonic { background: linear-gradient(135deg, #1a1025 0%, #2d1b3d 100%); border-radius: 12px; padding: 20px 25px; margin: 20px 0; text-align: center; border: 1px solid rgba(232, 121, 249, 0.2); }
+        .mnemonic h4 { color: var(--secondary); margin-bottom: 12px; }
+        .mnemonic .chant { font-size: 22px; font-weight: bold; color: #fff; letter-spacing: 3px; margin: 10px 0; }
+        .mnemonic p { color: var(--text-gray); font-size: 14px; }
+
+        .table-wrapper { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(249, 115, 22, 0.15); color: var(--primary); font-weight: 600; font-size: 14px; }
+        td { color: var(--text-gray); font-size: 14px; }
+
+        .self-check { background: linear-gradient(135deg, rgba(232, 121, 249, 0.1) 0%, rgba(56, 189, 248, 0.1) 100%); border-radius: 12px; padding: 25px; margin: 25px 0; border: 1px solid rgba(232, 121, 249, 0.15); }
+        .self-check h4 { color: var(--secondary); margin-bottom: 15px; font-size: 18px; }
+        .self-check ul li { padding: 8px 0 8px 25px; position: relative; color: var(--text-gray); }
+        .self-check ul li::before { content: '❓'; position: absolute; left: 0; color: var(--secondary); }
+
+        .step-container { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; }
+        .step-item { display: flex; gap: 15px; align-items: flex-start; padding: 15px; background: rgba(249, 115, 22, 0.05); border-radius: 8px; border-left: 4px solid var(--primary); }
+        .step-num { min-width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 14px; flex-shrink: 0; }
+        .step-content { flex: 1; }
+        .step-content h5 { color: var(--info); margin-bottom: 6px; font-size: 15px; }
+        .step-content p { color: var(--text-gray); margin: 0; line-height: 1.6; font-size: 14px; }
+
+        .tag-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin: 20px 0; }
+        .tag-card { background: rgba(249, 115, 22, 0.05); border: 1px solid var(--border); border-radius: 10px; padding: 18px; transition: all 0.3s; }
+        .tag-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .tag-card h5 { color: var(--primary); font-size: 14px; margin-bottom: 6px; }
+        .tag-card p { color: var(--text-gray); font-size: 13px; margin: 0; }
+        .tag-card code { background: rgba(249, 115, 22, 0.1); color: var(--primary); padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+
+        .flow-visual { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 25px 0; flex-wrap: wrap; }
+        .flow-step { background: rgba(249, 115, 22, 0.12); padding: 12px 20px; border-radius: 10px; text-align: center; border: 1px solid rgba(249, 115, 22, 0.15); }
+        .flow-step h5 { color: var(--primary); margin-bottom: 5px; font-size: 13px; }
+        .flow-step p { font-size: 11px; color: var(--text-gray); }
+        .flow-arrow { color: var(--secondary); font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div class="chapter">
+        <h2 class="chapter-title">第一章：HTML基础 — 网页的骨架</h2>
+        <div class="chapter-desc">
+            <strong>费曼学习法</strong>：如果你不能把 HTML 解释给一个完全不懂编程的人听，说明你还没真正理解它。<br><br>
+            <strong>本章目标</strong>：学完之后，你能用一句话说清楚 HTML 是什么，并且能手写一个结构良好的页面骨架。
+        </div>
+
+        <!-- 1.1 什么是HTML -->
+        <div class="card">
+            <h3>🏗️ 1.1 费曼入门：什么是HTML？</h3>
+
+            <div class="analogy-box">
+                <h4>🏠 盖房子比喻</h4>
+                <p>
+                    <strong>HTML = 房子的钢筋骨架</strong><br>
+                    你走进一栋还没装修的毛坯房，看到的是：<br>
+                    • <strong>承重墙</strong>（决定房间结构）—— 对应 HTML 的块级元素<br>
+                    • <strong>门框、窗框</strong>（开口和通道）—— 对应 HTML 的表单和链接<br>
+                    • <strong>房间标签</strong>（"主卧"、"厨房"）—— 对应 HTML 的语义标签<br><br>
+                    没有骨架，房子会塌。没有 HTML，网页就不存在。<br>
+                    <strong>CSS 是装修</strong>（决定好不好看），<strong>JavaScript 是水电系统</strong>（决定能不能动）。
+                </p>
+            </div>
+
+            <p><strong>一句话总结</strong>：HTML（HyperText Markup Language）是一种<strong>标记语言</strong>，用<strong>标签（tag）</strong>来告诉浏览器"这里放什么内容、结构怎么组织"。</p>
+        </div>
+
+        <!-- 1.2 文档结构 -->
+        <div class="card">
+            <h3>📄 1.2 HTML文档的基本结构</h3>
+            <p>每一个HTML页面都是一份"标准文件"，就像一封正式信件有固定的格式：</p>
+
+            <div class="flow-visual">
+                <div class="flow-step"><h5>DOCTYPE</h5><p>文档类型声明</p></div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step"><h5>html</h5><p>根元素</p></div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step"><h5>head</h5><p>元信息</p></div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step"><h5>body</h5><p>可见内容</p></div>
+            </div>
+
+            <div class="code-block">
+<pre><code><span class="comment">&lt;!-- 1. 文档声明：告诉浏览器"我是HTML5页面" --&gt;</span>
+<span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"zh-CN"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="comment">&lt;!-- 字符编码：支持中文等各种字符 --&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="comment">&lt;!-- 视口设置：适配移动端 --&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+    <span class="comment">&lt;!-- 浏览器标签栏显示的标题 --&gt;</span>
+    <span class="tag">&lt;title&gt;</span>我的网页<span class="tag">&lt;/title&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="comment">&lt;!-- 所有用户能看到的内容都写在这里 --&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>你好，世界！<span class="tag">&lt;/h1&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+            </div>
+
+            <div class="info-box">
+                <h4>💡 费曼理解法：head vs body</h4>
+                <p>
+                    <strong>head</strong> = 信封上的地址和邮戳（浏览器需要读，但用户看不到）<br>
+                    <strong>body</strong> = 信封里的信纸内容（用户真正看到的东西）<br>
+                    把 charset、title、meta 放 head；把 h1、p、div 放 body。
+                </p>
+            </div>
+        </div>
+
+        <!-- 1.3 常用标签 -->
+        <div class="card">
+            <h3>🏷️ 1.3 常用HTML标签速查</h3>
+            <p>HTML标签就像工具箱里的各种工具，每样工具干一件事：</p>
+
+            <div class="table-wrapper">
+                <table>
+                    <tr><th>标签</th><th>用途</th><th>类比</th><th>类型</th></tr>
+                    <tr><td><code>&lt;h1&gt;~&lt;h6&gt;</code></td><td>标题（1级最大，6级最小）</td><td>报纸头条 vs 小标题</td><td>块级</td></tr>
+                    <tr><td><code>&lt;p&gt;</code></td><td>段落</td><td>文章中的一个自然段</td><td>块级</td></tr>
+                    <tr><td><code>&lt;div&gt;</code></td><td>通用容器（无语义）</td><td>快递包装盒</td><td>块级</td></tr>
+                    <tr><td><code>&lt;span&gt;</code></td><td>行内容器（无语义）</td><td>荧光笔划的线</td><td>行内</td></tr>
+                    <tr><td><code>&lt;a&gt;</code></td><td>超链接</td><td>门牌号→另一个房间</td><td>行内</td></tr>
+                    <tr><td><code>&lt;img&gt;</code></td><td>图片（自闭合）</td><td>墙上挂的画</td><td>行内块</td></tr>
+                    <tr><td><code>&lt;ul&gt;/&lt;ol&gt;/&lt;li&gt;</code></td><td>列表（无序/有序）</td><td>购物清单</td><td>块级</td></tr>
+                    <tr><td><code>&lt;table&gt;</code></td><td>表格</td><td>Excel表格</td><td>块级</td></tr>
+                    <tr><td><code>&lt;form&gt;/&lt;input&gt;</code></td><td>表单</td><td>银行填单</td><td>块级/行内块</td></tr>
+                    <tr><td><code>&lt;br&gt;</code></td><td>换行（自闭合）</td><td>回车键</td><td>—</td></tr>
+                    <tr><td><code>&lt;hr&gt;</code></td><td>水平分割线（自闭合）</td><td>书签分隔线</td><td>块级</td></tr>
+                </table>
+            </div>
+
+            <div class="highlight-box">
+                <h4>✅ 核心要点：块级 vs 行内</h4>
+                <p>
+                    <strong>块级元素</strong>（div, p, h1）：独占一行，宽度默认100%，可以包住其他元素。<br>
+                    <strong>行内元素</strong>（span, a, strong）：像流水一样排在行内，宽度由内容决定。<br>
+                    这直接决定了后面 CSS 布局的基础 —— 这是<strong>整个布局理论的地基</strong>。
+                </p>
+            </div>
+        </div>
+
+        <!-- 1.4 语义化 -->
+        <div class="card">
+            <h3>🧠 1.4 语义化HTML：让代码"会说话"</h3>
+            <p>早期的 HTML 代码满屏都是 <code>&lt;div&gt;</code>，搜索引擎和屏幕阅读器完全不知道每个 div 是干什么的。语义化就是给每个区域一个"有意义的标签"：</p>
+
+            <div class="tag-grid">
+                <div class="tag-card">
+                    <h5><code>&lt;header&gt;</code></h5>
+                    <p>页眉区域，通常放Logo和导航</p>
+                </div>
+                <div class="tag-card">
+                    <h5><code>&lt;nav&gt;</code></h5>
+                    <p>导航链接区域</p>
+                </div>
+                <div class="tag-card">
+                    <h5><code>&lt;main&gt;</code></h5>
+                    <p>页面主体内容（每页一个）</p>
+                </div>
+                <div class="tag-card">
+                    <h5><code>&lt;article&gt;</code></h5>
+                    <p>独立的文章/内容块</p>
+                </div>
+                <div class="tag-card">
+                    <h5><code>&lt;section&gt;</code></h5>
+                    <p>主题分组区域</p>
+                </div>
+                <div class="tag-card">
+                    <h5><code>&lt;aside&gt;</code></h5>
+                    <p>侧边栏/附加内容</p>
+                </div>
+                <div class="tag-card">
+                    <h5><code>&lt;footer&gt;</code></h5>
+                    <p>页脚，版权信息等</p>
+                </div>
+                <div class="tag-card">
+                    <h5><code>&lt;figure&gt;/&lt;figcaption&gt;</code></h5>
+                    <p>带说明的图片/图表</p>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <h4>📦 语义化 = 给盒子贴标签</h4>
+                <p>
+                    以前：10个一模一样的棕色纸箱堆在一起，你要一个一个打开才知道里面是什么。<br>
+                    语义化：每个箱子上写着<strong>"冬装"、"厨具"、"工具"</strong> —— 搜索引擎（快递员）一眼就知道该把哪个箱子送到哪。
+                </p>
+            </div>
+
+            <div class="code-block">
+<pre><code><span class="comment">&lt;!-- 语义化页面结构示例 --&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;header&gt;</span>
+        <span class="tag">&lt;nav&gt;</span>...导航链接...<span class="tag">&lt;/nav&gt;</span>
+    <span class="tag">&lt;/header&gt;</span>
+    <span class="tag">&lt;main&gt;</span>
+        <span class="tag">&lt;article&gt;</span>
+            <span class="tag">&lt;section&gt;</span>第一部分<span class="tag">&lt;/section&gt;</span>
+            <span class="tag">&lt;section&gt;</span>第二部分<span class="tag">&lt;/section&gt;</span>
+        <span class="tag">&lt;/article&gt;</span>
+        <span class="tag">&lt;aside&gt;</span>侧边栏<span class="tag">&lt;/aside&gt;</span>
+    <span class="tag">&lt;/main&gt;</span>
+    <span class="tag">&lt;footer&gt;</span>版权信息<span class="tag">&lt;/footer&gt;</span>
+<span class="tag">&lt;/body&gt;</span></code></pre>
+            </div>
+        </div>
+
+        <!-- 1.5 表单 -->
+        <div class="card">
+            <h3>📝 1.5 表单：用户和网页对话的通道</h3>
+            <p>没有表单，网页就是一张静态的海报。有了表单，用户才能输入、选择、提交。</p>
+
+            <div class="code-block">
+<pre><code><span class="tag">&lt;form</span> <span class="attr">action</span>=<span class="val">"/submit"</span> <span class="attr">method</span>=<span class="val">"POST"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="val">"name"</span><span class="tag">&gt;</span>姓名：<span class="tag">&lt;/label&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"text"</span> <span class="attr">id</span>=<span class="val">"name"</span> <span class="attr">placeholder</span>=<span class="val">"请输入姓名"</span><span class="tag">&gt;</span>
+
+    <span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="val">"email"</span><span class="tag">&gt;</span>邮箱：<span class="tag">&lt;/label&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"email"</span> <span class="attr">id</span>=<span class="val">"email"</span><span class="tag">&gt;</span>
+
+    <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="val">"submit"</span><span class="tag">&gt;</span>提交<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span></code></pre>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <tr><th>input type</th><th>效果</th><th>常用属性</th></tr>
+                    <tr><td><code>text</code></td><td>单行文本输入</td><td>placeholder, maxlength, required</td></tr>
+                    <tr><td><code>password</code></td><td>密码输入（圆点隐藏）</td><td>minlength, autocomplete</td></tr>
+                    <tr><td><code>email</code></td><td>邮箱（自动校验格式）</td><td>multiple</td></tr>
+                    <tr><td><code>number</code></td><td>数字（带增减箭头）</td><td>min, max, step</td></tr>
+                    <tr><td><code>checkbox</code></td><td>多选框</td><td>checked</td></tr>
+                    <tr><td><code>radio</code></td><td>单选框（同name分组）</td><td>name, value, checked</td></tr>
+                    <tr><td><code>file</code></td><td>文件上传</td><td>accept, multiple</td></tr>
+                    <tr><td><code>date</code></td><td>日期选择器</td><td>min, max</td></tr>
+                </table>
+            </div>
+
+            <div class="info-box">
+                <h4>💡 label + for 的重要习惯</h4>
+                <p>始终用 <code>&lt;label for="id"&gt;</code> 关联表单元素。点击 label 文字会自动聚焦到对应输入框 —— 这是用户体验的基本素养，也是无障碍访问（a11y）的基础。</p>
+            </div>
+        </div>
+
+        <!-- 1.6 属性 -->
+        <div class="card">
+            <h3>🔧 1.6 HTML属性：标签的"配置项"</h3>
+            <p>属性就是标签的附加说明，格式是 <code>属性名="属性值"</code>：</p>
+
+            <div class="table-wrapper">
+                <table>
+                    <tr><th>属性</th><th>用于</th><th>说明</th></tr>
+                    <tr><td><code>id</code></td><td>任意元素</td><td>全局唯一标识，CSS/JS定位用。页面中不能重复！</td></tr>
+                    <tr><td><code>class</code></td><td>任意元素</td><td>CSS样式分类，可以多个（空格分隔），可以重复</td></tr>
+                    <tr><td><code>style</code></td><td>任意元素</td><td>内联样式（不推荐大量使用）</td></tr>
+                    <tr><td><code>href</code></td><td>a, link</td><td>链接地址</td></tr>
+                    <tr><td><code>src</code></td><td>img, script, iframe</td><td>资源路径</td></tr>
+                    <tr><td><code>alt</code></td><td>img</td><td>图片替代文本（SEO和无障碍必须！）</td></tr>
+                    <tr><td><code>data-*</code></td><td>任意元素</td><td>自定义数据属性，JS读取用</td></tr>
+                    <tr><td><code>disabled</code></td><td>input, button</td><td>禁用元素（布尔属性，不需要值）</td></tr>
+                </table>
+            </div>
+
+            <div class="mnemonic">
+                <h4>🧩 记忆口诀：id vs class</h4>
+                <p class="chant">id如身份证号 —— 一人一个，绝不重复</p>
+                <p class="chant">class如标签贴 —— 一物多个标签，多物同一标签</p>
+            </div>
+        </div>
+
+        <!-- 费曼自测 -->
+        <div class="self-check">
+            <h4>🎯 费曼自测：检验你是否真正理解了HTML</h4>
+            <ul>
+                <li>能用一句话向奶奶解释什么是HTML吗？（关键词：标记语言、标签、骨架）</li>
+                <li>块级元素和行内元素的区别是什么？各举3个例子</li>
+                <li>&lt;div&gt; 和 &lt;section&gt; 有什么区别？什么时候该用哪一个？</li>
+                <li>id 和 class 的本质区别是什么？在什么场景必须用 id？</li>
+                <li>能默写出一个标准 HTML5 页面从 &lt;!DOCTYPE&gt; 到 &lt;/html&gt; 的完整结构吗？</li>
+                <li>form 中 label 的 for 属性是干什么的？不写会怎样？</li>
+            </ul>
+        </div>
+
+        <div class="highlight-box">
+            <h4>🚀 进入下一章之前……</h4>
+            <p>HTML 是<strong>骨架</strong>，决定了"有什么"。<br>
+            但只有骨架的房子没法住人 —— 下一章，我们开始<strong>CSS（装修）</strong>，让网页好看、能用。<br>
+            特别重要的是：CSS 的<strong>盒模型</strong>，它是整个布局理论的基石。<br>
+            理解了盒模型，你就理解了 80% CSS 布局问题的本质。</p>
+        </div>
+    </div>
+</body>
+</html>

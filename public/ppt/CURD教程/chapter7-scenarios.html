@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第七章：15个经典实用场景题 — 把CRUD知识连成一张网</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js" defer></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1; --secondary: #f59e0b; --bg-dark: #0f172a;
+            --bg-card: #1e293b; --text-light: #f8fafc; --text-gray: #94a3b8;
+            --border: #334155; --success: #22c55e; --danger: #ef4444; --info: #3b82f6;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.8; }
+        .chapter { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .chapter-title { font-size: 32px; margin-bottom: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .chapter-desc { color: var(--text-gray); font-size: 16px; margin-bottom: 40px; line-height: 1.8; padding: 20px; background: var(--bg-card); border-radius: 10px; border-left: 4px solid var(--primary); }
+        .card { background: var(--bg-card); border-radius: 15px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .card h3 { font-size: 22px; margin-bottom: 20px; color: var(--secondary); display: flex; align-items: center; gap: 10px; }
+        .card h4 { font-size: 18px; margin: 20px 0 15px; color: var(--info); }
+        .card ul { list-style: none; padding-left: 0; }
+        .card ul li { padding: 10px 0 10px 25px; position: relative; color: var(--text-gray); line-height: 1.6; }
+        .card ul li::before { content: '→'; position: absolute; left: 0; color: var(--secondary); font-weight: bold; }
+        .scenario-box { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .scenario-box h5 { color: #fff; margin-bottom: 10px; font-size: 16px; }
+        .scenario-box p { color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.6; }
+        .code-block { background: #0f0f1a; padding: 20px; border-radius: 10px; margin: 20px 0; overflow-x: auto; border: 1px solid var(--border); }
+        .code-block code { font-family: 'Courier New', monospace; font-size: 13px; color: var(--text-light); line-height: 1.6; white-space: pre; }
+        .highlight-box { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%); border-left: 4px solid var(--secondary); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .highlight-box h4 { margin-bottom: 10px; color: var(--secondary); }
+        .warning-box { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border-left: 4px solid var(--danger); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .warning-box h4 { margin-bottom: 10px; color: var(--danger); }
+        .table-wrapper { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(245, 158, 11, 0.2); color: var(--secondary); font-weight: 600; }
+        td { color: var(--text-gray); }
+        .mermaid-container { background: #fff; border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .mermaid-title { text-align: center; color: var(--text-gray); margin-bottom: 15px; font-size: 14px; }
+        .self-check { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .self-check h3 { color: var(--secondary); margin-bottom: 15px; font-size: 20px; }
+        .self-check .q { margin-bottom: 12px; padding: 10px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .self-check .q strong { color: var(--info); }
+        .self-check .q p { color: var(--text-gray); margin: 5px 0 0 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="chapter">
+        <h2 class="chapter-title">第七章：19个经典场景 — 像闯关游戏一样学CRUD</h2>
+        <div class="chapter-desc">
+            <strong>费曼学习法</strong>：理论学得再多，不如解决几个真实问题来得深刻。本章每个场景就像一道<strong>闯关题</strong>——给你问题描述，先自己想解法，再看答案。<br><br>
+            每个场景都标注了难度：⭐基础 ⭐⭐进阶 ⭐⭐⭐挑战。建议按顺序通关。<br><br>
+            <strong>本章目标</strong>：遇到任何后台需求，脑海中自动弹出对应的解决方案模板。
+        </div>
+
+        <!-- 场景1：搜索联动 -->
+        <div class="card">
+            <h3>🔍 场景1：搜索框与表格联动查询</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>用户输入搜索关键词后，自动触发表格查询，支持多条件组合搜索，输入时防抖避免频繁请求。</p>
+            </div>
+            
+            <h4>前端实现（Vue3）</h4>
+            <div class="code-block">
+                <code>
+&lt;template&gt;<br>
+&nbsp;&nbsp;&lt;el-form :model="queryParams" :inline="true"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-form-item label="关键词"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-input v-model="queryParams.keyword" placeholder="搜索用户名/邮箱" clearable @input="handleSearch" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-form-item&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-form-item label="状态"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-select v-model="queryParams.status" placeholder="全部" clearable @change="handleSearch"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-option label="启用" :value="1" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-option label="禁用" :value="0" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-select&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-form-item&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-form-item label="日期范围"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-date-picker v-model="dateRange" type="daterange" @change="handleSearch" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-form-item&gt;<br>
+&nbsp;&nbsp;&lt;/el-form&gt;<br>
+&lt;/template&gt;<br><br>
+
+&lt;script setup&gt;<br>
+import { ref, watch } from 'vue'<br><br>
+
+const queryParams = ref({ keyword: '', status: undefined })<br>
+const dateRange = ref([])<br>
+let searchTimer = null<br><br>
+
+// 防抖搜索<br>
+const handleSearch = () => {<br>
+&nbsp;&nbsp;if (searchTimer) clearTimeout(searchTimer)<br>
+&nbsp;&nbsp;searchTimer = setTimeout(() => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 组装日期参数<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (dateRange.value && dateRange.value.length === 2) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;queryParams.value.startDate = dateRange.value[0]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;queryParams.value.endDate = dateRange.value[1]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;} else {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;delete queryParams.value.startDate<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;delete queryParams.value.endDate<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;fetchData()<br>
+&nbsp;&nbsp;}, 300)<br>
+}<br><br>
+
+// 监听日期变化<br>
+watch(dateRange, () => {<br>
+&nbsp;&nbsp;handleSearch()<br>
+})<br>
+&lt;/script&gt;
+                </code>
+            </div>
+            
+            <h4>后端实现（MyBatis Plus条件构造器）</h4>
+            <div class="code-block">
+                <code>
+// Controller<br>
+@GetMapping<br>
+public Result&lt;PageResult&lt;User&gt;&gt; list(UserQueryDTO query) {<br>
+&nbsp;&nbsp;return Result.success(userService.queryPage(query));<br>
+}<br><br>
+
+// Service - 多条件组合查询<br>
+public PageResult&lt;User&gt; queryPage(UserQueryDTO query) {<br>
+&nbsp;&nbsp;Page&lt;User&gt; page = new Page&lt;&gt;(query.getPageNum(), query.getPageSize());<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;LambdaQueryWrapper&lt;User&gt; wrapper = new LambdaQueryWrapper&lt;&gt;();<br>
+&nbsp;&nbsp;// 关键词搜索（用户名 OR 邮箱）<br>
+&nbsp;&nbsp;if (StringUtils.hasText(query.getKeyword())) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;wrapper.and(w -> w.like(User::getUsername, query.getKeyword())<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.or().like(User::getEmail, query.getKeyword()));<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;// 状态筛选<br>
+&nbsp;&nbsp;wrapper.eq(query.getStatus() != null, User::getStatus, query.getStatus());<br>
+&nbsp;&nbsp;// 日期范围<br>
+&nbsp;&nbsp;wrapper.ge(query.getStartDate() != null, User::getCreateTime, query.getStartDate());<br>
+&nbsp;&nbsp;wrapper.le(query.getEndDate() != null, User::getCreateTime, query.getEndDate());<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;wrapper.orderByDesc(User::getCreateTime);<br>
+&nbsp;&nbsp;Page&lt;User&gt; result = this.page(page, wrapper);<br>
+&nbsp;&nbsp;return new PageResult&lt;&gt;(result.getRecords(), result.getTotal());<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 场景2：状态切换 -->
+        <div class="card">
+            <h3>🔄 场景2：表格内状态快速切换</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>在表格中直接通过Switch组件切换用户状态，切换失败时自动回滚，切换前二次确认。</p>
+            </div>
+            
+            <h4>前端实现</h4>
+            <div class="code-block">
+                <code>
+&lt;template&gt;<br>
+&nbsp;&nbsp;&lt;el-table :data="userList"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table-column label="状态" width="100"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;template #default="{ row }"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-switch<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v-model="row.status"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:active-value="1"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:inactive-value="0"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:loading="row.switchLoading"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@change="handleStatusChange(row)"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-table-column&gt;<br>
+&nbsp;&nbsp;&lt;/el-table&gt;<br>
+&lt;/template&gt;<br><br>
+
+&lt;script setup&gt;<br>
+const handleStatusChange = async (row) => {<br>
+&nbsp;&nbsp;const oldStatus = row.status === 1 ? 0 : 1  // 记录原状态<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;try {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;row.switchLoading = true<br>
+&nbsp;&nbsp;&nbsp;&nbsp;await ElMessageBox.confirm(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`确认${row.status === 1 ? '启用' : '禁用'}用户"${row.username}"吗？`,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'提示',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ type: 'warning' }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;await updateUserStatus(row.id, row.status)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ElMessage.success('状态更新成功')<br>
+&nbsp;&nbsp;} catch (error) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 失败回滚状态<br>
+&nbsp;&nbsp;&nbsp;&nbsp;row.status = oldStatus<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (error !== 'cancel') {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ElMessage.error('状态更新失败')<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;} finally {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;row.switchLoading = false<br>
+&nbsp;&nbsp;}<br>
+}<br>
+&lt;/script&gt;
+                </code>
+            </div>
+            
+            <h4>后端实现</h4>
+            <div class="code-block">
+                <code>
+@PutMapping("/{id}/status")<br>
+public Result&lt;Void&gt; updateStatus(@PathVariable Long id, @RequestParam Integer status) {<br>
+&nbsp;&nbsp;// 参数校验<br>
+&nbsp;&nbsp;if (status != 0 && status != 1) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.error(400, "状态值无效");<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;User user = userService.getById(id);<br>
+&nbsp;&nbsp;if (user == null) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.error(404, "用户不存在");<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;// 不允许禁用超级管理员<br>
+&nbsp;&nbsp;if (user.isAdmin() && status == 0) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.error(403, "不能禁用超级管理员");<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;user.setStatus(status);<br>
+&nbsp;&nbsp;userService.updateById(user);<br>
+&nbsp;&nbsp;return Result.success();<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 场景3：批量删除 -->
+        <div class="card">
+            <h3>🗑️ 场景3：表格多选批量删除</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>表格支持多选，选中后显示已选数量，批量删除前二次确认，删除后刷新列表。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;<br>
+&nbsp;&nbsp;&lt;div class="toolbar"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button type="danger" :disabled="selectedIds.length === 0" @click="handleBatchDelete"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;🗑️ 批量删除 &lt;span v-if="selectedIds.length"&gt;({{ selectedIds.length }})&lt;/span&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&lt;/div&gt;<br>
+&nbsp;&nbsp;&lt;el-table :data="userList" @selection-change="handleSelectionChange"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table-column type="selection" width="55" :selectable="checkSelectable" /&gt;<br>
+&nbsp;&nbsp;&lt;/el-table&gt;<br>
+&lt;/template&gt;<br><br>
+
+&lt;script setup&gt;<br>
+const selectedIds = ref([])<br>
+const selectedRows = ref([])<br><br>
+
+// 选择变化<br>
+const handleSelectionChange = (selection) => {<br>
+&nbsp;&nbsp;selectedRows.value = selection<br>
+&nbsp;&nbsp;selectedIds.value = selection.map(item => item.id)<br>
+}<br><br>
+
+// 禁用某些行不可选（如管理员）<br>
+const checkSelectable = (row) => {<br>
+&nbsp;&nbsp;return !row.isAdmin  // 管理员不可删除<br>
+}<br><br>
+
+// 批量删除<br>
+const handleBatchDelete = async () => {<br>
+&nbsp;&nbsp;const names = selectedRows.value.map(r => r.username).join('、')<br>
+&nbsp;&nbsp;await ElMessageBox.confirm(`确认删除以下用户吗？\n${names}`, '批量删除确认', {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;type: 'warning',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;confirmButtonText: '确认删除',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cancelButtonText: '取消'<br>
+&nbsp;&nbsp;})<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;await batchDeleteUsers(selectedIds.value)<br>
+&nbsp;&nbsp;ElMessage.success(`成功删除 ${selectedIds.value.length} 个用户`)<br>
+&nbsp;&nbsp;selectedIds.value = []<br>
+&nbsp;&nbsp;fetchData()<br>
+}<br>
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <!-- 场景4：文件上传 -->
+        <div class="card">
+            <h3>📤 场景4：Excel批量导入用户</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>提供Excel模板下载，用户填写后上传，后端解析Excel批量导入数据，返回成功/失败统计。</p>
+            </div>
+            
+            <h4>前端实现</h4>
+            <div class="code-block">
+                <code>
+&lt;template&gt;<br>
+&nbsp;&nbsp;&lt;el-dialog v-model="importVisible" title="批量导入用户" width="500px"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-alert title="导入说明" type="info" :closable="false" style="margin-bottom: 15px"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. 请先下载模板，按格式填写后上传&lt;br/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. 用户名重复的数据将跳过&lt;br/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. 单次最多导入1000条<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-alert&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button @click="downloadTemplate"&gt;📥 下载模板&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-upload<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ref="uploadRef"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:action="uploadUrl"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:headers="uploadHeaders"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:on-success="handleImportSuccess"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:on-error="handleImportError"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;accept=".xlsx,.xls"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:limit="1"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button type="primary"&gt;📤 选择Excel文件上传&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-upload&gt;<br>
+&nbsp;&nbsp;&lt;/el-dialog&gt;<br>
+&lt;/template&gt;<br><br>
+
+&lt;script setup&gt;<br>
+const uploadUrl = import.meta.env.VITE_BASE_API + '/api/users/import'<br>
+const uploadHeaders = computed(() => ({<br>
+&nbsp;&nbsp;Authorization: `Bearer ${getToken()}`<br>
+}))<br><br>
+
+// 下载模板<br>
+const downloadTemplate = async () => {<br>
+&nbsp;&nbsp;const res = await request({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;url: '/api/users/template',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;method: 'get',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;responseType: 'blob'<br>
+&nbsp;&nbsp;})<br>
+&nbsp;&nbsp;downloadBlob(res, '用户导入模板.xlsx')<br>
+}<br><br>
+
+// 导入成功回调<br>
+const handleImportSuccess = (response) => {<br>
+&nbsp;&nbsp;const { successCount, failCount, errors } = response.data<br>
+&nbsp;&nbsp;ElMessage.success(`导入完成：成功${successCount}条，失败${failCount}条`)<br>
+&nbsp;&nbsp;if (failCount > 0) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 显示失败详情<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ElMessageBox.alert(errors.join('\n'), '导入失败详情')<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;importVisible.value = false<br>
+&nbsp;&nbsp;fetchData()<br>
+}<br>
+&lt;/script&gt;
+                </code>
+            </div>
+            
+            <h4>后端实现（EasyExcel）</h4>
+            <div class="code-block">
+                <code>
+@PostMapping("/import")<br>
+public Result&lt;ImportResult&gt; importUsers(@RequestParam("file") MultipartFile file) {<br>
+&nbsp;&nbsp;try {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;List&lt;UserImportDTO&gt; dataList = EasyExcel.read(file.getInputStream())<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;head(UserImportDTO.class)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sheet()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doReadSync();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (dataList.size() > 1000) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return Result.error("单次最多导入1000条");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ImportResult result = userService.batchImport(dataList);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.success(result);<br>
+&nbsp;&nbsp;} catch (Exception e) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.error("文件解析失败：" + e.getMessage());<br>
+&nbsp;&nbsp;}<br>
+}<br><br>
+
+// Service批量导入<br>
+@Transactional<br>
+public ImportResult batchImport(List&lt;UserImportDTO&gt; dataList) {<br>
+&nbsp;&nbsp;int successCount = 0;<br>
+&nbsp;&nbsp;int failCount = 0;<br>
+&nbsp;&nbsp;List&lt;String&gt; errors = new ArrayList&lt;&gt;();<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;// 查询已存在的用户名<br>
+&nbsp;&nbsp;List&lt;String&gt; existingUsernames = this.list()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.stream().map(User::getUsername).collect(Collectors.toList());<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;List&lt;User&gt; toInsert = new ArrayList&lt;&gt;();<br>
+&nbsp;&nbsp;for (int i = 0; i &lt; dataList.size(); i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UserImportDTO dto = dataList.get(i);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int rowNum = i + 2;  // Excel行号<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 数据验证<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (existingUsernames.contains(dto.getUsername())) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;errors.add("第" + rowNum + "行：用户名\"" + dto.getUsername() + "\"已存在");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;failCount++;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continue;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;User user = new User();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setUsername(dto.getUsername());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setEmail(dto.getEmail());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setPhone(dto.getPhone());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setStatus(1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;toInsert.add(user);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;successCount++;<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;// 批量插入<br>
+&nbsp;&nbsp;if (!toInsert.isEmpty()) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;this.saveBatch(toInsert);<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;return new ImportResult(successCount, failCount, errors);<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 场景5：图片上传 -->
+        <div class="card">
+            <h3>🖼️ 场景5：用户头像上传与预览</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>表单中支持上传头像图片，限制大小和格式，上传后显示预览，可重新上传或删除。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;<br>
+&nbsp;&nbsp;&lt;el-form-item label="头像"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-upload<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="avatar-uploader"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:action="uploadUrl"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:show-file-list="false"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:before-upload="beforeUpload"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:on-success="handleAvatarSuccess"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:headers="uploadHeaders"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;img v-if="userForm.avatar" :src="userForm.avatar" class="avatar" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-icon v-else :size="40" class="avatar-uploader-icon"&gt;&lt;Plus /&gt;&lt;/el-icon&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-upload&gt;<br>
+&nbsp;&nbsp;&lt;/el-form-item&gt;<br>
+&lt;/template&gt;<br><br>
+
+&lt;script setup&gt;<br>
+const beforeUpload = (file) => {<br>
+&nbsp;&nbsp;const isImage = file.type.startsWith('image/')<br>
+&nbsp;&nbsp;const isLt2M = file.size / 1024 / 1024 < 2<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;if (!isImage) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ElMessage.error('只能上传图片文件！')<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;if (!isLt2M) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ElMessage.error('图片大小不能超过2MB！')<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;return isImage && isLt2M<br>
+}<br><br>
+
+const handleAvatarSuccess = (response) => {<br>
+&nbsp;&nbsp;userForm.value.avatar = response.data.url<br>
+&nbsp;&nbsp;ElMessage.success('头像上传成功')<br>
+}<br>
+&lt;/script&gt;<br><br>
+
+&lt;style scoped&gt;<br>
+.avatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; }<br>
+.avatar-uploader-icon { border: 1px dashed #d9d9d9; border-radius: 50%; cursor: pointer; }<br>
+&lt;/style&gt;
+                </code>
+            </div>
+            
+            <h4>后端文件上传</h4>
+            <div class="code-block">
+                <code>
+@PostMapping("/upload/avatar")<br>
+public Result&lt;FileInfo&gt; uploadAvatar(@RequestParam("file") MultipartFile file) {<br>
+&nbsp;&nbsp;// 验证文件类型<br>
+&nbsp;&nbsp;String contentType = file.getContentType();<br>
+&nbsp;&nbsp;if (!contentType.startsWith("image/")) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.error("只允许上传图片文件");<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;// 验证文件大小（2MB）<br>
+&nbsp;&nbsp;if (file.getSize() > 2 * 1024 * 1024) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.error("文件大小不能超过2MB");<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;// 生成文件名<br>
+&nbsp;&nbsp;String originalFilename = file.getOriginalFilename();<br>
+&nbsp;&nbsp;String extension = originalFilename.substring(originalFilename.lastIndexOf("."));<br>
+&nbsp;&nbsp;String fileName = UUID.randomUUID().toString() + extension;<br>
+&nbsp;&nbsp;String filePath = "/uploads/avatars/" + fileName;<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;// 保存文件（实际应使用OSS等云存储）<br>
+&nbsp;&nbsp;Path path = Paths.get(uploadDir + filePath);<br>
+&nbsp;&nbsp;Files.createDirectories(path.getParent());<br>
+&nbsp;&nbsp;file.transferTo(path);<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;FileInfo fileInfo = new FileInfo();<br>
+&nbsp;&nbsp;fileInfo.setUrl("/api/files" + filePath);<br>
+&nbsp;&nbsp;return Result.success(fileInfo);<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 场景6：表单复制 -->
+        <div class="card">
+            <h3>📋 场景6：一键复制表单数据</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>编辑表单时提供"复制"按钮，一键复制当前表单数据并创建新记录，常用于快速创建相似数据。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;<br>
+&nbsp;&nbsp;&lt;el-dialog v-model="dialogVisible" :title="dialogTitle"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-form ref="formRef" :model="userForm" :rules="rules"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- 表单字段 --&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-form&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;template #footer&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button v-if="isEdit" @click="handleCopy"&gt;📋 复制并新增&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button @click="dialogVisible = false"&gt;取消&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button type="primary" @click="handleSubmit"&gt;确定&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br>
+&nbsp;&nbsp;&lt;/el-dialog&gt;<br>
+&lt;/template&gt;<br><br>
+
+&lt;script setup&gt;<br>
+// 复制并新增<br>
+const handleCopy = () => {<br>
+&nbsp;&nbsp;// 保存当前数据用于复制<br>
+&nbsp;&nbsp;const copyData = { ...userForm.value }<br>
+&nbsp;&nbsp;delete copyData.id  // 清除ID<br>
+&nbsp;&nbsp;copyData.username = copyData.username + '_副本'  // 修改用户名避免冲突<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;// 重置表单为新增模式<br>
+&nbsp;&nbsp;isEdit.value = false<br>
+&nbsp;&nbsp;Object.assign(userForm.value, copyData)<br>
+&nbsp;&nbsp;formRef.value?.clearValidate()  // 清除验证状态<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;ElMessage.success('已复制表单数据，请修改后提交')<br>
+}<br>
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <!-- 场景7：表格列自定义显示 -->
+        <div class="card">
+            <h3>🎛️ 场景7：自定义表格列显示/隐藏</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>用户可自定义显示哪些列，选择后持久化到localStorage，下次打开时恢复设置。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;<br>
+&nbsp;&nbsp;&lt;div class="table-toolbar"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-popover trigger="click" width="200"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;template #reference&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button icon="Setting"&gt;自定义列&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-checkbox-group v-model="visibleColumns"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-checkbox v-for="col in allColumns" :key="col.prop" :label="col.prop"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ col.label }}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-checkbox&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-checkbox-group&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-popover&gt;<br>
+&nbsp;&nbsp;&lt;/div&gt;<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&lt;el-table :data="userList"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table-column v-if="visibleColumns.includes('username')" prop="username" label="用户名" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table-column v-if="visibleColumns.includes('email')" prop="email" label="邮箱" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table-column v-if="visibleColumns.includes('phone')" prop="phone" label="手机号" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table-column v-if="visibleColumns.includes('status')" label="状态" /&gt;<br>
+&nbsp;&nbsp;&lt;/el-table&gt;<br>
+&lt;/template&gt;<br><br>
+
+&lt;script setup&gt;<br>
+import { ref, watch, onMounted } from 'vue'<br><br>
+
+const allColumns = [<br>
+&nbsp;&nbsp;{ prop: 'username', label: '用户名' },<br>
+&nbsp;&nbsp;{ prop: 'email', label: '邮箱' },<br>
+&nbsp;&nbsp;{ prop: 'phone', label: '手机号' },<br>
+&nbsp;&nbsp;{ prop: 'status', label: '状态' },<br>
+&nbsp;&nbsp;{ prop: 'createTime', label: '创建时间' }<br>
+]<br><br>
+
+// 默认显示所有列<br>
+const visibleColumns = ref(allColumns.map(c => c.prop))<br><br>
+
+// 加载保存的设置<br>
+onMounted(() => {<br>
+&nbsp;&nbsp;const saved = localStorage.getItem('user-table-columns')<br>
+&nbsp;&nbsp;if (saved) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;visibleColumns.value = JSON.parse(saved)<br>
+&nbsp;&nbsp;}<br>
+})<br><br>
+
+// 监听变化并保存<br>
+watch(visibleColumns, (val) => {<br>
+&nbsp;&nbsp;localStorage.setItem('user-table-columns', JSON.stringify(val))<br>
+}, { deep: true })<br>
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <!-- 场景8：数据字典下拉 -->
+        <div class="card">
+            <h3>📚 场景8：数据字典动态下拉框</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>从后端获取字典数据，动态渲染下拉选项，支持字典缓存减少请求。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+// 前端：字典Hook<br>
+import { ref, onMounted } from 'vue'<br><br>
+
+const dictCache = new Map()<br><br>
+
+export function useDict(dictType) {<br>
+&nbsp;&nbsp;const options = ref([])<br>
+&nbsp;&nbsp;const loading = ref(false)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;const loadDict = async () => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 检查缓存<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (dictCache.has(dictType)) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;options.value = dictCache.get(dictType)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;loading.value = true<br>
+&nbsp;&nbsp;&nbsp;&nbsp;try {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const res = await getDictData(dictType)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;options.value = res.data<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dictCache.set(dictType, res.data)  // 缓存<br>
+&nbsp;&nbsp;&nbsp;&nbsp;} finally {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;loading.value = false<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;onMounted(loadDict)<br>
+&nbsp;&nbsp;return { options, loading }<br>
+}<br><br>
+
+// 使用示例<br>
+const { options: statusOptions } = useDict('user_status')<br><br>
+// 模板中使用<br>
+&lt;el-select v-model="form.status"&gt;<br>
+&nbsp;&nbsp;&lt;el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" /&gt;<br>
+&lt;/el-select&gt;
+                </code>
+            </div>
+        </div>
+
+        <!-- 场景9：表单重置 -->
+        <div class="card">
+            <h3>🔄 场景9：表单智能重置</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>关闭对话框时重置表单，区分"取消"和"确定"后的重置，保留某些默认值。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;script setup&gt;<br>
+// 默认表单值<br>
+const defaultForm = {<br>
+&nbsp;&nbsp;username: '',<br>
+&nbsp;&nbsp;email: '',<br>
+&nbsp;&nbsp;phone: '',<br>
+&nbsp;&nbsp;status: 1,  // 默认启用<br>
+&nbsp;&nbsp;role: 'user'  // 默认普通用户<br>
+}<br><br>
+
+const userForm = ref({ ...defaultForm })<br>
+const formRef = ref()<br><br>
+
+// 打开新增对话框<br>
+const handleAdd = () => {<br>
+&nbsp;&nbsp;isEdit.value = false<br>
+&nbsp;&nbsp;resetForm()  // 重置为默认值<br>
+&nbsp;&nbsp;dialogVisible.value = true<br>
+}<br><br>
+
+// 打开编辑对话框<br>
+const handleEdit = (row) => {<br>
+&nbsp;&nbsp;isEdit.value = true<br>
+&nbsp;&nbsp;Object.assign(userForm.value, row)<br>
+&nbsp;&nbsp;dialogVisible.value = true<br>
+&nbsp;&nbsp;nextTick(() => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;formRef.value?.clearValidate()  // 清除验证状态<br>
+&nbsp;&nbsp;})<br>
+}<br><br>
+
+// 重置表单<br>
+const resetForm = () => {<br>
+&nbsp;&nbsp;userForm.value = { ...defaultForm }<br>
+&nbsp;&nbsp;nextTick(() => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;formRef.value?.resetFields()  // 重置验证<br>
+&nbsp;&nbsp;})<br>
+}<br><br>
+
+// 取消<br>
+const handleCancel = () => {<br>
+&nbsp;&nbsp;resetForm()<br>
+&nbsp;&nbsp;dialogVisible.value = false<br>
+}<br><br>
+
+// 提交成功后的处理<br>
+const handleSubmitSuccess = () => {<br>
+&nbsp;&nbsp;resetForm()  // 重置表单<br>
+&nbsp;&nbsp;dialogVisible.value = false<br>
+&nbsp;&nbsp;fetchData()  // 刷新列表<br>
+}<br>
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <!-- 场景10：行内编辑 -->
+        <div class="card">
+            <h3>✏️ 场景10：表格行内编辑</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>不打开对话框，直接在表格单元格内编辑数据，支持保存和取消，编辑时显示loading。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;<br>
+&nbsp;&nbsp;&lt;el-table :data="userList"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table-column label="邮箱"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;template #default="{ row }"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;template v-if="row.editing"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-input v-model="row.email" size="small" @keyup.enter="handleSave(row)" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;span v-else&gt;{{ row.email }}&lt;/span&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-table-column&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table-column label="操作" width="150"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;template #default="{ row }"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;template v-if="row.editing"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button size="small" type="primary" @click="handleSave(row)"&gt;保存&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button size="small" @click="handleCancel(row)"&gt;取消&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;template v-else&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button size="small" type="primary" @click="handleEdit(row)"&gt;编辑&lt;/el-button&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-table-column&gt;<br>
+&nbsp;&nbsp;&lt;/el-table&gt;<br>
+&lt;/template&gt;<br><br>
+
+&lt;script setup&gt;<br>
+// 进入编辑模式<br>
+const handleEdit = (row) => {<br>
+&nbsp;&nbsp;row.originalEmail = row.email  // 保存原始值用于取消<br>
+&nbsp;&nbsp;row.editing = true<br>
+}<br><br>
+
+// 保存<br>
+const handleSave = async (row) => {<br>
+&nbsp;&nbsp;try {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;row.saving = true<br>
+&nbsp;&nbsp;&nbsp;&nbsp;await updateUser(row.id, { email: row.email })<br>
+&nbsp;&nbsp;&nbsp;&nbsp;row.editing = false<br>
+&nbsp;&nbsp;&nbsp;&nbsp;delete row.originalEmail<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ElMessage.success('保存成功')<br>
+&nbsp;&nbsp;} finally {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;row.saving = false<br>
+&nbsp;&nbsp;}<br>
+}<br><br>
+
+// 取消<br>
+const handleCancel = (row) => {<br>
+&nbsp;&nbsp;row.email = row.originalEmail  // 恢复原始值<br>
+&nbsp;&nbsp;row.editing = false<br>
+&nbsp;&nbsp;delete row.originalEmail<br>
+}<br>
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🌳 场景11：树形表格与层级数据</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>部门管理、菜单管理等层级数据，使用树形表格展示，支持展开/收起、拖拽排序。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;el-table 
+    :data="deptList" 
+    row-key="id"
+    :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+    default-expand-all
+    border
+  &gt;
+    &lt;el-table-column prop="name" label="部门名称" width="200" /&gt;
+    &lt;el-table-column prop="leader" label="负责人" width="120" /&gt;
+    &lt;el-table-column prop="phone" label="联系电话" width="150" /&gt;
+    &lt;el-table-column prop="status" label="状态" width="100"&gt;
+      &lt;template #default="{ row }"&gt;
+        &lt;el-tag :type="row.status === 1 ? 'success' : 'danger'"&gt;
+          {{ row.status === 1 ? '正常' : '停用' }}
+        &lt;/el-tag&gt;
+      &lt;/template&gt;
+    &lt;/el-table-column&gt;
+    &lt;el-table-column label="操作" width="200" fixed="right"&gt;
+      &lt;template #default="{ row }"&gt;
+        &lt;el-button v-if="row.level &lt; 3" size="small" @click="handleAddChild(row)"&gt;新增子部门&lt;/el-button&gt;
+        &lt;el-button size="small" type="primary" @click="handleEdit(row)"&gt;编辑&lt;/el-button&gt;
+        &lt;el-button size="small" type="danger" @click="handleDelete(row)"&gt;删除&lt;/el-button&gt;
+      &lt;/template&gt;
+    &lt;/el-table-column&gt;
+  &lt;/el-table&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+// 树形数据示例
+const deptList = ref([
+  {
+    id: 1,
+    name: '总公司',
+    leader: '张三',
+    phone: '13800000001',
+    status: 1,
+    level: 1,
+    children: [
+      {
+        id: 11,
+        name: '技术部',
+        leader: '李四',
+        phone: '13800000002',
+        status: 1,
+        level: 2,
+        children: [
+          { id: 111, name: '前端组', leader: '王五', phone: '13800000003', status: 1, level: 3 },
+          { id: 112, name: '后端组', leader: '赵六', phone: '13800000004', status: 1, level: 3 }
+        ]
+      },
+      {
+        id: 12,
+        name: '市场部',
+        leader: '钱七',
+        phone: '13800000005',
+        status: 1,
+        level: 2
+      }
+    ]
+  }
+])
+
+const handleAddChild = (row) => {
+  // 打开新增对话框，设置parentId
+  dialogVisible.value = true
+  deptForm.parentId = row.id
+}
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔄 场景12：穿梭框实现角色权限分配</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>使用穿梭框为角色分配菜单权限，左侧显示所有菜单，右侧显示已分配菜单。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;el-transfer
+    v-model="checkedMenus"
+    :data="allMenus"
+    :titles="['所有菜单', '已分配菜单']"
+    :props="{ key: 'id', label: 'name' }"
+    filterable
+    filter-placeholder="搜索菜单"
+    :button-texts="['移除', '添加']"
+    @change="handleChange"
+  /&gt;
+  
+  &lt;el-button type="primary" @click="handleSave" :loading="saving"&gt;保存权限&lt;/el-button&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref, onMounted } from 'vue'
+
+const props = defineProps({ roleId: Number })
+const allMenus = ref([])
+const checkedMenus = ref([])
+const saving = ref(false)
+
+onMounted(async () => {
+  // 获取所有菜单树（扁平化）
+  const res = await getAllMenus()
+  allMenus.value = flattenTree(res.data)
+  
+  // 获取角色已分配的菜单
+  const roleRes = await getRoleMenus(props.roleId)
+  checkedMenus.value = roleRes.data.map(m => m.id)
+})
+
+// 树形数据扁平化
+function flattenTree(tree, result = []) {
+  tree.forEach(node => {
+    result.push({ id: node.id, name: node.name, disabled: node.type === 'button' })
+    if (node.children) flattenTree(node.children, result)
+  })
+  return result
+}
+
+const handleChange = (value, direction, movedKeys) => {
+  console.log('变化的菜单:', value, direction, movedKeys)
+}
+
+const handleSave = async () => {
+  saving.value = true
+  try {
+    await saveRoleMenus(props.roleId, checkedMenus.value)
+    ElMessage.success('权限保存成功')
+  } finally {
+    saving.value = false
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📋 场景13：分步表单（Steps）</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>复杂表单拆分为多个步骤，每步验证通过后再进入下一步，最后统一提交。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;el-steps :active="currentStep" finish-status="success" style="margin-bottom: 30px"&gt;
+    &lt;el-step title="基本信息" /&gt;
+    &lt;el-step title="详细信息" /&gt;
+    &lt;el-step title="确认提交" /&gt;
+  &lt;/el-steps&gt;
+
+  &lt;el-card&gt;
+    &lt;!-- 第一步：基本信息 --&gt;
+    &lt;el-form v-show="currentStep === 0" ref="step1Ref" :model="form" :rules="step1Rules" label-width="100px"&gt;
+      &lt;el-form-item label="用户名" prop="username"&gt;
+        &lt;el-input v-model="form.username" /&gt;
+      &lt;/el-form-item&gt;
+      &lt;el-form-item label="邮箱" prop="email"&gt;
+        &lt;el-input v-model="form.email" /&gt;
+      &lt;/el-form-item&gt;
+    &lt;/el-form&gt;
+
+    &lt;!-- 第二步：详细信息 --&gt;
+    &lt;el-form v-show="currentStep === 1" ref="step2Ref" :model="form" :rules="step2Rules" label-width="100px"&gt;
+      &lt;el-form-item label="手机号" prop="phone"&gt;
+        &lt;el-input v-model="form.phone" /&gt;
+      &lt;/el-form-item&gt;
+      &lt;el-form-item label="地址" prop="address"&gt;
+        &lt;el-input v-model="form.address" type="textarea" /&gt;
+      &lt;/el-form-item&gt;
+    &lt;/el-form&gt;
+
+    &lt;!-- 第三步：确认信息 --&gt;
+    &lt;el-descriptions v-show="currentStep === 2" :column="1" border&gt;
+      &lt;el-descriptions-item label="用户名"&gt;{{ form.username }}&lt;/el-descriptions-item&gt;
+      &lt;el-descriptions-item label="邮箱"&gt;{{ form.email }}&lt;/el-descriptions-item&gt;
+      &lt;el-descriptions-item label="手机号"&gt;{{ form.phone }}&lt;/el-descriptions-item&gt;
+      &lt;el-descriptions-item label="地址"&gt;{{ form.address }}&lt;/el-descriptions-item&gt;
+    &lt;/el-descriptions&gt;
+
+    &lt;div style="margin-top: 20px; text-align: right"&gt;
+      &lt;el-button v-if="currentStep > 0" @click="currentStep--"&gt;上一步&lt;/el-button&gt;
+      &lt;el-button v-if="currentStep &lt; 2" type="primary" @click="nextStep"&gt;下一步&lt;/el-button&gt;
+      &lt;el-button v-if="currentStep === 2" type="primary" @click="handleSubmit" :loading="submitting"&gt;提交&lt;/el-button&gt;
+    &lt;/div&gt;
+  &lt;/el-card&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref, reactive } from 'vue'
+
+const currentStep = ref(0)
+const submitting = ref(false)
+const step1Ref = ref()
+const step2Ref = ref()
+
+const form = reactive({
+  username: '',
+  email: '',
+  phone: '',
+  address: ''
+})
+
+const step1Rules = {
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
+  ]
+}
+
+const step2Rules = {
+  phone: [{ pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }],
+  address: [{ required: true, message: '请输入地址', trigger: 'blur' }]
+}
+
+const nextStep = async () => {
+  if (currentStep.value === 0) {
+    const valid = await step1Ref.value.validate().catch(() => false)
+    if (!valid) return
+  }
+  if (currentStep.value === 1) {
+    const valid = await step2Ref.value.validate().catch(() => false)
+    if (!valid) return
+  }
+  currentStep.value++
+}
+
+const handleSubmit = async () => {
+  submitting.value = true
+  try {
+    await createUser(form)
+    ElMessage.success('创建成功')
+    currentStep.value = 0
+  } finally {
+    submitting.value = false
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🖱️ 场景14：拖拽排序表格</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>使用Sortable.js实现表格行拖拽排序，排序后自动保存到后端。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+# 安装
+npm install sortablejs
+
+&lt;template&gt;
+  &lt;el-table ref="tableRef" :data="list" row-key="id" border&gt;
+    &lt;el-table-column width="50" class-name="drag-handle"&gt;
+      &lt;template #default&gt;
+        &lt;el-icon style="cursor: move"&gt;&lt;Rank /&gt;&lt;/el-icon&gt;
+      &lt;/template&gt;
+    &lt;/el-table-column&gt;
+    &lt;el-table-column prop="name" label="名称" /&gt;
+    &lt;el-table-column prop="sort" label="排序" width="80" /&gt;
+  &lt;/el-table&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref, onMounted } from 'vue'
+import Sortable from 'sortablejs'
+
+const tableRef = ref()
+const list = ref([
+  { id: 1, name: '菜单1', sort: 1 },
+  { id: 2, name: '菜单2', sort: 2 },
+  { id: 3, name: '菜单3', sort: 3 }
+])
+
+onMounted(() => {
+  const tbody = tableRef.value.$el.querySelector('.el-table__body-wrapper tbody')
+  Sortable.create(tbody, {
+    handle: '.drag-handle',
+    animation: 150,
+    onEnd: async ({ newIndex, oldIndex }) => {
+      // 更新本地数据顺序
+      const item = list.value.splice(oldIndex, 1)[0]
+      list.value.splice(newIndex, 0, item)
+      
+      // 重新计算排序值
+      list.value.forEach((item, index) => {
+        item.sort = index + 1
+      })
+      
+      // 保存到后端
+      await updateSort(list.value.map(item => ({ id: item.id, sort: item.sort })))
+      ElMessage.success('排序已更新')
+    }
+  })
+})
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📅 场景15：日历视图展示</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>使用日历组件展示日程安排，点击日期查看详情，支持按日/周/月切换。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;el-calendar v-model="currentDate"&gt;
+    &lt;template #date-cell="{ data }"&gt;
+      &lt;div class="calendar-cell" @click="showDayDetail(data)"&gt;
+        &lt;p class="calendar-day"&gt;{{ data.day.split('-').slice(2).join('-') }}&lt;/p&gt;
+        &lt;div class="events"&gt;
+          &lt;div 
+            v-for="event in getEventsByDate(data.day)" 
+            :key="event.id"
+            class="event-item"
+            :style="{ backgroundColor: event.color }"
+          &gt;
+            {{ event.title }}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/template&gt;
+  &lt;/el-calendar&gt;
+
+  &lt;!-- 日程详情对话框 --&gt;
+  &lt;el-dialog v-model="detailVisible" :title="selectedDate" width="600px"&gt;
+    &lt;el-timeline&gt;
+      &lt;el-timeline-item 
+        v-for="event in selectedEvents" 
+        :key="event.id"
+        :timestamp="event.time"
+        placement="top"
+      &gt;
+        &lt;el-card&gt;
+          &lt;h4&gt;{{ event.title }}&lt;/h4&gt;
+          &lt;p&gt;{{ event.description }}&lt;/p&gt;
+        &lt;/el-card&gt;
+      &lt;/el-timeline-item&gt;
+    &lt;/el-timeline&gt;
+  &lt;/el-dialog&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref, computed } from 'vue'
+
+const currentDate = ref(new Date())
+const detailVisible = ref(false)
+const selectedDate = ref('')
+const selectedEvents = ref([])
+const events = ref([
+  { id: 1, date: '2024-01-15', time: '09:00', title: '项目会议', description: '讨论项目进度', color: '#409eff' },
+  { id: 2, date: '2024-01-15', time: '14:00', title: '需求评审', description: '评审新需求', color: '#67c23a' },
+  { id: 3, date: '2024-01-20', time: '10:00', title: '代码审查', description: '审查PR', color: '#e6a23c' }
+])
+
+const getEventsByDate = (date: string) => {
+  return events.value.filter(e => e.date === date)
+}
+
+const showDayDetail = (data: any) => {
+  selectedDate.value = data.day
+  selectedEvents.value = getEventsByDate(data.day)
+  detailVisible.value = true
+}
+&lt;/script&gt;
+
+&lt;style scoped&gt;
+.calendar-cell { min-height: 80px; cursor: pointer; }
+.calendar-day { font-size: 14px; margin: 0; }
+.event-item {
+  font-size: 12px;
+  padding: 2px 4px;
+  margin: 2px 0;
+  border-radius: 2px;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+&lt;/style&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔍 场景16：全文搜索（Elasticsearch集成）</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>MySQL LIKE查询性能差且不支持分词，使用Elasticsearch实现高效的全文搜索和高级查询。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>// pom.xml
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-elasticsearch&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+// 实体类
+@Document(indexName = "articles")
+public class ArticleDoc {
+    @Id
+    private Long id;
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    private String title;
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    private String content;
+    @Field(type = FieldType.Keyword)
+    private String author;
+    @Field(type = FieldType.Date)
+    private Date publishTime;
+}
+
+// Repository
+public interface ArticleRepository extends ElasticsearchRepository&lt;ArticleDoc, Long&gt; {
+    // 高亮搜索
+    Page&lt;ArticleDoc&gt; findByTitleOrContent(String title, String content, Pageable pageable);
+}
+
+// 高级搜索Service
+@Service
+public class SearchService {
+    @Autowired
+    private ElasticsearchRestTemplate esTemplate;
+    
+    public Page&lt;ArticleDoc&gt; search(String keyword, int page, int size) {
+        NativeSearchQuery query = new NativeSearchQueryBuilder()
+            .withQuery(QueryBuilders.multiMatchQuery(keyword, "title^3", "content"))
+            .withHighlightFields(
+                new HighlightBuilder.Field("title").preTags("&lt;em&gt;").postTags("&lt;/em&gt;"),
+                new HighlightBuilder.Field("content").preTags("&lt;em&gt;").postTags("&lt;/em&gt;")
+            )
+            .withPageable(PageRequest.of(page - 1, size))
+            .build();
+        return esTemplate.search(query, ArticleDoc.class);
+    }
+    
+    // MySQL -> ES 数据同步（通过Canal或定时任务）
+    @Scheduled(fixedDelay = 60000)
+    public void syncData() {
+        // 全量/增量同步
+    }
+}
+
+// 前端搜索框
+&lt;el-input v-model="keyword" placeholder="搜索文章..." @keyup.enter="handleSearch"&gt;
+  &lt;template #prefix&gt;
+    &lt;el-icon&gt;&lt;Search /&gt;&lt;/el-icon&gt;
+  &lt;/template&gt;
+&lt;/el-input&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🗺️ 场景17：高德/百度地图集成</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>在后台管理系统中集成地图功能，用于展示门店分布、物流轨迹、区域管理等。</p>
+            </div>
+            
+            <div class="code-block">
+                <code># index.html 引入AMap
+&lt;script src="https://webapi.amap.com/maps?v=2.0&amp;key=YOUR_KEY&amp;plugin=AMap.Geocoder"&gt;&lt;/script&gt;
+npm install @vuemap/vue-amap
+
+// main.ts
+import VueAmap from '@vuemap/vue-amap'
+app.use(VueAmap, { initAMapApiLoader: { key: 'YOUR_KEY', version: '2.0' } })
+
+&lt;template&gt;
+  &lt;el-card&gt;
+    &lt;div class="map-container" style="height: 500px"&gt;
+      &lt;vue-map :center="center" :zoom="12"&gt;
+        &lt;vue-map-marker 
+          v-for="marker in markers" 
+          :key="marker.id"
+          :position="marker.position"
+          :icon="marker.icon"
+          :label="marker.label"
+          @click="showInfoWindow(marker)"
+        /&gt;
+        &lt;vue-info-window v-model="currentMarker"&gt;
+          &lt;div&gt;
+            &lt;h4&gt;{{ currentMarker.name }}&lt;/h4&gt;
+            &lt;p&gt;地址：{{ currentMarker.address }}&lt;/p&gt;
+            &lt;p&gt;电话：{{ currentMarker.phone }}&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/vue-info-window&gt;
+        &lt;vue-heat-map :data="heatData" :radius="30" /&gt;
+      &lt;/vue-map&gt;
+    &lt;/div&gt;
+  &lt;/el-card&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+// 地址转坐标（地理编码）
+async function geocode(address: string) {
+  const geocoder = new AMap.Geocoder()
+  const result = await new Promise((resolve, reject) => {
+    geocoder.getLocation(address, (status, result) => {
+      if (status === 'complete') resolve(result)
+      else reject(status)
+    })
+  })
+  return result.geocodes[0].location
+}
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>✏️ 场景18：Monaco代码编辑器集成</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>内置代码编辑器，支持语法高亮、自动补全、多语言，常用于在线配置编辑、脚本管理。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>npm install monaco-editor @guolao/vue-monaco-editor
+
+&lt;template&gt;
+  &lt;el-card&gt;
+    &lt;el-select v-model="language" style="margin-bottom: 10px"&gt;
+      &lt;el-option label="JSON" value="json" /&gt;
+      &lt;el-option label="JavaScript" value="javascript" /&gt;
+      &lt;el-option label="SQL" value="sql" /&gt;
+      &lt;el-option label="YAML" value="yaml" /&gt;
+      &lt;el-option label="Python" value="python" /&gt;
+      &lt;el-option label="Java" value="java" /&gt;
+    &lt;/el-select&gt;
+    
+    &lt;vue-monaco-editor
+      v-model:value="code"
+      :language="language"
+      :options="editorOptions"
+      @mount="handleMount"
+      height="600px"
+    /&gt;
+    
+    &lt;el-button type="primary" @click="saveContent" :loading="saving" style="margin-top: 10px"&gt;保存&lt;/el-button&gt;
+  &lt;/el-card&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref } from 'vue'
+
+const language = ref('json')
+const code = ref(JSON.stringify({ key: 'value' }, null, 2))
+
+const editorOptions = {
+  theme: 'vs-dark',
+  fontSize: 14,
+  minimap: { enabled: false },
+  lineNumbers: 'on',
+  scrollBeyondLastLine: false,
+  automaticLayout: true,
+  tabSize: 2,
+  wordWrap: 'on'
+}
+
+const handleMount = (editor) => {
+  // 添加快捷键
+  editor.addAction({
+    id: 'save',
+    label: '保存',
+    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+    run: () => saveContent()
+  })
+}
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📄 场景19：Office文件在线预览</h3>
+            <div class="scenario-box">
+                <h5>📝 场景描述</h5>
+                <p>支持在浏览器中直接预览Word、Excel、PPT、PDF等办公文档。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>// 方案1：微软Office在线预览（公开文件）
+function previewOffice(url: string) {
+  const previewUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`
+  window.open(previewUrl)
+}
+
+// 方案2：kkFileView开源预览服务
+// docker run -d -p 8012:8012 keking/kkfileview
+// 支持：doc/docx/xls/xlsx/ppt/pptx/pdf/txt/zip/jpg等
+
+// 后端接入
+@RestController
+@RequestMapping("/api/preview")
+public class PreviewController {
+    @Value("${kkfileview.url}") private String kkfileUrl;
+    
+    @GetMapping("/file/{id}")
+    public void preview(@PathVariable Long id, HttpServletResponse response) {
+        FileInfo file = fileService.getById(id);
+        String fileUrl = "http://yourdomain.com/api/files/" + file.getPath();
+        response.sendRedirect(kkfileUrl + "/onlinePreview?url=" + URLEncoder.encode(fileUrl));
+    }
+}
+
+// 方案3：PDF.js预览PDF
+npm install pdfjs-dist
+
+&lt;template&gt;
+  &lt;canvas ref="pdfCanvas" /&gt;
+  &lt;el-pagination 
+    layout="prev, pager, next" 
+    :total="pdfPages" 
+    v-model:current-page="currentPage"
+    @current-change="renderPage"
+  /&gt;
+&lt;/template&gt;
+
+import * as pdfjsLib from 'pdfjs-dist'
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.js'
+
+async function loadPdf(url: string) {
+  const pdf = await pdfjsLib.getDocument(url).promise
+  pdfPages.value = pdf.numPages
+  renderPage(1, pdf)
+}
+
+async function renderPage(num: number, pdfDoc?: any) {
+  const pdf = pdfDoc || await pdfjsLib.getDocument(url).promise
+  const page = await pdf.getPage(num)
+  const canvas = pdfCanvas.value
+  const ctx = canvas.getContext('2d')
+  const viewport = page.getViewport({ scale: 1.5 })
+  canvas.width = viewport.width
+  canvas.height = viewport.height
+  await page.render({ canvasContext: ctx, viewport }).promise
+}
+                </code>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h4>💡 场景题核心要点总结</h4>
+            <p>1. <strong>搜索联动</strong>：防抖处理、多条件组合、日期范围处理<br/>
+            2. <strong>状态切换</strong>：失败回滚、二次确认、权限控制<br/>
+            3. <strong>批量删除</strong>：禁用特定行、显示已选数量、批量确认<br/>
+            4. <strong>Excel导入</strong>：模板下载、数据验证、成功/失败统计<br/>
+            5. <strong>图片上传</strong>：格式限制、大小限制、预览功能<br/>
+            6. <strong>表单复制</strong>：深拷贝数据、清除ID、修改冲突字段<br/>
+            7. <strong>自定义列</strong>：v-if控制、localStorage持久化<br/>
+            8. <strong>数据字典</strong>：动态加载、缓存优化、Hook封装<br/>
+            9. <strong>表单重置</strong>：区分场景、清除验证、保留默认值<br/>
+            10. <strong>行内编辑</strong>：编辑状态管理、原始值保存、Enter快捷键<br/>
+            11. <strong>树形表格</strong>：row-key、tree-props、层级数据处理<br/>
+            12. <strong>穿梭框</strong>：权限分配、数据扁平化、双向同步<br/>
+            13. <strong>分步表单</strong>：步骤验证、数据共享、最终提交<br/>
+            14. <strong>拖拽排序</strong>：Sortable.js、row-key、排序更新<br/>
+            15. <strong>日历视图</strong>：自定义单元格、事件关联、详情展示<br/>
+            16. <strong>全文搜索</strong>：Elasticsearch、IK分词、高亮显示、MySQL同步<br/>
+            17. <strong>地图集成</strong>：高德/百度地图、标记点、热力图、地理编码<br/>
+            18. <strong>代码编辑器</strong>：Monaco Editor、语法高亮、多语言、快捷键<br/>
+            19. <strong>文件预览</strong>：Office在线预览、kkFileView、PDF.js</p>
+        </div>
+
+        <div class="self-check">
+            <h3>🧠 费曼自测：你能解释给同学听吗？</h3>
+            <div class="q"><strong>Q1：搜索框防抖为什么要延迟300毫秒？</strong><p>A：想象你在打字——每按一个键就发一次请求，服务器会崩溃。300毫秒是人打字间隔的上限，等用户停下来0.3秒后再发送请求，是最佳平衡点。</p></div>
+            <div class="q"><strong>Q2：批量删除为什么要先勾选再删除？</strong><p>A：就像在文件管理器里操作——按住Ctrl一个一个选，确认好再右键删除。单独的删除按钮和批量删除按钮是为了防止误操作——单独删除就删一个，批量删除要确认N个。</p></div>
+            <div class="q"><strong>Q3：Monaco编辑器和普通textarea有什么区别？</strong><p>A：textarea就像WordPad（简陋），Monaco就像VS Code（专业）。后者支持语法高亮、代码补全、多光标编辑——适用于需要用户写代码或配置的场景。</p></div>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose', flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' } });
+    </script>
+    <script>
+        function convertCodeBlocks(lang) {
+            document.querySelectorAll('.code-block').forEach(block => {
+                const oldCode = block.querySelector('code');
+                if (!oldCode || oldCode.parentElement.tagName === 'PRE') return;
+                let html = oldCode.innerHTML;
+                let text = html.replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/gi, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.className = `language-${lang}`;
+                code.textContent = text;
+                pre.appendChild(code);
+                block.appendChild(pre);
+                oldCode.remove();
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            convertCodeBlocks('javascript');
+            if (window.Prism) Prism.highlightAll();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第四章：Java后端CRUD开发 - 从原理到实战</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js" defer></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1; --secondary: #f59e0b; --bg-dark: #0f172a;
+            --bg-card: #1e293b; --text-light: #f8fafc; --text-gray: #94a3b8;
+            --border: #334155; --success: #22c55e; --danger: #ef4444; --info: #3b82f6;
+            --java: #f89820; --spring: #6db33f;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.8; }
+        .chapter { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .chapter-title { font-size: 36px; margin-bottom: 20px; background: linear-gradient(135deg, #f89820 0%, #6db33f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .chapter-desc { color: var(--text-gray); font-size: 16px; margin-bottom: 40px; line-height: 1.8; padding: 20px; background: var(--bg-card); border-radius: 10px; border-left: 4px solid var(--java); }
+        .card { background: var(--bg-card); border-radius: 15px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .card h3 { font-size: 22px; margin-bottom: 20px; color: var(--java); display: flex; align-items: center; gap: 10px; }
+        .card h4 { font-size: 18px; margin: 20px 0 15px; color: var(--spring); }
+        .card ul { list-style: none; padding-left: 0; }
+        .card ul li { padding: 10px 0 10px 25px; position: relative; color: var(--text-gray); line-height: 1.6; }
+        .card ul li::before { content: '→'; position: absolute; left: 0; color: var(--java); font-weight: bold; }
+        .mermaid-container { background: #fff; border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .mermaid-title { text-align: center; color: var(--text-gray); margin-bottom: 15px; font-size: 14px; }
+        .code-block { background: #0f0f1a; padding: 20px; border-radius: 10px; margin: 20px 0; overflow-x: auto; border: 1px solid var(--border); }
+        .code-block code { font-family: 'Courier New', monospace; font-size: 13px; color: var(--text-light); line-height: 1.6; white-space: pre; }
+        .highlight-box { background: linear-gradient(135deg, rgba(248, 152, 32, 0.1) 0%, rgba(109, 179, 63, 0.1) 100%); border-left: 4px solid var(--java); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .highlight-box h4 { margin-bottom: 10px; color: var(--java); }
+        .warning-box { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border-left: 4px solid var(--danger); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .warning-box h4 { margin-bottom: 10px; color: var(--danger); }
+        .table-wrapper { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(248, 152, 32, 0.2); color: var(--java); font-weight: 600; }
+        td { color: var(--text-gray); }
+        .analogy-box { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border: 2px dashed var(--secondary); padding: 25px; border-radius: 12px; margin: 25px 0; }
+        .analogy-box h4 { color: var(--secondary); margin-bottom: 12px; font-size: 18px; }
+        .analogy-box p { color: var(--text-gray); line-height: 1.8; }
+        .self-check { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .self-check h3 { color: var(--secondary); margin-bottom: 15px; font-size: 20px; }
+        .self-check .q { margin-bottom: 12px; padding: 10px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .self-check .q strong { color: var(--info); }
+        .self-check .q p { color: var(--text-gray); margin: 5px 0 0 0; font-size: 14px; }
+        .mnemonic { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; }
+        .mnemonic h4 { color: var(--secondary); margin-bottom: 12px; }
+        .mnemonic .chant { font-size: 22px; font-weight: bold; color: #fff; letter-spacing: 3px; margin: 10px 0; }
+        .mnemonic p { color: var(--text-gray); font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="chapter">
+        <h2 class="chapter-title">第四章：Java后端CRUD开发 — 像流水线一样处理数据</h2>
+        <div class="chapter-desc">
+            <strong>费曼学习法</strong>：后端开发本质上就是一条数据流水线。前端传来请求 → Controller接单 → Service加工 → Mapper存库 → 结果原路返回。<br><br>
+            本章用最清晰的<strong>三层架构</strong>，带你理解Spring Boot如何把数据从"毛坯"加工成"精装"。<br><br>
+            <strong>本章目标</strong>：掌握Controller→Service→Mapper的分层思想，任何CRUD接口都是这个模板的变体。
+        </div>
+
+        <div class="analogy-box">
+            <h4>🏭 费曼类比：后端 = 工厂流水线</h4>
+            <p>
+                <strong>Controller（接单员）</strong> = 前台客服，接待客户、验证订单格式，但不亲自干活<br>
+                <strong>Service（车间工人）</strong> = 真正的加工者，调用工具（Mapper）、执行工艺（业务逻辑）<br>
+                <strong>Mapper（仓库管理员）</strong> = 只管存取货架，你说"取第3排第5个"，它就去拿；你说"放第7排"，它就放<br><br>
+                为什么分三层？因为<strong>客服生病了换一个人就好，车间换工艺不需要客服重新培训，货架换数据库品牌不关车间的事</strong>。这就是"解耦"——各司其职，互不干扰。
+            </p>
+        </div>
+
+        <!-- 项目结构 -->
+        <div class="card">
+            <h3>📁 4.1 项目目录结构</h3>
+            <div class="code-block">
+                <code>
+src/main/java/com/example/demo/<br>
+├── controller/           # 控制器层<br>
+│   └── UserController.java<br>
+├── service/              # 业务逻辑层<br>
+│   ├── UserService.java           # 接口<br>
+│   └── impl/<br>
+│       └── UserServiceImpl.java   # 实现类<br>
+├── mapper/               # 数据访问层<br>
+│   └── UserMapper.java<br>
+├── entity/               # 实体类<br>
+│   └── User.java<br>
+├── dto/                  # 数据传输对象<br>
+│   ├── UserDTO.java              # 请求参数<br>
+│   └── UserQueryDTO.java         # 查询参数<br>
+├── common/               # 公共组件<br>
+│   ├── Result.java               # 统一响应<br>
+│   ├── PageResult.java           # 分页结果<br>
+│   └── GlobalExceptionHandler.java # 全局异常处理<br>
+└── DemoApplication.java  # 启动类<br><br>
+src/main/resources/<br>
+├── application.yml       # 配置文件<br>
+└── mapper/               # MyBatis XML映射文件<br>
+    └── UserMapper.xml
+                </code>
+            </div>
+        </div>
+
+        <!-- 依赖配置 -->
+        <div class="card">
+            <h3>📦 4.2 Maven依赖配置</h3>
+            <div class="code-block">
+                <code>
+&lt;dependencies&gt;<br>
+&nbsp;&nbsp;&lt;!-- Spring Boot Web --&gt;<br>
+&nbsp;&nbsp;&lt;dependency&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;<br>
+&nbsp;&nbsp;&lt;/dependency&gt;<br><br>
+
+&nbsp;&nbsp;&lt;!-- MyBatis Plus --&gt;<br>
+&nbsp;&nbsp;&lt;dependency&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;com.baomidou&lt;/groupId&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;mybatis-plus-boot-starter&lt;/artifactId&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;3.5.3.1&lt;/version&gt;<br>
+&nbsp;&nbsp;&lt;/dependency&gt;<br><br>
+
+&nbsp;&nbsp;&lt;!-- MySQL驱动 --&gt;<br>
+&nbsp;&nbsp;&lt;dependency&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;com.mysql&lt;/groupId&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;mysql-connector-j&lt;/artifactId&gt;<br>
+&nbsp;&nbsp;&lt;/dependency&gt;<br><br>
+
+&nbsp;&nbsp;&lt;!-- Lombok简化代码 --&gt;<br>
+&nbsp;&nbsp;&lt;dependency&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;org.projectlombok&lt;/groupId&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;lombok&lt;/artifactId&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;optional&gt;true&lt;/optional&gt;<br>
+&nbsp;&nbsp;&lt;/dependency&gt;<br><br>
+
+&nbsp;&nbsp;&lt;!-- 参数验证 --&gt;<br>
+&nbsp;&nbsp;&lt;dependency&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;<br>
+&nbsp;&nbsp;&lt;/dependency&gt;<br>
+&lt;/dependencies&gt;
+                </code>
+            </div>
+        </div>
+
+        <!-- 配置文件 -->
+        <div class="card">
+            <h3>⚙️ 4.3 application.yml配置</h3>
+            <div class="code-block">
+                <code>
+server:<br>
+&nbsp;&nbsp;port: 8080<br><br>
+
+spring:<br>
+&nbsp;&nbsp;datasource:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;driver-class-name: com.mysql.cj.jdbc.Driver<br>
+&nbsp;&nbsp;&nbsp;&nbsp;url: jdbc:mysql://localhost:3306/demo_db?useUnicode=true&amp;characterEncoding=utf-8&amp;serverTimezone=Asia/Shanghai<br>
+&nbsp;&nbsp;&nbsp;&nbsp;username: root<br>
+&nbsp;&nbsp;&nbsp;&nbsp;password: your_password<br><br>
+
+mybatis-plus:<br>
+&nbsp;&nbsp;configuration:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;map-underscore-to-camel-case: true  # 驼峰转换<br>
+&nbsp;&nbsp;&nbsp;&nbsp;log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # SQL日志<br>
+&nbsp;&nbsp;global-config:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;db-config:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id-type: auto  # 主键自增<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;logic-delete-field: deleted  # 逻辑删除字段<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;logic-delete-value: 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;logic-not-delete-value: 0
+                </code>
+            </div>
+        </div>
+
+        <!-- 实体类 -->
+        <div class="card">
+            <h3>📋 4.4 实体类与DTO</h3>
+            <h4>实体类 (Entity)</h4>
+            <div class="code-block">
+                <code>
+import com.baomidou.mybatisplus.annotation.*;<br>
+import lombok.Data;<br>
+import java.time.LocalDateTime;<br><br>
+
+@Data<br>
+@TableName("users")<br>
+public class User {<br>
+&nbsp;&nbsp;@TableId(type = IdType.AUTO)<br>
+&nbsp;&nbsp;private Long id;<br>
+<br>
+&nbsp;&nbsp;private String username;<br>
+&nbsp;&nbsp;private String email;<br>
+&nbsp;&nbsp;private String phone;<br>
+&nbsp;&nbsp;private Integer status;<br>
+<br>
+&nbsp;&nbsp;@TableLogic<br>
+&nbsp;&nbsp;private Integer deleted;<br>
+<br>
+&nbsp;&nbsp;@TableField(fill = FieldFill.INSERT)<br>
+&nbsp;&nbsp;private LocalDateTime createTime;<br>
+<br>
+&nbsp;&nbsp;@TableField(fill = FieldFill.INSERT_UPDATE)<br>
+&nbsp;&nbsp;private LocalDateTime updateTime;<br>
+}
+                </code>
+            </div>
+            
+            <h4>DTO (数据传输对象)</h4>
+            <div class="code-block">
+                <code>
+import lombok.Data;<br>
+import javax.validation.constraints.Email;<br>
+import javax.validation.constraints.NotBlank;<br>
+import javax.validation.constraints.Pattern;<br><br>
+
+@Data<br>
+public class UserDTO {<br>
+&nbsp;&nbsp;private Long id;<br>
+<br>
+&nbsp;&nbsp;@NotBlank(message = "用户名不能为空")<br>
+&nbsp;&nbsp;private String username;<br>
+<br>
+&nbsp;&nbsp;@NotBlank(message = "邮箱不能为空")<br>
+&nbsp;&nbsp;@Email(message = "邮箱格式不正确")<br>
+&nbsp;&nbsp;private String email;<br>
+<br>
+&nbsp;&nbsp;@Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")<br>
+&nbsp;&nbsp;private String phone;<br>
+<br>
+&nbsp;&nbsp;private Integer status;<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 统一响应格式 -->
+        <div class="card">
+            <h3>📤 4.5 统一响应格式</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">所有接口返回统一的数据格式，便于前端统一处理。</p>
+            <div class="code-block">
+                <code>
+import lombok.Data;<br><br>
+
+@Data<br>
+public class Result&lt;T&gt; {<br>
+&nbsp;&nbsp;private Integer code;<br>
+&nbsp;&nbsp;private String msg;<br>
+&nbsp;&nbsp;private T data;<br>
+<br>
+&nbsp;&nbsp;public static &lt;T&gt; Result&lt;T&gt; success() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return success(null);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;public static &lt;T&gt; Result&lt;T&gt; success(T data) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Result&lt;T&gt; result = new Result&lt;&gt;();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;result.setCode(200);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;result.setMsg("成功");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;result.setData(data);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return result;<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;public static &lt;T&gt; Result&lt;T&gt; error(String msg) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return error(500, msg);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;public static &lt;T&gt; Result&lt;T&gt; error(Integer code, String msg) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Result&lt;T&gt; result = new Result&lt;&gt;();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;result.setCode(code);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;result.setMsg(msg);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return result;<br>
+&nbsp;&nbsp;}<br>
+}
+                </code>
+            </div>
+            
+            <h4>分页结果封装</h4>
+            <div class="code-block">
+                <code>
+import lombok.Data;<br>
+import java.util.List;<br><br>
+
+@Data<br>
+public class PageResult&lt;T&gt; {<br>
+&nbsp;&nbsp;private List&lt;T&gt; list;<br>
+&nbsp;&nbsp;private Long total;<br>
+<br>
+&nbsp;&nbsp;public PageResult(List&lt;T&gt; list, Long total) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;this.list = list;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;this.total = total;<br>
+&nbsp;&nbsp;}<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- Mapper层 -->
+        <div class="card">
+            <h3>🗄️ 4.6 Mapper层（数据访问）</h3>
+            <div class="code-block">
+                <code>
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;<br>
+import com.example.demo.entity.User;<br>
+import org.apache.ibatis.annotations.Mapper;<br><br>
+
+@Mapper<br>
+public interface UserMapper extends BaseMapper&lt;User&gt; {<br>
+&nbsp;&nbsp;// 继承BaseMapper后，自动拥有以下方法：<br>
+&nbsp;&nbsp;// int insert(T entity);              // 新增<br>
+&nbsp;&nbsp;// int deleteById(Serializable id);   // 根据ID删除<br>
+&nbsp;&nbsp;// int updateById(T entity);          // 根据ID更新<br>
+&nbsp;&nbsp;// T selectById(Serializable id);     // 根据ID查询<br>
+&nbsp;&nbsp;// List&lt;T&gt; selectList(Wrapper&lt;T&gt; queryWrapper);  // 条件查询<br>
+&nbsp;&nbsp;// IPage&lt;T&gt; selectPage(IPage&lt;T&gt; page, Wrapper&lt;T&gt; queryWrapper);  // 分页查询<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- Service层 -->
+        <div class="card">
+            <h3>⚙️ 4.7 Service层（业务逻辑）</h3>
+            <h4>Service接口</h4>
+            <div class="code-block">
+                <code>
+import com.baomidou.mybatisplus.extension.service.IService;<br>
+import com.example.demo.dto.UserDTO;<br>
+import com.example.demo.dto.UserQueryDTO;<br>
+import com.example.demo.entity.User;<br>
+import com.example.demo.common.PageResult;<br><br>
+
+public interface UserService extends IService&lt;User&gt; {<br>
+&nbsp;&nbsp;PageResult&lt;User&gt; queryPage(UserQueryDTO queryDTO);<br>
+&nbsp;&nbsp;void createUser(UserDTO userDTO);<br>
+&nbsp;&nbsp;void updateUser(Long id, UserDTO userDTO);<br>
+&nbsp;&nbsp;void deleteUser(Long id);<br>
+}
+                </code>
+            </div>
+            
+            <h4>Service实现类</h4>
+            <div class="code-block">
+                <code>
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;<br>
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;<br>
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;<br>
+import org.springframework.stereotype.Service;<br>
+import org.springframework.transaction.annotation.Transactional;<br>
+import org.springframework.util.StringUtils;<br><br>
+
+@Service<br>
+public class UserServiceImpl extends ServiceImpl&lt;UserMapper, User&gt; implements UserService {<br>
+<br>
+&nbsp;&nbsp;@Override<br>
+&nbsp;&nbsp;public PageResult&lt;User&gt; queryPage(UserQueryDTO queryDTO) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 构建分页对象<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Page&lt;User&gt; page = new Page&lt;&gt;(queryDTO.getPageNum(), queryDTO.getPageSize());<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 构建查询条件<br>
+&nbsp;&nbsp;&nbsp;&nbsp;LambdaQueryWrapper&lt;User&gt; wrapper = new LambdaQueryWrapper&lt;&gt;();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;wrapper.like(StringUtils.hasText(queryDTO.getUsername()), User::getUsername, queryDTO.getUsername())<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.eq(queryDTO.getStatus() != null, User::getStatus, queryDTO.getStatus())<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.orderByDesc(User::getCreateTime);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 执行分页查询<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Page&lt;User&gt; resultPage = this.page(page, wrapper);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return new PageResult&lt;&gt;(resultPage.getRecords(), resultPage.getTotal());<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;@Override<br>
+&nbsp;&nbsp;@Transactional  // 事务管理<br>
+&nbsp;&nbsp;public void createUser(UserDTO userDTO) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 检查用户名是否存在<br>
+&nbsp;&nbsp;&nbsp;&nbsp;long count = this.count(new LambdaQueryWrapper&lt;User&gt;()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.eq(User::getUsername, userDTO.getUsername()));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (count > 0) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;throw new RuntimeException("用户名已存在");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;User user = new User();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setUsername(userDTO.getUsername());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setEmail(userDTO.getEmail());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setPhone(userDTO.getPhone());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setStatus(userDTO.getStatus() != null ? userDTO.getStatus() : 1);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;this.save(user);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;@Override<br>
+&nbsp;&nbsp;@Transactional<br>
+&nbsp;&nbsp;public void updateUser(Long id, UserDTO userDTO) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;User user = this.getById(id);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (user == null) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;throw new RuntimeException("用户不存在");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setEmail(userDTO.getEmail());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setPhone(userDTO.getPhone());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user.setStatus(userDTO.getStatus());<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;this.updateById(user);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;@Override<br>
+&nbsp;&nbsp;@Transactional<br>
+&nbsp;&nbsp;public void deleteUser(Long id) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;User user = this.getById(id);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (user == null) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;throw new RuntimeException("用户不存在");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 配置了@TableLogic后，这里会执行逻辑删除而非物理删除<br>
+&nbsp;&nbsp;&nbsp;&nbsp;this.removeById(id);<br>
+&nbsp;&nbsp;}<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- Controller层 -->
+        <div class="card">
+            <h3>🎮 4.8 Controller层（接口层）</h3>
+            <div class="code-block">
+                <code>
+import com.example.demo.common.PageResult;<br>
+import com.example.demo.common.Result;<br>
+import com.example.demo.dto.UserDTO;<br>
+import com.example.demo.dto.UserQueryDTO;<br>
+import com.example.demo.entity.User;<br>
+import com.example.demo.service.UserService;<br>
+import org.springframework.validation.annotation.Validated;<br>
+import org.springframework.web.bind.annotation.*;<br>
+import javax.annotation.Resource;<br><br>
+
+@RestController<br>
+@RequestMapping("/api/users")<br>
+public class UserController {<br>
+<br>
+&nbsp;&nbsp;@Resource<br>
+&nbsp;&nbsp;private UserService userService;<br>
+<br>
+&nbsp;&nbsp;// 查询用户列表（分页）<br>
+&nbsp;&nbsp;@GetMapping<br>
+&nbsp;&nbsp;public Result&lt;PageResult&lt;User&gt;&gt; list(UserQueryDTO queryDTO) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;PageResult&lt;User&gt; result = userService.queryPage(queryDTO);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.success(result);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;// 新增用户<br>
+&nbsp;&nbsp;@PostMapping<br>
+&nbsp;&nbsp;public Result&lt;Void&gt; create(@Validated @RequestBody UserDTO userDTO) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;userService.createUser(userDTO);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.success();<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;// 更新用户<br>
+&nbsp;&nbsp;@PutMapping("/{id}")<br>
+&nbsp;&nbsp;public Result&lt;Void&gt; update(@PathVariable Long id, @Validated @RequestBody UserDTO userDTO) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;userService.updateUser(id, userDTO);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.success();<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;// 删除用户<br>
+&nbsp;&nbsp;@DeleteMapping("/{id}")<br>
+&nbsp;&nbsp;public Result&lt;Void&gt; delete(@PathVariable Long id) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;userService.deleteUser(id);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.success();<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;// 获取用户详情<br>
+&nbsp;&nbsp;@GetMapping("/{id}")<br>
+&nbsp;&nbsp;public Result&lt;User&gt; detail(@PathVariable Long id) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;User user = userService.getById(id);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.success(user);<br>
+&nbsp;&nbsp;}<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 全局异常处理 -->
+        <div class="card">
+            <h3>🛡️ 4.9 全局异常处理</h3>
+            <div class="code-block">
+                <code>
+import com.example.demo.common.Result;<br>
+import org.springframework.web.bind.MethodArgumentNotValidException;<br>
+import org.springframework.web.bind.annotation.ExceptionHandler;<br>
+import org.springframework.web.bind.annotation.RestControllerAdvice;<br><br>
+
+@RestControllerAdvice<br>
+public class GlobalExceptionHandler {<br>
+<br>
+&nbsp;&nbsp;// 处理参数验证异常<br>
+&nbsp;&nbsp;@ExceptionHandler(MethodArgumentNotValidException.class)<br>
+&nbsp;&nbsp;public Result&lt;Void&gt; handleValidException(MethodArgumentNotValidException e) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;String msg = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.error(400, msg);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;// 处理业务异常<br>
+&nbsp;&nbsp;@ExceptionHandler(RuntimeException.class)<br>
+&nbsp;&nbsp;public Result&lt;Void&gt; handleRuntimeException(RuntimeException e) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.error(500, e.getMessage());<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;// 处理未知异常<br>
+&nbsp;&nbsp;@ExceptionHandler(Exception.class)<br>
+&nbsp;&nbsp;public Result&lt;Void&gt; handleException(Exception e) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;e.printStackTrace();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return Result.error(500, "系统异常，请稍后重试");<br>
+&nbsp;&nbsp;}<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 核心知识点 -->
+        <div class="card">
+            <h3>🎯 4.10 Java后端核心知识点</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>注解</th>
+                        <th>作用</th>
+                        <th>使用场景</th>
+                    </tr>
+                    <tr>
+                        <td>@RestController</td>
+                        <td>标记RESTful控制器，返回JSON</td>
+                        <td>所有Controller类</td>
+                    </tr>
+                    <tr>
+                        <td>@RequestMapping</td>
+                        <td>映射请求路径</td>
+                        <td>类级别+方法级别</td>
+                    </tr>
+                    <tr>
+                        <td>@GetMapping/@PostMapping</td>
+                        <td>GET/POST请求映射</td>
+                        <td>CRUD接口方法</td>
+                    </tr>
+                    <tr>
+                        <td>@PathVariable</td>
+                        <td>获取路径参数</td>
+                        <td>/api/users/{id} 中的id</td>
+                    </tr>
+                    <tr>
+                        <td>@RequestBody</td>
+                        <td>将JSON绑定到对象</td>
+                        <td>POST/PUT请求体</td>
+                    </tr>
+                    <tr>
+                        <td>@Validated</td>
+                        <td>启用参数验证</td>
+                        <td>配合DTO的验证注解</td>
+                    </tr>
+                    <tr>
+                        <td>@Transactional</td>
+                        <td>声明式事务管理</td>
+                        <td>需要事务的方法</td>
+                    </tr>
+                    <tr>
+                        <td>@Service</td>
+                        <td>标记Service层Bean</td>
+                        <td>所有Service实现类</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- MyBatis Plus核心 -->
+        <div class="card">
+            <h3>🔧 4.11 MyBatis Plus核心功能</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>功能</th>
+                        <th>代码示例</th>
+                        <th>说明</th>
+                    </tr>
+                    <tr>
+                        <td>条件构造器</td>
+                        <td>wrapper.eq(User::getUsername, name)</td>
+                        <td>类型安全，避免硬编码字段名</td>
+                    </tr>
+                    <tr>
+                        <td>分页插件</td>
+                        <td>new Page&lt;&gt;(pageNum, pageSize)</td>
+                        <td>自动处理分页SQL</td>
+                    </tr>
+                    <tr>
+                        <td>逻辑删除</td>
+                        <td>@TableLogic</td>
+                        <td>删除时更新deleted字段</td>
+                    </tr>
+                    <tr>
+                        <td>自动填充</td>
+                        <td>@TableField(fill = FieldFill.INSERT)</td>
+                        <td>自动填充创建时间等字段</td>
+                    </tr>
+                    <tr>
+                        <td>主键策略</td>
+                        <td>@TableId(type = IdType.AUTO)</td>
+                        <td>主键自增/雪花算法等</td>
+                    </tr>
+                    <tr>
+                        <td>链式调用</td>
+                        <td>wrapper.like(...).eq(...).orderByDesc(...)</td>
+                        <td>灵活构建复杂查询</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h4>💡 Java后端开发技巧</h4>
+            <p>1. <strong>统一响应格式</strong>：所有接口返回Result&lt;T&gt;，前端统一处理<br/>
+            2. <strong>DTO与Entity分离</strong>：避免暴露数据库结构，增强安全性<br/>
+            3. <strong>参数验证</strong>：使用@Validated+注解，自动验证请求参数<br/>
+            4. <strong>逻辑删除</strong>：数据不真正删除，便于恢复和审计<br/>
+            5. <strong>事务管理</strong>：写操作加@Transactional，保证数据一致性<br/>
+            6. <strong>全局异常处理</strong>：统一捕获异常，返回友好错误信息<br/>
+            7. <strong>多环境配置</strong>：使用application-{profile}.yml管理不同环境配置</p>
+        </div>
+        
+        <div class="warning-box">
+            <h4>⚠️ 常见错误</h4>
+            <p>1. <strong>忘记配置分页插件</strong>：MyBatis Plus分页需要配置PaginationInnerInterceptor<br/>
+            2. <strong>直接返回Entity</strong>：应该转换为VO/DTO，避免暴露敏感字段<br/>
+            3. <strong>SQL注入风险</strong>：使用条件构造器而非字符串拼接SQL<br/>
+            4. <strong>N+1查询问题</strong>：避免在循环中查询数据库，使用批量查询</p>
+        </div>
+
+        <div class="card">
+            <h3>🛡️ 费曼图解：MyBatis Plus 为什么能"自动"写SQL？</h3>
+            <p>很多新手困惑：<strong>"为什么我继承了 ServiceImpl，就能直接调 this.getById() 而不写任何SQL？"</strong></p>
+            
+            <div class="analogy-box" style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border: 2px dashed var(--secondary); padding: 25px; border-radius: 12px; margin: 25px 0;">
+                <h4 style="color: var(--secondary);">🍔 麦当劳厨房比喻</h4>
+                <p style="color: var(--text-gray); font-style: italic;">
+                    <strong>ServiceImpl</strong> = 麦当劳的<strong>标准化操作手册</strong><br>
+                    你知道炸薯条需要：放油→加热→放薯条→3分钟→捞出<br>
+                    但你不需要每次炸薯条时都重新写一遍这5步<br><br>
+                    
+                    <strong>同样地：</strong><br>
+                    ServiceImpl 就知道增删改查的标准操作：<br>
+                    &nbsp;&nbsp;• getById(id) = SELECT * FROM table WHERE id = ?<br>
+                    &nbsp;&nbsp;• save(entity) = INSERT INTO table VALUES (...)<br>
+                    &nbsp;&nbsp;• updateById(entity) = UPDATE table SET ... WHERE id = ?<br>
+                    &nbsp;&nbsp;• removeById(id) = DELETE FROM table WHERE id = ?<br><br>
+                    
+                    你只需要告诉它"我要炸薯条"（this.getById(1)），它自己完成剩下的步骤。
+                    <strong>这就是"约定优于配置"的本质。</strong>
+                </p>
+            </div>
+
+            <h4>🔧 必须手动配置的：分页插件</h4>
+            <p>但是！分页功能不是"标准操作"——每个数据库的方言不同（MySQL用 LIMIT，Oracle用 ROWNUM）。所以你需要<strong>手动告诉MyBatis Plus你用的是什么数据库</strong>：</p>
+            
+            <div class="code-block">
+                <pre><code class="language-java">// MyBatisPlusConfig.java - 分页插件配置（必须！）
+@Configuration
+public class MyBatisPlusConfig {
+
+    /**
+     * MyBatis Plus 拦截器配置
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        
+        // 添加分页插件（指定数据库类型）
+        PaginationInnerInterceptor paginationInterceptor = new PaginationInnerInterceptor();
+        paginationInterceptor.setDbType(DbType.MYSQL);  // 指定MySQL
+        paginationInterceptor.setMaxLimit(500L);         // 单页最大500条，防止一次查太多
+        paginationInterceptor.setOverflow(true);         // 超出总页数后回到第一页
+        
+        interceptor.addInnerInterceptor(paginationInterceptor);
+        return interceptor;
+    }
+}
+
+// 然后在Service中使用分页
+public PageResult&lt;User&gt; getUserPage(UserQueryDTO query) {
+    // 创建分页对象：第几页、每页多少条
+    Page&lt;User&gt; page = new Page&lt;&gt;(query.getPageNum(), query.getPageSize());
+    
+    // 条件构造器
+    LambdaQueryWrapper&lt;User&gt; wrapper = new LambdaQueryWrapper&lt;&gt;();
+    wrapper.like(StringUtils.hasText(query.getKeyword()), User::getUsername, query.getKeyword());
+    wrapper.eq(query.getStatus() != null, User::getStatus, query.getStatus());
+    wrapper.orderByDesc(User::getCreateTime);
+    
+    // 执行分页查询
+    Page&lt;User&gt; result = this.page(page, wrapper);
+    
+    return new PageResult&lt;&gt;(result.getRecords(), result.getTotal());
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🗄️ 数据库建表语句（粘贴即用）</h3>
+            <p>以下是本教程所有章节共用的 <strong>users 表</strong>，包含逻辑删除、乐观锁、时间戳等常用字段：</p>
+            
+            <div class="code-block">
+                <pre><code class="language-sql">-- 创建用户表（直接复制到MySQL执行）
+CREATE TABLE `users` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+    `username` VARCHAR(50) NOT NULL COMMENT '用户名',
+    `password` VARCHAR(255) NOT NULL COMMENT '密码（BCrypt加密）',
+    `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
+    `phone` VARCHAR(20) DEFAULT NULL COMMENT '手机号',
+    `avatar` VARCHAR(255) DEFAULT NULL COMMENT '头像URL',
+    `gender` TINYINT DEFAULT 0 COMMENT '性别 0-未知 1-男 2-女',
+    `status` TINYINT DEFAULT 1 COMMENT '状态 0-禁用 1-启用',
+    `department_id` BIGINT DEFAULT NULL COMMENT '部门ID',
+    `deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除 0-未删除 1-已删除',
+    `version` INT DEFAULT 0 COMMENT '乐观锁版本号',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_username` (`username`),
+    UNIQUE KEY `uk_email` (`email`),
+    KEY `idx_status` (`status`),
+    KEY `idx_department_id` (`department_id`),
+    KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';</code></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔨 4.12 Swagger/Knife4j接口文档详解</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">使用Swagger/Knife4j生成API文档，方便前后端协作和接口测试。</p>
+            
+            <h4>依赖配置</h4>
+            <div class="code-block">
+                <code>
+&lt;!-- pom.xml --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.github.xiaoymin&lt;/groupId&gt;
+    &lt;artifactId&gt;knife4j-openapi3-spring-boot-starter&lt;/artifactId&gt;
+    &lt;version&gt;4.3.0&lt;/version&gt;
+&lt;/dependency&gt;
+                </code>
+            </div>
+
+            <h4>Swagger配置类</h4>
+            <div class="code-block">
+                <code>
+@Configuration
+public class SwaggerConfig {
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("CRUD系统API文档")
+                .version("1.0")
+                .description("用户管理系统接口文档")
+                .contact(new Contact().name("开发者").email("dev@example.com")))
+            .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
+            .components(new Components()
+                .addSecuritySchemes("BearerAuth",
+                    new SecurityScheme()
+                        .name("BearerAuth")
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")));
+    }
+}
+                </code>
+            </div>
+
+            <h4>Controller注解示例</h4>
+            <div class="code-block">
+                <code>
+@Tag(name = "用户管理", description = "用户增删改查接口")
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    @Operation(summary = "查询用户列表", description = "支持分页和条件筛选")
+    @Parameters({
+        @Parameter(name = "pageNum", description = "页码", example = "1"),
+        @Parameter(name = "pageSize", description = "每页条数", example = "10"),
+        @Parameter(name = "username", description = "用户名筛选", example = "张三")
+    })
+    @GetMapping
+    public Result&lt;PageResult&lt;UserVO&gt;&gt; list(
+        @RequestParam(defaultValue = "1") Integer pageNum,
+        @RequestParam(defaultValue = "10") Integer pageSize,
+        @RequestParam(required = false) String username) {
+        // ...
+    }
+
+    @Operation(summary = "新增用户")
+    @PostMapping
+    public Result&lt;Void&gt; create(@RequestBody @Validated UserDTO userDTO) {
+        // ...
+    }
+
+    @Operation(summary = "更新用户")
+    @PutMapping("/{id}")
+    public Result&lt;Void&gt; update(@PathVariable Long id, @RequestBody @Validated UserDTO userDTO) {
+        // ...
+    }
+
+    @Operation(summary = "删除用户")
+    @DeleteMapping("/{id}")
+    public Result&lt;Void&gt; delete(@PathVariable Long id) {
+        // ...
+    }
+}
+                </code>
+            </div>
+
+            <h4>访问地址</h4>
+            <div class="code-block">
+                <code>
+# Knife4j文档地址（推荐）
+http://localhost:8080/doc.html
+
+# 原生Swagger地址
+http://localhost:8080/swagger-ui.html
+
+# OpenAPI JSON
+http://localhost:8080/v3/api-docs
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>⚙️ 4.13 多环境配置</h3>
+            <div class="code-block">
+                <code>
+# application.yml (主配置文件)
+spring:
+  profiles:
+    active: @spring.profiles.active@  # Maven动态指定
+
+---
+# application-dev.yml (开发环境)
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/dev_db
+    username: root
+    password: root
+  redis:
+    host: localhost
+    port: 6379
+server:
+  port: 8080
+logging:
+  level:
+    com.example: debug
+
+---
+# application-prod.yml (生产环境)
+spring:
+  datasource:
+    url: jdbc:mysql://prod-server:3306/prod_db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+server:
+  port: 80
+logging:
+  level:
+    com.example: warn
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📝 4.14 Python API测试脚本</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">后端API开发完成后，使用Python requests库快速测试接口。</p>
+            <div class="code-block">
+                <code>
+# test_api.py - Python API测试脚本
+import requests
+import json
+
+BASE_URL = "http://localhost:8080/api"
+
+# 1. 测试新增用户
+def test_create_user():
+    url = f"{BASE_URL}/users"
+    data = {
+        "username": "test_user",
+        "email": "test@example.com",
+        "phone": "13800138000",
+        "status": 1
+    }
+    resp = requests.post(url, json=data)
+    print(f"创建用户: {resp.status_code} - {resp.json()}")
+    return resp.json()["data"]
+
+# 2. 测试查询列表
+def test_get_list():
+    url = f"{BASE_URL}/users"
+    params = {"pageNum": 1, "pageSize": 10}
+    resp = requests.get(url, params=params)
+    print(f"查询列表: {resp.status_code} - 共{resp.json()['data']['total']}条")
+
+# 3. 测试更新用户
+def test_update_user(user_id):
+    url = f"{BASE_URL}/users/{user_id}"
+    data = {"username": "updated_user", "email": "updated@example.com"}
+    resp = requests.put(url, json=data)
+    print(f"更新用户: {resp.status_code} - {resp.json()}")
+
+# 4. 测试删除用户
+def test_delete_user(user_id):
+    url = f"{BASE_URL}/users/{user_id}"
+    resp = requests.delete(url)
+    print(f"删除用户: {resp.status_code} - {resp.json()}")
+
+# 5. 测试带Token的请求
+def test_with_token():
+    url = f"{BASE_URL}/users"
+    headers = {"Authorization": "Bearer YOUR_TOKEN_HERE"}
+    resp = requests.get(url, headers=headers)
+    print(f"带Token请求: {resp.status_code}")
+
+# 运行测试
+if __name__ == "__main__":
+    print("=" * 50)
+    print("开始API测试...")
+    print("=" * 50)
+    
+    test_get_list()
+    user = test_create_user()
+    test_update_user(user["id"])
+    test_delete_user(user["id"])
+    test_get_list()
+    
+    print("=" * 50)
+    print("测试完成!")
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>⚡ 4.15 Spring Cache + Redis 缓存实战</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">使用Spring Cache注解 + Redis实现方法级缓存，减少数据库查询压力。</p>
+            
+            <h4>依赖与配置</h4>
+            <div class="code-block">
+                <code>&lt;!-- pom.xml --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-cache&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-redis&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+// CacheConfig.java
+@Configuration
+@EnableCaching
+public class CacheConfig {
+    @Bean
+    public RedisCacheConfiguration cacheConfig() {
+        return RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(30))  // 默认过期30分钟
+            .serializeKeysWith(RedisSerializationContext.SerializationPair
+                .fromSerializer(new StringRedisSerializer()))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair
+                .fromSerializer(new GenericJackson2JsonRedisSerializer()))
+            .disableCachingNullValues();
+    }
+}
+
+// Service层使用缓存
+@Service
+public class UserService {
+    
+    @Cacheable(value = "user", key = "#id")   // 查询时自动缓存
+    public UserVO getById(Long id) {
+        return userMapper.selectById(id).toVO();
+    }
+    
+    @Cacheable(value = "userList", key = "#pageNum + '_' + #pageSize")
+    public PageResult&lt;UserVO&gt; list(int pageNum, int pageSize) {
+        return userMapper.selectPage(pageNum, pageSize);
+    }
+    
+    @CacheEvict(value = "userList", allEntries = true)  // 写入时清除列表缓存
+    @CachePut(value = "user", key = "#result.id")       // 更新返回结果缓存
+    public UserVO create(UserDTO dto) { ... }
+    
+    @CacheEvict(value = "user", key = "#id")             // 删除时清除单条缓存
+    public void delete(Long id) { ... }
+    
+    @Caching(evict = {
+        @CacheEvict(value = "user", key = "#id"),
+        @CacheEvict(value = "userList", allEntries = true)
+    })
+    @CachePut(value = "user", key = "#result.id")
+    public UserVO update(Long id, UserDTO dto) { ... }
+}
+                </code>
+            </div>
+
+            <h4>多级缓存策略</h4>
+            <div class="table-wrapper">
+                <table>
+                    <tr><th>注解</th><th>说明</th><th>使用场景</th></tr>
+                    <tr><td>@Cacheable</td><td>查询前先查缓存，命中则直接返回</td><td>查询接口</td></tr>
+                    <tr><td>@CachePut</td><td>始终执行方法，结果写入缓存</td><td>新增、更新接口</td></tr>
+                    <tr><td>@CacheEvict</td><td>删除缓存</td><td>删除、列表刷新</td></tr>
+                    <tr><td>@Caching</td><td>组合多个缓存操作</td><td>复杂更新场景</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🚦 4.16 接口限流（Rate Limiting）</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">防止接口被恶意刷取或突发流量打垮系统。</p>
+            
+            <div class="code-block">
+                <code>// 方案1：Guava RateLimiter（单机限流）
+import com.google.common.util.concurrent.RateLimiter;
+
+@Component
+public class RateLimitInterceptor implements HandlerInterceptor {
+    private final RateLimiter limiter = RateLimiter.create(100.0);  // 每秒100个请求
+    
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (!limiter.tryAcquire(1, TimeUnit.SECONDS)) {
+            response.setStatus(429);
+            response.getWriter().write("{\"code\":429,\"msg\":\"请求过于频繁\"}");
+            return false;
+        }
+        return true;
+    }
+}
+
+// 方案2：Redis + Lua脚本（分布式限流）
+@Component
+public class RedisRateLimiter {
+    @Autowired
+    private RedisTemplate&lt;String, String&gt; redisTemplate;
+    
+    private static final String LUA_SCRIPT = """
+        local key = KEYS[1]
+        local limit = tonumber(ARGV[1])
+        local window = tonumber(ARGV[2])
+        local current = redis.call('INCR', key)
+        if current == 1 then
+            redis.call('EXPIRE', key, window)
+        end
+        if current > limit then
+            return 0
+        end
+        return 1
+    """;
+    
+    public boolean isAllowed(String userId, int limit, int windowSeconds) {
+        String key = "rate_limit:" + userId;
+        Long result = redisTemplate.execute(
+            new DefaultRedisScript&lt;&gt;(LUA_SCRIPT, Long.class),
+            List.of(key),
+            String.valueOf(limit),
+            String.valueOf(windowSeconds)
+        );
+        return result != null &amp;&amp; result == 1;
+    }
+}
+
+// 方案3：Bucket4j令牌桶（分布式）
+// 引入 bucket4j-redis 依赖即可使用令牌桶算法
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔄 4.17 Flyway数据库版本迁移</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">版本化管理数据库DDL，避免手动执行SQL脚本的混乱。</p>
+            
+            <div class="code-block">
+                <code>&lt;!-- pom.xml --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.flywaydb&lt;/groupId&gt;
+    &lt;artifactId&gt;flyway-mysql&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+# application.yml
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true      # 非空数据库基线化
+    table: flyway_schema_history   # 版本记录表
+    validate-on-migrate: true      # 验证脚本一致性
+
+# db/migration/V1__init.sql
+CREATE TABLE user (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100),
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+# db/migration/V2__add_phone.sql
+ALTER TABLE user ADD COLUMN phone VARCHAR(20);
+
+# db/migration/V3__add_index.sql
+CREATE INDEX idx_username ON user(username);
+
+# 命名规范：V{version}__{description}.sql
+# V1__init.sql
+# V2__add_column.sql
+# V1.1__fix_data.sql
+# R__repeatable.sql（可重复执行）
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔑 4.18 OAuth2 第三方登录</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">集成GitHub/微信等第三方OAuth2登录，简化用户注册流程。</p>
+            
+            <div class="code-block">
+                <code># application.yml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            scope: user:email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          wechat:
+            client-id: ${WECHAT_APP_ID}
+            client-secret: ${WECHAT_APP_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/wechat"
+
+// SecurityConfig.java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler((request, response, auth) -> {
+                    // OAuth2登录成功后：创建或更新本地用户
+                    OAuth2User oauthUser = auth.getPrincipal();
+                    String email = oauthUser.getAttribute("email");
+                    User user = userService.findOrCreateByEmail(email);
+                    
+                    // 生成JWT返回前端
+                    String jwt = jwtUtil.createToken(user.getId());
+                    response.sendRedirect("/auth/callback?token=" + jwt);
+                })
+            )
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/login", "/oauth2/**").permitAll()
+                .anyRequest().authenticated()
+            );
+        return http.build();
+    }
+}
+
+// 前端：GitHub登录按钮
+&lt;a href="/oauth2/authorization/github"&gt;
+  &lt;el-button&gt;
+    &lt;svg&gt;...&lt;/svg&gt; GitHub登录
+  &lt;/el-button&gt;
+&lt;/a&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📁 4.19 MinIO对象存储文件上传</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">MinIO是开源的对象存储服务，兼容AWS S3 API，适合文件上传场景。</p>
+            
+            <div class="code-block">
+                <code>&lt;!-- pom.xml --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.minio&lt;/groupId&gt;
+    &lt;artifactId&gt;minio&lt;/artifactId&gt;
+    &lt;version&gt;8.5.7&lt;/version&gt;
+&lt;/dependency&gt;
+
+// MinioConfig.java
+@Configuration
+public class MinioConfig {
+    @Value("${minio.endpoint}") private String endpoint;
+    @Value("${minio.access-key}") private String accessKey;
+    @Value("${minio.secret-key}") private String secretKey;
+    @Value("${minio.bucket}") private String bucket;
+    
+    @Bean
+    public MinioClient minioClient() {
+        return MinioClient.builder()
+            .endpoint(endpoint)
+            .credentials(accessKey, secretKey)
+            .build();
+    }
+}
+
+// FileService.java
+@Service
+public class FileService {
+    @Autowired
+    private MinioClient minioClient;
+    @Value("${minio.bucket}") private String bucket;
+    
+    public String upload(MultipartFile file) throws Exception {
+        String objectName = generateFileName(file.getOriginalFilename());
+        
+        minioClient.putObject(PutObjectArgs.builder()
+            .bucket(bucket)
+            .object(objectName)
+            .stream(file.getInputStream(), file.getSize(), -1)
+            .contentType(file.getContentType())
+            .build());
+        
+        // 返回访问URL
+        return "/api/files/" + objectName;
+    }
+    
+    public void download(String objectName, HttpServletResponse response) {
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + objectName);
+        
+        GetObjectResponse stream = minioClient.getObject(
+            GetObjectArgs.builder().bucket(bucket).object(objectName).build()
+        );
+        stream.transferTo(response.getOutputStream());
+    }
+}
+
+// docker-compose添加MinIO
+services:
+  minio:
+    image: minio/minio
+    ports: ["9000:9000", "9001:9001"]
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔗 4.20 Spring WebSocket实时通信</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">WebSocket实现服务端主动向客户端推送消息，如通知推送、数据实时刷新。</p>
+            
+            <div class="code-block">
+                <code>&lt;!-- pom.xml --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-websocket&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+// WebSocketConfig.java
+@Configuration
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer {
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(myHandler(), "/ws/notify")
+            .setAllowedOrigins("*");
+    }
+    
+    @Bean
+    public MyWebSocketHandler myHandler() {
+        return new MyWebSocketHandler();
+    }
+}
+
+// MyWebSocketHandler.java
+@Component
+public class MyWebSocketHandler extends TextWebSocketHandler {
+    private static final Map&lt;Long, WebSocketSession&gt; sessions = new ConcurrentHashMap&lt;&gt;();
+    
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        Long userId = getUserIdFromSession(session);
+        sessions.put(userId, session);
+    }
+    
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        Long userId = getUserIdFromSession(session);
+        sessions.remove(userId);
+    }
+    
+    // 推送消息给指定用户
+    public void sendMessage(Long userId, String message) throws IOException {
+        WebSocketSession session = sessions.get(userId);
+        if (session != null &amp;&amp; session.isOpen()) {
+            session.sendMessage(new TextMessage(message));
+        }
+    }
+    
+    // 广播消息给所有用户
+    public void broadcast(String message) {
+        sessions.values().forEach(session -> {
+            if (session.isOpen()) {
+                try { session.sendMessage(new TextMessage(message)); } 
+                catch (IOException e) { sessions.remove(getUserIdFromSession(session)); }
+            }
+        });
+    }
+}
+
+// 业务层调用推送
+@Service
+public class NotificationService {
+    @Autowired
+    private MyWebSocketHandler wsHandler;
+    
+    public void notifyUser(Long userId, String content) throws IOException {
+        wsHandler.sendMessage(userId, JSON.toJSONString(Map.of("type", "通知", "content", content)));
+    }
+}
+                </code>
+            </div>
+        </div>
+
+        <div class="self-check">
+            <h3>🧠 费曼自测：你能解释给同学听吗？</h3>
+            <div class="q"><strong>Q1：Controller、Service、Mapper各自的职责是什么？</strong><p>A：Controller = 接电话的客服（只负责接收和返回，不干实质活），Service = 车间工人（真正执行业务逻辑），Mapper = 仓库搬运工（只负责存取数据）。记住口诀：<strong>接电→干活→存取</strong>。</p></div>
+            <div class="q"><strong>Q2：为什么要用DTO和Entity分开？</strong><p>A：就像你去银行不会把保险柜密码贴在大厅墙上。Entity包含数据库所有字段（包括密码hash等敏感信息），DTO只暴露需要给前端的数据。DIFFERENT AUDIENCES, DIFFERENT DATA。</p></div>
+            <div class="q"><strong>Q3：@Transactional 到底做了什么？</strong><p>A：就像"一键撤销"按钮。一个操作涉及多个步骤（比如转账：扣钱 + 加钱），如果中间一步失败，前面的所有操作全部撤回。没有它，你可能会"钱扣了但没转过去"。</p></div>
+        </div>
+
+        <div class="mnemonic">
+            <h4>🧠 记忆口诀：Spring Boot三层心法</h4>
+            <div class="chant">C → S → M</div>
+            <p>Controller接收 → Service处理 → Mapper存取<br>任何CRUD后端代码都逃不出这三个字母。</p>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+        });
+    </script>
+    <script>
+        function convertCodeBlocks(lang) {
+            document.querySelectorAll('.code-block').forEach(block => {
+                const oldCode = block.querySelector('code');
+                if (!oldCode || oldCode.parentElement.tagName === 'PRE') return;
+                let html = oldCode.innerHTML;
+                let text = html.replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/gi, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.className = `language-${lang}`;
+                code.textContent = text;
+                pre.appendChild(code);
+                block.appendChild(pre);
+                oldCode.remove();
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            convertCodeBlocks('javascript');
+            if (window.Prism) Prism.highlightAll();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第五章：API接口设计与规范 - 从原理到实战</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js" defer></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1; --secondary: #f59e0b; --bg-dark: #0f172a;
+            --bg-card: #1e293b; --text-light: #f8fafc; --text-gray: #94a3b8;
+            --border: #334155; --success: #22c55e; --danger: #ef4444; --info: #3b82f6;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.8; }
+        .chapter { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .chapter-title { font-size: 36px; margin-bottom: 20px; background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .chapter-desc { color: var(--text-gray); font-size: 16px; margin-bottom: 40px; line-height: 1.8; padding: 20px; background: var(--bg-card); border-radius: 10px; border-left: 4px solid var(--primary); }
+        .card { background: var(--bg-card); border-radius: 15px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .card h3 { font-size: 22px; margin-bottom: 20px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .card h4 { font-size: 18px; margin: 20px 0 15px; color: var(--info); }
+        .card ul { list-style: none; padding-left: 0; }
+        .card ul li { padding: 10px 0 10px 25px; position: relative; color: var(--text-gray); line-height: 1.6; }
+        .card ul li::before { content: '→'; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+        .mermaid-container { background: #fff; border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .mermaid-title { text-align: center; color: var(--text-gray); margin-bottom: 15px; font-size: 14px; }
+        .code-block { background: #0f0f1a; padding: 20px; border-radius: 10px; margin: 20px 0; overflow-x: auto; border: 1px solid var(--border); }
+        .code-block code { font-family: 'Courier New', monospace; font-size: 13px; color: var(--text-light); line-height: 1.6; white-space: pre; }
+        .highlight-box { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border-left: 4px solid var(--primary); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .highlight-box h4 { margin-bottom: 10px; color: var(--primary); }
+        .warning-box { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border-left: 4px solid var(--danger); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .warning-box h4 { margin-bottom: 10px; color: var(--danger); }
+        .table-wrapper { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(99, 102, 241, 0.2); color: var(--primary); font-weight: 600; }
+        td { color: var(--text-gray); }
+        .api-example { background: #0d1117; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid var(--success); }
+        .api-example.post { border-left-color: var(--success); }
+        .api-example.get { border-left-color: var(--info); }
+        .api-example.put { border-left-color: var(--secondary); }
+        .api-example.delete { border-left-color: var(--danger); }
+        .analogy-box { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border: 2px dashed var(--secondary); padding: 25px; border-radius: 12px; margin: 25px 0; }
+        .analogy-box h4 { color: var(--secondary); margin-bottom: 12px; font-size: 18px; }
+        .analogy-box p { color: var(--text-gray); line-height: 1.8; }
+        .self-check { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .self-check h3 { color: var(--secondary); margin-bottom: 15px; font-size: 20px; }
+        .self-check .q { margin-bottom: 12px; padding: 10px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .self-check .q strong { color: var(--info); }
+        .self-check .q p { color: var(--text-gray); margin: 5px 0 0 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="chapter">
+        <h2 class="chapter-title">第五章：API接口设计 — 前后端沟通的共同语言</h2>
+        <div class="chapter-desc">
+            <strong>费曼学习法</strong>：API就是前后端之间的"共同语言"。就像中国人和美国人交流需要英语，Vue和Spring Boot交流需要HTTP+JSON。<br><br>
+            本章让你成为"前后端翻译官"，写出清晰、规范、防错的接口。<br><br>
+            <strong>本章目标</strong>：看到一个URL就能秒懂它做了什么操作。
+        </div>
+
+        <div class="analogy-box">
+            <h4>🌐 费曼类比：API = 餐厅菜单</h4>
+            <p>
+                <strong>URL</strong> = 菜名（/api/users = 用户这道菜）<br>
+                <strong>HTTP方法</strong> = 你对服务员说的话（GET = 我要看菜单，POST = 我要加一道菜，PUT = 这道菜改配方，DELETE = 退菜）<br>
+                <strong>请求参数</strong> = 备注（微辣、不要香菜、pageSize=10）<br>
+                <strong>响应JSON</strong> = 端上来的菜<br><br>
+                好的API就像好菜单——一眼看懂、结构清晰、不会端错菜。
+            </p>
+        </div>
+
+        <!-- RESTful设计原则 -->
+        <div class="card">
+            <h3>📐 5.1 RESTful设计原则</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">RESTful是一种软件架构风格，通过HTTP协议实现资源的增删改查操作。</p>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>HTTP方法</th>
+                        <th>操作</th>
+                        <th>幂等</th>
+                        <th>安全</th>
+                        <th>示例</th>
+                    </tr>
+                    <tr>
+                        <td><span style="color: var(--info); font-weight: bold;">GET</span></td>
+                        <td>查询</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>GET /api/users</td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: var(--success); font-weight: bold;">POST</span></td>
+                        <td>新增</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>POST /api/users</td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: var(--secondary); font-weight: bold;">PUT</span></td>
+                        <td>全量更新</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>PUT /api/users/1</td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: var(--secondary); font-weight: bold;">PATCH</span></td>
+                        <td>部分更新</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>PATCH /api/users/1</td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: var(--danger); font-weight: bold;">DELETE</span></td>
+                        <td>删除</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>DELETE /api/users/1</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="mermaid-container">
+                <div class="mermaid-title">RESTful资源操作映射图</div>
+                <div class="mermaid">
+graph LR
+    A[资源 /api/users] --> B[GET 查询列表]
+    A --> C[POST 新增用户]
+    A --> D["GET/#123;id#125; 查询详情"]
+    A --> E["PUT/#123;id#125; 更新用户"]
+    A --> F["DELETE/#123;id#125; 删除用户"]
+    
+    classDef get fill:#3b82f6,stroke:#2563eb,color:#fff
+    classDef post fill:#22c55e,stroke:#16a34a,color:#fff
+    classDef put fill:#f59e0b,stroke:#d97706,color:#fff
+    classDef delete fill:#ef4444,stroke:#dc2626,color:#fff
+    class A fill:#6366f1,stroke:#4f46e5,color:#fff
+    class B,D get
+    class C post
+    class E put
+    class F delete
+                </div>
+            </div>
+        </div>
+
+        <!-- API设计规范 -->
+        <div class="card">
+            <h3>📋 5.2 API命名规范</h3>
+            <h4>URL设计规范</h4>
+            <ul>
+                <li><strong>使用名词而非动词</strong>：/api/users 而不是 /api/getUsers</li>
+                <li><strong>使用复数形式</strong>：/api/users 而不是 /api/user</li>
+                <li><strong>使用小写字母和连字符</strong>：/api/user-roles 而不是 /api/UserRoles</li>
+                <li><strong>资源嵌套</strong>：/api/users/{userId}/orders 表示用户的订单</li>
+                <li><strong>查询参数</strong>：用于过滤、排序、分页，如 ?status=1&page=1&size=10</li>
+            </ul>
+            
+            <div class="code-block">
+                <code>
+// ✅ 好的API设计<br>
+GET    /api/users              # 获取用户列表<br>
+GET    /api/users/1            # 获取ID为1的用户<br>
+POST   /api/users              # 新增用户<br>
+PUT    /api/users/1            # 更新ID为1的用户<br>
+DELETE /api/users/1            # 删除ID为1的用户<br><br>
+
+// ❌ 不好的API设计<br>
+GET    /api/getUsers           # 使用动词<br>
+GET    /api/user/1             # 使用单数<br>
+POST   /api/createUser         # 使用动词<br>
+GET    /api/user?id=1          # 用查询参数代替路径参数<br>
+POST   /api/users/delete/1     # 在URL中包含操作
+                </code>
+            </div>
+        </div>
+
+        <!-- 常见API接口示例 -->
+        <div class="card">
+            <h3>📡 5.3 常见API接口示例</h3>
+            <div class="api-example get">
+                <strong style="color: var(--info);">GET</strong> /api/users?pageNum=1&pageSize=10&username=admin
+            </div>
+            <div class="code-block">
+                <code>
+// 请求：查询用户列表<br>
+// 响应：<br>
+{<br>
+&nbsp;&nbsp;"code": 200,<br>
+&nbsp;&nbsp;"msg": "成功",<br>
+&nbsp;&nbsp;"data": {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"list": [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ "id": 1, "username": "admin", "email": "admin@example.com", "status": 1, "createTime": "2024-01-01 10:00:00" }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"total": 100<br>
+&nbsp;&nbsp;}<br>
+}
+                </code>
+            </div>
+            
+            <div class="api-example post">
+                <strong style="color: var(--success);">POST</strong> /api/users
+            </div>
+            <div class="code-block">
+                <code>
+// 请求体：<br>
+{<br>
+&nbsp;&nbsp;"username": "testuser",<br>
+&nbsp;&nbsp;"email": "test@example.com",<br>
+&nbsp;&nbsp;"phone": "13800138000",<br>
+&nbsp;&nbsp;"status": 1<br>
+}<br><br>
+
+// 响应：<br>
+{<br>
+&nbsp;&nbsp;"code": 200,<br>
+&nbsp;&nbsp;"msg": "成功",<br>
+&nbsp;&nbsp;"data": null<br>
+}
+                </code>
+            </div>
+            
+            <div class="api-example put">
+                <strong style="color: var(--secondary);">PUT</strong> /api/users/1
+            </div>
+            <div class="code-block">
+                <code>
+// 请求体：<br>
+{<br>
+&nbsp;&nbsp;"email": "newemail@example.com",<br>
+&nbsp;&nbsp;"phone": "13900139000"<br>
+}<br><br>
+
+// 响应：<br>
+{<br>
+&nbsp;&nbsp;"code": 200,<br>
+&nbsp;&nbsp;"msg": "成功",<br>
+&nbsp;&nbsp;"data": null<br>
+}
+                </code>
+            </div>
+            
+            <div class="api-example delete">
+                <strong style="color: var(--danger);">DELETE</strong> /api/users/1
+            </div>
+            <div class="code-block">
+                <code>
+// 响应：<br>
+{<br>
+&nbsp;&nbsp;"code": 200,<br>
+&nbsp;&nbsp;"msg": "成功",<br>
+&nbsp;&nbsp;"data": null<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- HTTP状态码 -->
+        <div class="card">
+            <h3>🔢 5.4 HTTP状态码规范</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>状态码</th>
+                        <th>含义</th>
+                        <th>使用场景</th>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--success);">200</strong></td>
+                        <td>OK</td>
+                        <td>请求成功，返回数据</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--success);">201</strong></td>
+                        <td>Created</td>
+                        <td>资源创建成功（POST）</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--success);">204</strong></td>
+                        <td>No Content</td>
+                        <td>请求成功，无返回内容（DELETE）</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--secondary);">400</strong></td>
+                        <td>Bad Request</td>
+                        <td>请求参数错误</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--secondary);">401</strong></td>
+                        <td>Unauthorized</td>
+                        <td>未认证/Token无效</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--secondary);">403</strong></td>
+                        <td>Forbidden</td>
+                        <td>无权限访问</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--secondary);">404</strong></td>
+                        <td>Not Found</td>
+                        <td>资源不存在</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--danger);">500</strong></td>
+                        <td>Internal Server Error</td>
+                        <td>服务器内部错误</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Swagger文档 -->
+        <div class="card">
+            <h3>📖 5.5 Swagger接口文档</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">使用Swagger自动生成API文档，方便前后端联调和接口测试。</p>
+            
+            <h4>引入依赖</h4>
+            <div class="code-block">
+                <code>
+&lt;dependency&gt;<br>
+&nbsp;&nbsp;&lt;groupId&gt;org.springdoc&lt;/groupId&gt;<br>
+&nbsp;&nbsp;&lt;artifactId&gt;springdoc-openapi-ui&lt;/artifactId&gt;<br>
+&nbsp;&nbsp;&lt;version&gt;1.7.0&lt;/version&gt;<br>
+&lt;/dependency&gt;
+                </code>
+            </div>
+            
+            <h4>Controller注解示例</h4>
+            <div class="code-block">
+                <code>
+import io.swagger.v3.oas.annotations.Operation;<br>
+import io.swagger.v3.oas.annotations.Parameter;<br>
+import io.swagger.v3.oas.annotations.tags.Tag;<br><br>
+
+@Tag(name = "用户管理", description = "用户增删改查接口")<br>
+@RestController<br>
+@RequestMapping("/api/users")<br>
+public class UserController {<br>
+<br>
+&nbsp;&nbsp;@Operation(summary = "查询用户列表", description = "分页查询用户列表")<br>
+&nbsp;&nbsp;@GetMapping<br>
+&nbsp;&nbsp;public Result&lt;PageResult&lt;User&gt;&gt; list(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer pageNum,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Parameter(description = "每页数量") @RequestParam(defaultValue = "10") Integer pageSize) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// ...<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;@Operation(summary = "新增用户")<br>
+&nbsp;&nbsp;@PostMapping<br>
+&nbsp;&nbsp;public Result&lt;Void&gt; create(@Validated @RequestBody UserDTO userDTO) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// ...<br>
+&nbsp;&nbsp;}<br>
+}
+                </code>
+            </div>
+            <p style="color: var(--text-gray); margin-top: 10px;">访问 <code style="background: rgba(99, 102, 241, 0.2); padding: 2px 6px; border-radius: 4px;">http://localhost:8080/swagger-ui.html</code> 查看文档</p>
+        </div>
+
+        <!-- 接口版本控制 -->
+        <div class="card">
+            <h3>🔄 5.6 接口版本控制</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">随着业务发展，API可能需要升级，版本控制可以保证向后兼容。</p>
+            
+            <h4>版本控制方式对比</h4>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>方式</th>
+                        <th>示例</th>
+                        <th>优点</th>
+                        <th>缺点</th>
+                    </tr>
+                    <tr>
+                        <td>URL路径</td>
+                        <td>/api/v1/users</td>
+                        <td>简单直观，广泛使用</td>
+                        <td>URL中嵌入版本</td>
+                    </tr>
+                    <tr>
+                        <td>请求头</td>
+                        <td>Header: API-Version: 1</td>
+                        <td>URL保持简洁</td>
+                        <td>不够直观</td>
+                    </tr>
+                    <tr>
+                        <td>查询参数</td>
+                        <td>/api/users?version=1</td>
+                        <td>灵活</td>
+                        <td>容易遗漏</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="code-block">
+                <code>
+// 推荐：URL路径方式<br>
+@RestController<br>
+@RequestMapping("/api/v1/users")<br>
+public class UserControllerV1 {<br>
+&nbsp;&nbsp;// v1版本接口<br>
+}<br><br>
+
+@RestController<br>
+@RequestMapping("/api/v2/users")<br>
+public class UserControllerV2 {<br>
+&nbsp;&nbsp;// v2版本接口（新字段、新逻辑）<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 错误码设计 -->
+        <div class="card">
+            <h3>⚠️ 5.7 错误码设计</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">合理的错误码体系可以快速定位问题，提高开发效率。</p>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>错误码</th>
+                        <th>含义</th>
+                        <th>处理方式</th>
+                    </tr>
+                    <tr>
+                        <td>200</td>
+                        <td>成功</td>
+                        <td>正常业务流程</td>
+                    </tr>
+                    <tr>
+                        <td>400</td>
+                        <td>参数错误</td>
+                        <td>提示用户修改参数</td>
+                    </tr>
+                    <tr>
+                        <td>401</td>
+                        <td>未认证</td>
+                        <td>跳转登录页</td>
+                    </tr>
+                    <tr>
+                        <td>403</td>
+                        <td>无权限</td>
+                        <td>提示权限不足</td>
+                    </tr>
+                    <tr>
+                        <td>404</td>
+                        <td>资源不存在</td>
+                        <td>提示资源不存在</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>服务器错误</td>
+                        <td>提示系统异常，记录日志</td>
+                    </tr>
+                    <tr>
+                        <td>1001</td>
+                        <td>用户名已存在</td>
+                        <td>业务错误码，自定义</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h4>💡 API设计最佳实践</h4>
+            <p>1. <strong>使用RESTful风格</strong>：资源用名词，操作用HTTP方法<br/>
+            2. <strong>统一响应格式</strong>：{code, msg, data} 结构<br/>
+            3. <strong>合理使用状态码</strong>：2xx成功、4xx客户端错误、5xx服务端错误<br/>
+            4. <strong>提供Swagger文档</strong>：降低前后端沟通成本<br/>
+            5. <strong>版本控制</strong>：使用URL路径方式 /api/v1/xxx<br/>
+            6. <strong>错误码体系</strong>：区分HTTP状态码和业务错误码<br/>
+            7. <strong>使用Apifox/Postman</strong>：接口调试与Mock数据生成</p>
+        </div>
+
+        <div class="card">
+            <h3>🔧 5.8 Apifox/Postman高级用法</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">Apifox是新一代API协作工具，集API文档、调试、Mock、测试于一体。</p>
+            
+            <h4>Apifox核心功能</h4>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>功能</th>
+                        <th>说明</th>
+                        <th>优势</th>
+                    </tr>
+                    <tr>
+                        <td>API文档管理</td>
+                        <td>在线编写/导入OpenAPI/Swagger</td>
+                        <td>自动同步，团队共享</td>
+                    </tr>
+                    <tr>
+                        <td>接口调试</td>
+                        <td>类似Postman的请求功能</td>
+                        <td>与文档联动，参数自动填充</td>
+                    </tr>
+                    <tr>
+                        <td>Mock数据</td>
+                        <td>自动生成模拟数据</td>
+                        <td>前端可独立开发</td>
+                    </tr>
+                    <tr>
+                        <td>自动化测试</td>
+                        <td>编写测试用例，批量运行</td>
+                        <td>CI/CD集成</td>
+                    </tr>
+                    <tr>
+                        <td>数据模型</td>
+                        <td>定义请求/响应数据结构</td>
+                        <td>类型安全，自动生成文档</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h4>Mock数据配置</h4>
+            <div class="code-block">
+                <code>
+// Apifox Mock规则
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "list|10": [
+      {
+        "id|+1": 1,
+        "username": "@cname",
+        "email": "@email",
+        "phone": /^1[3-9]\d{9}$/,
+        "status|1": [0, 1],
+        "createTime": "@datetime('yyyy-MM-dd HH:mm:ss')"
+      }
+    ],
+    "total": 100,
+    "pageNum": 1,
+    "pageSize": 10
+  }
+}
+
+// 常用Mock语法
+@cname           // 中文姓名
+@name            // 英文姓名
+@email           // 邮箱
+@phone           // 手机号
+@id              // 身份证号
+@city            // 城市名
+@datetime        // 日期时间
+@integer(min,max) // 随机整数
+@float(min,max)   // 随机浮点数
+                </code>
+            </div>
+
+            <h4>Postman环境变量管理</h4>
+            <div class="code-block">
+                <code>
+// Postman环境变量示例
+// 开发环境
+{
+  "base_url": "http://localhost:8080",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "username": "admin",
+  "password": "123456"
+}
+
+// 测试环境
+{
+  "base_url": "http://test.example.com",
+  "token": "{{test_token}}",
+  "username": "test_user",
+  "password": "test123"
+}
+
+// 生产环境
+{
+  "base_url": "https://api.example.com",
+  "token": "{{prod_token}}"
+}
+
+// 使用方式: {{base_url}}/api/users
+// 前置脚本: pm.environment.get("base_url")
+// 后置脚本: pm.test("Status code is 200", () => pm.response.to.have.status(200))
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔗 5.9 GraphQL vs REST API 对比</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>特性</th>
+                        <th>REST API</th>
+                        <th>GraphQL</th>
+                    </tr>
+                    <tr>
+                        <td>数据获取</td>
+                        <td>固定结构，可能过度获取</td>
+                        <td>按需获取，避免多余数据</td>
+                    </tr>
+                    <tr>
+                        <td>接口数量</td>
+                        <td>多个端点（/users, /users/:id...）</td>
+                        <td>单一端点（/graphql）</td>
+                    </tr>
+                    <tr>
+                        <td>版本控制</td>
+                        <td>/api/v1/users, /api/v2/users</td>
+                        <td>通过字段废弃实现平滑升级</td>
+                    </tr>
+                    <tr>
+                        <td>学习曲线</td>
+                        <td>低，HTTP标准</td>
+                        <td>中，需要学习GraphQL语法</td>
+                    </tr>
+                    <tr>
+                        <td>缓存</td>
+                        <td>HTTP缓存机制成熟</td>
+                        <td>需第三方库支持</td>
+                    </tr>
+                    <tr>
+                        <td>适用场景</td>
+                        <td>CRUD系统、简单API</td>
+                        <td>复杂查询、多端适配</td>
+                    </tr>
+                    <tr>
+                        <td>推荐</td>
+                        <td>大部分后台管理系统</td>
+                        <td>数据关系复杂、移动端优先</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h4>GraphQL示例</h4>
+            <div class="code-block">
+                <code>
+# GraphQL查询示例（客户端请求）
+query {
+  users(pageNum: 1, pageSize: 10) {
+    list {
+      id
+      username
+      email
+      role {
+        name
+        permissions
+      }
+    }
+    total
+  }
+}
+
+# GraphQL突变示例（新增/更新/删除）
+mutation {
+  createUser(input: {
+    username: "new_user"
+    email: "new@example.com"
+    phone: "13800138000"
+    roleIds: [1, 2]
+  }) {
+    id
+    username
+    createTime
+  }
+}
+
+# 注意：GraphQL适合数据关系复杂、需要灵活查询的场景
+# 对于常规CRUD系统，REST API更简单直接
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔒 5.10 API签名安全（防篡改 + 防重放）</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">对敏感API请求进行签名校验，防止参数篡改和重放攻击。</p>
+            
+            <div class="code-block">
+                <code>// 前端签名生成
+import CryptoJS from 'crypto-js'
+
+function signRequest(params, secret) {
+  const timestamp = Date.now()
+  const nonce = Math.random().toString(36).slice(2)
+  
+  // 1. 按key字母排序参数
+  const sortedKeys = Object.keys(params).sort()
+  const signStr = sortedKeys.map(k => `${k}=${params[k]}`).join('&')
+  
+  // 2. 拼接：signStr + timestamp + nonce + secret
+  const raw = `${signStr}${timestamp}${nonce}${secret}`
+  
+  // 3. HMAC-SHA256签名
+  const signature = CryptoJS.HmacSHA256(raw, secret).toString()
+  
+  return { timestamp, nonce, signature }
+}
+
+// 使用
+const signed = signRequest({ username: 'admin', pageNum: 1 }, 'SECRET_KEY')
+axios.get('/api/users', {
+  params: { username: 'admin', pageNum: 1 },
+  headers: {
+    'X-Timestamp': signed.timestamp,
+    'X-Nonce': signed.nonce,
+    'X-Signature': signed.signature
+  }
+})
+
+// 后端签名校验拦截器
+@Component
+public class SignInterceptor implements HandlerInterceptor {
+    private static final long TIMEOUT = 5 * 60 * 1000;  // 5分钟失效
+    
+    @Override
+    public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) {
+        String timestamp = req.getHeader("X-Timestamp");
+        String nonce = req.getHeader("X-Nonce");
+        String signature = req.getHeader("X-Signature");
+        
+        // 1. 检查时间戳（防重放）
+        if (Math.abs(System.currentTimeMillis() - Long.parseLong(timestamp)) > TIMEOUT) {
+            return fail(resp, "请求已过期");
+        }
+        
+        // 2. 检查nonce是否已使用（Redis存储5分钟）
+        if (redisTemplate.hasKey("nonce:" + nonce)) {
+            return fail(resp, "重复请求");
+        }
+        
+        // 3. 重新计算签名并比对
+        String expected = computeSign(req.getParameterMap(), timestamp, nonce);
+        if (!expected.equals(signature)) {
+            return fail(resp, "签名验证失败");
+        }
+        
+        // 4. 标记nonce已使用
+        redisTemplate.opsForValue().set("nonce:" + nonce, "1", Duration.ofMinutes(5));
+        return true;
+    }
+}
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔗 5.11 SSE（Server-Sent Events）服务端推送</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">SSE比WebSocket更轻量，单向（服务端→客户端），适合日志推送、进度通知等场景。</p>
+            
+            <div class="code-block">
+                <code>// 后端SSE接口
+@RestController
+@RequestMapping("/api/sse")
+public class SseController {
+    private static final Map&lt;String, SseEmitter&gt; emitters = new ConcurrentHashMap&lt;&gt;();
+    
+    @GetMapping("/subscribe/{userId}")
+    public SseEmitter subscribe(@PathVariable String userId) {
+        SseEmitter emitter = new SseEmitter(0L);  // 永不超时
+        emitters.put(userId, emitter);
+        
+        emitter.onCompletion(() -> emitters.remove(userId));
+        emitter.onTimeout(() -> emitters.remove(userId));
+        
+        // 发送连接成功事件
+        try {
+            emitter.send(SseEmitter.event().name("connected").data("连接成功"));
+        } catch (IOException e) {
+            emitters.remove(userId);
+        }
+        
+        return emitter;
+    }
+    
+    // 推送消息给指定用户
+    public static void push(String userId, String event, Object data) {
+        SseEmitter emitter = emitters.get(userId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event().name(event).data(data));
+            } catch (IOException e) {
+                emitters.remove(userId);
+            }
+        }
+    }
+}
+
+// 前端SSE连接
+const eventSource = new EventSource('/api/sse/subscribe/' + userId)
+
+eventSource.addEventListener('connected', (e) => {
+  console.log('SSE连接:', e.data)
+})
+
+eventSource.addEventListener('notification', (e) => {
+  const data = JSON.parse(e.data)
+  console.log('收到通知:', data)
+})
+
+eventSource.addEventListener('progress', (e) => {
+  console.log('进度:', e.data)
+  // 更新进度条
+})
+
+eventSource.onerror = () => {
+  console.log('SSE断开，3秒后重连...')
+  setTimeout(() => location.reload(), 3000)
+}
+
+// SSE vs WebSocket
+// SSE：单向推送、HTTP协议、自动重连、轻量、适合日志/进度/通知
+// WebSocket：双向通信、独立协议、自定义重连、适合聊天/协作
+                </code>
+            </div>
+        </div>
+
+        <div class="self-check">
+            <h3>🧠 费曼自测：你能解释给同学听吗？</h3>
+            <div class="q"><strong>Q1：GET、POST、PUT、DELETE分别什么时候用？</strong><p>A：GET = 看菜单（不改变数据，读操作），POST = 点菜（创建新东西），PUT = 改配方（完整更新），DELETE = 退菜（删除）。记住口诀：<strong>看→点→改→退</strong>。</p></div>
+            <div class="q"><strong>Q2：为什么接口要版本号（/api/v1/users vs /api/v2/users）？</strong><p>A：就像APP更新。v1.0的接口老用户还在用，v2.0的新功能不能破坏老版本。版本号就像给接口贴保质期标签，新老共存互不影响。</p></div>
+            <div class="q"><strong>Q3：GraphQL比REST好在哪里？</strong><p>A：REST像自助餐——后端定好什么菜你就吃什么（数据不可选），GraphQL像点菜——你想吃什么就点什么（前端决定返回哪些字段）。小项目REST够了，复杂数据关系时才考虑GraphQL。</p></div>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+        });
+    </script>
+    <script>
+        function convertCodeBlocks(lang) {
+            document.querySelectorAll('.code-block').forEach(block => {
+                const oldCode = block.querySelector('code');
+                if (!oldCode || oldCode.parentElement.tagName === 'PRE') return;
+                let html = oldCode.innerHTML;
+                let text = html.replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/gi, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.className = `language-${lang}`;
+                code.textContent = text;
+                pre.appendChild(code);
+                block.appendChild(pre);
+                oldCode.remove();
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            convertCodeBlocks('javascript');
+            if (window.Prism) Prism.highlightAll();
+        });
+    </script>
+</body>
+</html>

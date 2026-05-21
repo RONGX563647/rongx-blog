@@ -13,8 +13,8 @@
             --border: #3f3f5a; --success: #22c55e; --danger: #ef4444; --info: #3b82f6;
             --warning: #f97316; --purple: #a855f7; --teal: #14b8a6;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); padding: 40px; line-height: 1.7; }
-        .chapter { margin-bottom: 80px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.7; }
+        .chapter { max-width: 1200px; margin: 0 auto; padding: 40px; }
         .chapter-title { font-size: 36px; margin-bottom: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .chapter-desc { color: var(--text-gray); font-size: 18px; margin-bottom: 40px; line-height: 1.8; }
         .section-title { font-size: 22px; margin: 35px 0 20px; color: var(--secondary); border-bottom: 2px solid var(--secondary); padding-bottom: 8px; }
@@ -46,8 +46,8 @@
         .highlight-box code { background: rgba(99, 102, 241, 0.15); padding: 2px 8px; border-radius: 4px; color: var(--text-light); font-family: 'Consolas', monospace; font-size: 13px; }
         .highlight-box pre { background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 6px; margin-top: 12px; overflow-x: auto; }
         .highlight-box pre code { background: none; padding: 0; }
-        .code-block { background: #0d0d1a; border-radius: 8px; padding: 20px; margin: 20px 0; overflow-x: auto; border: 1px solid var(--border); }
-        .code-block code { color: var(--text-light); font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.6; }
+        .code-block { background: #0f0f1a; border-radius: 10px; padding: 20px; margin: 20px 0; overflow-x: auto; border: 1px solid var(--border); }
+        .code-block code { color: var(--text-light); font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.6; white-space: pre; }
         .code-block .comment { color: #6b7280; }
         .code-block .keyword { color: var(--primary); }
         .code-block .string { color: var(--success); }
@@ -98,6 +98,119 @@
     </style>
 </head>
 <body>
+
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="app-container">
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>JVM 教程</h1>
+                <p>Java虚拟机深度讲解</p>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">基础概念</div>
+                <a href="chapter1-overview.html" class="nav-item">
+                    <span class="nav-item-icon">📖</span>
+                    <span class="nav-item-text">第一章：JVM概述</span>
+                </a>
+                <a href="chapter2-architecture.html" class="nav-item">
+                    <span class="nav-item-icon">🏗️</span>
+                    <span class="nav-item-text">第二章：JVM架构</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">内存管理</div>
+                <a href="chapter3-memory.html" class="nav-item">
+                    <span class="nav-item-icon">🧠</span>
+                    <span class="nav-item-text">第三章：内存模型</span>
+                </a>
+                <a href="chapter4-heap.html" class="nav-item">
+                    <span class="nav-item-icon">📦</span>
+                    <span class="nav-item-text">第四章：堆区详解</span>
+                </a>
+                <a href="chapter5-stack.html" class="nav-item">
+                    <span class="nav-item-icon">📚</span>
+                    <span class="nav-item-text">第五章：栈区详解</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">垃圾回收</div>
+                <a href="chapter6-gc-overview.html" class="nav-item">
+                    <span class="nav-item-icon">♻️</span>
+                    <span class="nav-item-text">第六章：GC概述</span>
+                </a>
+                <a href="chapter7-gc-algorithms.html" class="nav-item">
+                    <span class="nav-item-icon">🔄</span>
+                    <span class="nav-item-text">第七章：GC算法</span>
+                </a>
+                <a href="chapter8-gc-collectors.html" class="nav-item">
+                    <span class="nav-item-icon">⚙️</span>
+                    <span class="nav-item-text">第八章：垃圾收集器</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">类加载机制</div>
+                <a href="chapter9-class-loading.html" class="nav-item">
+                    <span class="nav-item-icon">📋</span>
+                    <span class="nav-item-text">第九章：类加载过程</span>
+                </a>
+                <a href="chapter10-classloader.html" class="nav-item active">
+                    <span class="nav-item-icon">🔧</span>
+                    <span class="nav-item-text">第十章：类加载器</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">运行时</div>
+                <a href="chapter11-execution.html" class="nav-item">
+                    <span class="nav-item-icon">⚡</span>
+                    <span class="nav-item-text">第十一章：执行流程</span>
+                </a>
+                <a href="chapter12-jit.html" class="nav-item">
+                    <span class="nav-item-icon">🚀</span>
+                    <span class="nav-item-text">第十二章：JIT编译</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">性能调优</div>
+                <a href="chapter13-params.html" class="nav-item">
+                    <span class="nav-item-icon">🎯</span>
+                    <span class="nav-item-text">第十三章：JVM参数</span>
+                </a>
+                <a href="chapter14-monitoring.html" class="nav-item">
+                    <span class="nav-item-icon">📊</span>
+                    <span class="nav-item-text">第十四章：监控工具</span>
+                </a>
+            </div>
+
+
+            <div style="padding: 20px; border-top: 1px solid var(--border); margin-top: 20px;">
+                <a href="index.html" class="nav-item" style="border-radius: 8px; background: rgba(99, 102, 241, 0.1);">
+                    <span class="nav-item-icon">🏠</span>
+                    <span class="nav-item-text">返回目录首页</span>
+                </a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="top-bar-content">
+                    <div class="breadcrumb">
+                        <a href="index.html">首页</a> / <span>第十章：类加载器详解</span>
+                    </div>
+                    <div class="nav-buttons">
+                        <a href="chapter9-class-loading.html" class="nav-btn">← 上一章</a>
+                        <a href="chapter11-execution.html" class="nav-btn">下一章 →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chapter">
+
     <div class="chapter">
         <h2 class="chapter-title">第十章：类加载器详解</h2>
         <p class="chapter-desc">类加载器是JVM实现类加载的核心组件，决定了类如何被加载、何时被加载。深入理解双亲委派模型及其破坏场景，掌握自定义类加载器的实现原理。</p>
@@ -504,5 +617,18 @@ jmap -dump:live,format=b,file=heap.hprof &lt;pid&gt;</code></pre>
             }
         });
     </script>
+
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+</main>
+    </div>
 </body>
 </html>

@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第六章：高级实用技巧与最佳实践 - 从原理到实战</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js" defer></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1; --secondary: #f59e0b; --bg-dark: #0f172a;
+            --bg-card: #1e293b; --text-light: #f8fafc; --text-gray: #94a3b8;
+            --border: #334155; --success: #22c55e; --danger: #ef4444; --info: #3b82f6;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.8; }
+        .chapter { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .chapter-title { font-size: 36px; margin-bottom: 20px; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .chapter-desc { color: var(--text-gray); font-size: 16px; margin-bottom: 40px; line-height: 1.8; padding: 20px; background: var(--bg-card); border-radius: 10px; border-left: 4px solid var(--secondary); }
+        .card { background: var(--bg-card); border-radius: 15px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .card h3 { font-size: 22px; margin-bottom: 20px; color: var(--secondary); display: flex; align-items: center; gap: 10px; }
+        .card h4 { font-size: 18px; margin: 20px 0 15px; color: var(--info); }
+        .card ul { list-style: none; padding-left: 0; }
+        .card ul li { padding: 10px 0 10px 25px; position: relative; color: var(--text-gray); line-height: 1.6; }
+        .card ul li::before { content: '→'; position: absolute; left: 0; color: var(--secondary); font-weight: bold; }
+        .mermaid-container { background: #fff; border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .mermaid-title { text-align: center; color: var(--text-gray); margin-bottom: 15px; font-size: 14px; }
+        .code-block { background: #0f0f1a; padding: 20px; border-radius: 10px; margin: 20px 0; overflow-x: auto; border: 1px solid var(--border); }
+        .code-block code { font-family: 'Courier New', monospace; font-size: 13px; color: var(--text-light); line-height: 1.6; white-space: pre; }
+        .highlight-box { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%); border-left: 4px solid var(--secondary); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .highlight-box h4 { margin-bottom: 10px; color: var(--secondary); }
+        .warning-box { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border-left: 4px solid var(--danger); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .warning-box h4 { margin-bottom: 10px; color: var(--danger); }
+        .table-wrapper { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(245, 158, 11, 0.2); color: var(--secondary); font-weight: 600; }
+        td { color: var(--text-gray); }
+    </style>
+</head>
+<body>
+    <div class="chapter">
+        <h2 class="chapter-title">第六章：高级实用技巧与最佳实践</h2>
+        <div class="chapter-desc">
+            本章将介绍前端和后端开发中的高级技巧，包括防抖节流、批量操作、性能优化、事务管理等实战经验，帮助你写出更高质量的代码。
+        </div>
+
+        <!-- 前端：防抖与节流 -->
+        <div class="card">
+            <h3>🎯 6.1 前端防抖与节流</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">防抖和节流是优化高频事件处理的两种常用技术。</p>
+            
+            <h4>防抖（Debounce）</h4>
+            <p style="color: var(--text-gray); margin-bottom: 10px;">在事件触发后等待一段时间，如果期间再次触发则重新计时。适用于搜索框输入。</p>
+            <div class="code-block">
+                <code>
+// Vue3 Hook - useDebounce<br>
+import { ref } from 'vue'<br><br>
+
+export function useDebounce(fn, delay = 300) {<br>
+&nbsp;&nbsp;let timer = null<br>
+&nbsp;&nbsp;return (...args) => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (timer) clearTimeout(timer)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;timer = setTimeout(() => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fn(...args)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}, delay)<br>
+&nbsp;&nbsp;}<br>
+}<br><br>
+
+// 使用示例：搜索框<br>
+const searchQuery = ref('')<br>
+const handleSearch = useDebounce((value) => {<br>
+&nbsp;&nbsp;// 调用搜索API<br>
+&nbsp;&nbsp;fetchSearchResults(value)<br>
+}, 300)<br><br>
+// 输入时触发<br>
+&lt;el-input v-model="searchQuery" @input="handleSearch" /&gt;
+                </code>
+            </div>
+            
+            <h4>节流（Throttle）</h4>
+            <p style="color: var(--text-gray); margin-bottom: 10px;">在一段时间内只允许执行一次。适用于滚动事件、窗口resize、按钮防重复点击。</p>
+            <div class="code-block">
+                <code>
+// Vue3 Hook - useThrottle<br>
+export function useThrottle(fn, delay = 300) {<br>
+&nbsp;&nbsp;let lastTime = 0<br>
+&nbsp;&nbsp;return (...args) => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const now = Date.now()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (now - lastTime >= delay) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fn(...args)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lastTime = now<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+}<br><br>
+
+// 使用示例：防止重复提交<br>
+const handleSubmit = useThrottle(async () => {<br>
+&nbsp;&nbsp;await submitForm()<br>
+&nbsp;&nbsp;ElMessage.success('提交成功')<br>
+}, 1000)
+                </code>
+            </div>
+        </div>
+
+        <!-- 前端：批量操作 -->
+        <div class="card">
+            <h3>📦 6.2 批量操作（前端）</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">表格多选后批量删除、批量修改状态等常见操作。</p>
+            <div class="code-block">
+                <code>
+&lt;template&gt;<br>
+&nbsp;&nbsp;&lt;div&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-button type="danger" :disabled="!selectedIds.length" @click="handleBatchDelete"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;批量删除 {{ selectedIds.length ? `(${selectedIds.length})` : '' }}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-button&gt;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table :data="userList" @selection-change="handleSelectionChange"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-table-column type="selection" width="55" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- 其他列 --&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/el-table&gt;<br>
+&nbsp;&nbsp;&lt;/div&gt;<br>
+&lt;/template&gt;<br><br>
+
+&lt;script setup&gt;<br>
+import { ref } from 'vue'<br>
+import { ElMessage, ElMessageBox } from 'element-plus'<br>
+import { batchDeleteUsers } from '@/api/user'<br><br>
+
+const selectedIds = ref([])<br><br>
+
+// 选择变化<br>
+const handleSelectionChange = (selection) => {<br>
+&nbsp;&nbsp;selectedIds.value = selection.map(item => item.id)<br>
+}<br><br>
+
+// 批量删除<br>
+const handleBatchDelete = async () => {<br>
+&nbsp;&nbsp;await ElMessageBox.confirm(`确认删除选中的 ${selectedIds.value.length} 个用户吗？`, '提示', {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;type: 'warning'<br>
+&nbsp;&nbsp;})<br>
+<br>
+&nbsp;&nbsp;await batchDeleteUsers(selectedIds.value)<br>
+&nbsp;&nbsp;ElMessage.success('批量删除成功')<br>
+&nbsp;&nbsp;fetchData()<br>
+}<br>
+&lt;/script&gt;
+                </code>
+            </div>
+            
+            <h4>后端批量删除接口</h4>
+            <div class="code-block">
+                <code>
+// Controller<br>
+@DeleteMapping("/batch")<br>
+public Result&lt;Void&gt; batchDelete(@RequestBody List&lt;Long&gt; ids) {<br>
+&nbsp;&nbsp;userService.batchDelete(ids);<br>
+&nbsp;&nbsp;return Result.success();<br>
+}<br><br>
+
+// Service实现<br>
+@Override<br>
+@Transactional<br>
+public void batchDelete(List&lt;Long&gt; ids) {<br>
+&nbsp;&nbsp;if (ids == null || ids.isEmpty()) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;throw new RuntimeException("请选择要删除的数据");<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;// MyBatis Plus批量删除<br>
+&nbsp;&nbsp;this.removeByIds(ids);<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 前端：导出功能 -->
+        <div class="card">
+            <h3>📤 6.3 导出Excel功能</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">前端请求后端导出接口，下载Excel文件。</p>
+            <div class="code-block">
+                <code>
+// 前端导出函数<br>
+export function exportUsers(queryParams) {<br>
+&nbsp;&nbsp;return request({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;url: '/api/users/export',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;method: 'get',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;params: queryParams,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;responseType: 'blob'  // 重要：指定响应类型为blob<br>
+&nbsp;&nbsp;})<br>
+}<br><br>
+
+// 调用导出<br>
+const handleExport = async () => {<br>
+&nbsp;&nbsp;const res = await exportUsers(queryParams)<br>
+&nbsp;&nbsp;// 创建下载链接<br>
+&nbsp;&nbsp;const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })<br>
+&nbsp;&nbsp;const url = window.URL.createObjectURL(blob)<br>
+&nbsp;&nbsp;const link = document.createElement('a')<br>
+&nbsp;&nbsp;link.href = url<br>
+&nbsp;&nbsp;link.download = `用户列表_${new Date().getTime()}.xlsx`<br>
+&nbsp;&nbsp;link.click()<br>
+&nbsp;&nbsp;window.URL.revokeObjectURL(url)<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 后端：事务管理 -->
+        <div class="card">
+            <h3>💾 6.4 Spring事务管理</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">事务保证多个数据库操作的原子性，要么全部成功，要么全部失败。</p>
+            
+            <h4>@Transactional使用要点</h4>
+            <ul>
+                <li><strong>作用范围</strong>：只能应用于public方法</li>
+                <li><strong>异常回滚</strong>：默认只对RuntimeException回滚</li>
+                <li><strong>同类调用</strong>：同一类内方法调用事务不生效（需要注入自身或使用AopContext）</li>
+                <li><strong>传播行为</strong>：默认REQUIRED（有事务加入，无事务新建）</li>
+            </ul>
+            
+            <div class="code-block">
+                <code>
+@Service<br>
+public class UserServiceImpl implements UserService {<br>
+<br>
+&nbsp;&nbsp;@Resource<br>
+&nbsp;&nbsp;private UserMapper userMapper;<br>
+<br>
+&nbsp;&nbsp;@Resource<br>
+&nbsp;&nbsp;private OrderMapper orderMapper;<br>
+<br>
+&nbsp;&nbsp;// 基本事务<br>
+&nbsp;&nbsp;@Transactional<br>
+&nbsp;&nbsp;public void createUserWithOrder(User user, Order order) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;userMapper.insert(user);  // 新增用户<br>
+&nbsp;&nbsp;&nbsp;&nbsp;order.setUserId(user.getId());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;orderMapper.insert(order);  // 新增订单<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 如果任意一步失败，两步都会回滚<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;// 指定回滚异常<br>
+&nbsp;&nbsp;@Transactional(rollbackFor = Exception.class)<br>
+&nbsp;&nbsp;public void complexOperation() throws Exception {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 所有异常都会回滚<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;// 只读事务（优化性能）<br>
+&nbsp;&nbsp;@Transactional(readOnly = true)<br>
+&nbsp;&nbsp;public List&lt;User&gt; queryUsers() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return userMapper.selectList(null);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;// 手动回滚<br>
+&nbsp;&nbsp;@Transactional<br>
+&nbsp;&nbsp;public void manualRollback() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;try {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 业务逻辑<br>
+&nbsp;&nbsp;&nbsp;&nbsp;} catch (Exception e) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 后端：分页优化 -->
+        <div class="card">
+            <h3>📊 6.5 分页优化</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">大数据量分页查询的性能优化方案。</p>
+            
+            <h4>深分页问题</h4>
+            <p style="color: var(--text-gray); margin-bottom: 10px;">当页码很大时（如10000页），OFFSET会扫描大量无用数据，导致查询变慢。</p>
+            
+            <div class="code-block">
+                <code>
+// ❌ 低效的深分页（MySQL会扫描100000条数据然后丢弃）<br>
+SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 100000;<br><br>
+
+// ✅ 方案1：游标分页（推荐）<br>
+SELECT * FROM users WHERE id &gt; 100000 ORDER BY id LIMIT 10;<br><br>
+
+// ✅ 方案2：子查询优化<br>
+SELECT * FROM users<br>
+WHERE id &gt;= (SELECT id FROM users ORDER BY id LIMIT 100000, 1)<br>
+ORDER BY id LIMIT 10;<br><br>
+
+// ✅ 方案3：延迟关联<br>
+SELECT t1.* FROM users t1<br>
+INNER JOIN (SELECT id FROM users ORDER BY id LIMIT 100000, 10) t2<br>
+ON t1.id = t2.id;
+                </code>
+            </div>
+            
+            <h4>MyBatis Plus游标分页实现</h4>
+            <div class="code-block">
+                <code>
+// 前端传递cursor（上一页最后一条记录的ID）<br>
+const queryWithCursor = {<br>
+&nbsp;&nbsp;cursor: lastId,  // 上一页最后一条ID<br>
+&nbsp;&nbsp;pageSize: 10<br>
+}<br><br>
+
+// 后端实现<br>
+public PageResult&lt;User&gt; queryByCursor(Long cursor, Integer pageSize) {<br>
+&nbsp;&nbsp;LambdaQueryWrapper&lt;User&gt; wrapper = new LambdaQueryWrapper&lt;&gt;();<br>
+&nbsp;&nbsp;if (cursor != null) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;wrapper.gt(User::getId, cursor);  // 只查询ID大于cursor的记录<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;wrapper.orderByAsc(User::getId).last("LIMIT " + pageSize);<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;List&lt;User&gt; list = userMapper.selectList(wrapper);<br>
+&nbsp;&nbsp;return new PageResult&lt;&gt;(list, null);  // 游标分页无法获取总数<br>
+}
+                </code>
+            </div>
+        </div>
+
+        <!-- 前端：表单动态验证 -->
+        <div class="card">
+            <h3>✅ 6.6 表单动态验证</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">根据业务需求动态添加验证规则。</p>
+            <div class="code-block">
+                <code>
+// 动态验证规则<br>
+const rules = computed(() => ({<br>
+&nbsp;&nbsp;username: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ required: true, message: '请输入用户名', trigger: 'blur' },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ min: 3, max: 20, message: '长度3-20个字符', trigger: 'blur' }<br>
+&nbsp;&nbsp;],<br>
+&nbsp;&nbsp;password: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 新增时需要密码，编辑时可选<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ required: !isEdit.value, message: '请输入密码', trigger: 'blur' },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ min: 6, message: '密码至少6位', trigger: 'blur' }<br>
+&nbsp;&nbsp;],<br>
+&nbsp;&nbsp;email: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ required: true, message: '请输入邮箱', trigger: 'blur' },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;validator: (rule, value, callback) => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 自定义异步验证：检查邮箱是否已被使用<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!value) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;callback()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;checkEmailExists(value).then(exists => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (exists) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;callback(new Error('邮箱已被使用'))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} else {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;callback()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trigger: 'blur'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;]<br>
+}))
+                </code>
+            </div>
+        </div>
+
+        <!-- 前后端联调技巧 -->
+        <div class="card">
+            <h3>🔗 6.7 前后端联调技巧</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>技巧</th>
+                        <th>说明</th>
+                        <th>工具/方法</th>
+                    </tr>
+                    <tr>
+                        <td>Mock数据</td>
+                        <td>后端未开发完时，前端使用Mock数据</td>
+                        <td>Mock.js、vite-plugin-mock</td>
+                    </tr>
+                    <tr>
+                        <td>跨域处理</td>
+                        <td>开发环境代理，生产环境Nginx配置</td>
+                        <td>vite.config.js proxy</td>
+                    </tr>
+                    <tr>
+                        <td>Postman测试</td>
+                        <td>后端开发完成后，先自己测试接口</td>
+                        <td>Postman、Apifox</td>
+                    </tr>
+                    <tr>
+                        <td>接口文档</td>
+                        <td>前后端约定好接口格式再开发</td>
+                        <td>Swagger、Apifox</td>
+                    </tr>
+                    <tr>
+                        <td>浏览器调试</td>
+                        <td>Network面板查看请求详情</td>
+                        <td>Chrome DevTools</td>
+                    </tr>
+                    <tr>
+                        <td>日志输出</td>
+                        <td>后端打印SQL和请求日志</td>
+                        <td>MyBatis日志、logback</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <h4>Vite跨域配置</h4>
+            <div class="code-block">
+                <code>
+// vite.config.js<br>
+export default defineConfig({<br>
+&nbsp;&nbsp;server: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;proxy: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/api: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target: 'http://localhost:8080',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;changeOrigin: true,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite: (path) => path.replace(/^\/api/, '/api')<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+})
+                </code>
+            </div>
+        </div>
+
+        <!-- 常见场景处理 -->
+        <div class="card">
+            <h3>🎭 6.8 常见场景处理方案</h3>
+            
+            <h4>场景1：编辑时回显数据</h4>
+            <div class="code-block">
+                <code>
+// 方式1：使用表格行数据（简单场景）<br>
+const handleEdit = (row) => {<br>
+&nbsp;&nbsp;Object.assign(userForm, row)  // 直接复用行数据<br>
+&nbsp;&nbsp;dialogVisible.value = true<br>
+}<br><br>
+
+// 方式2：重新请求详情接口（复杂场景）<br>
+const handleEdit = async (row) => {<br>
+&nbsp;&nbsp;const res = await getUserDetail(row.id)<br>
+&nbsp;&nbsp;Object.assign(userForm, res.data)  // 使用最新数据<br>
+&nbsp;&nbsp;dialogVisible.value = true<br>
+}
+                </code>
+            </div>
+            
+            <h4>场景2：状态切换</h4>
+            <div class="code-block">
+                <code>
+// 前端Switch组件<br>
+&lt;el-table-column label="状态"&gt;<br>
+&nbsp;&nbsp;&lt;template #default="{ row }"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;el-switch<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v-model="row.status"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:active-value="1"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:inactive-value="0"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@change="handleStatusChange(row)"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;/&gt;<br>
+&nbsp;&nbsp;&lt;/template&gt;<br>
+&lt;/el-table-column&gt;<br><br>
+
+// 状态切换处理<br>
+const handleStatusChange = async (row) => {<br>
+&nbsp;&nbsp;try {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;await updateUserStatus(row.id, row.status)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ElMessage.success('状态更新成功')<br>
+&nbsp;&nbsp;} catch (error) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// 失败时恢复原状态<br>
+&nbsp;&nbsp;&nbsp;&nbsp;row.status = row.status === 1 ? 0 : 1<br>
+&nbsp;&nbsp;}<br>
+}
+                </code>
+            </div>
+            
+            <h4>场景3：字典数据转换</h4>
+            <div class="code-block">
+                <code>
+// 后端返回状态码，前端需要显示文字<br>
+const statusMap = {<br>
+&nbsp;&nbsp;0: { label: '禁用', type: 'danger' },<br>
+&nbsp;&nbsp;1: { label: '启用', type: 'success' },<br>
+&nbsp;&nbsp;2: { label: '待审核', type: 'warning' }<br>
+}<br><br>
+
+// 模板中使用<br>
+&lt;el-tag :type="statusMap[row.status].type"&gt;<br>
+&nbsp;&nbsp;{{ statusMap[row.status].label }}<br>
+&lt;/el-tag&gt;
+                </code>
+            </div>
+        </div>
+
+        <!-- 性能优化 -->
+        <div class="card">
+            <h3>⚡ 6.9 性能优化建议</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>优化点</th>
+                        <th>前端</th>
+                        <th>后端</th>
+                    </tr>
+                    <tr>
+                        <td>列表加载</td>
+                        <td>骨架屏、懒加载</td>
+                        <td>分页查询、索引优化</td>
+                    </tr>
+                    <tr>
+                        <td>请求优化</td>
+                        <td>防抖、节流、缓存</td>
+                        <td>接口合并、Redis缓存</td>
+                    </tr>
+                    <tr>
+                        <td>渲染优化</td>
+                        <td>虚拟滚动、分页</td>
+                        <td>减少返回字段</td>
+                    </tr>
+                    <tr>
+                        <td>图片优化</td>
+                        <td>懒加载、压缩、CDN</td>
+                        <td>图片服务器、CDN</td>
+                    </tr>
+                    <tr>
+                        <td>打包优化</td>
+                        <td>按需加载、代码分割</td>
+                        <td>GZIP压缩</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h4>💡 全栈开发最佳实践</h4>
+            <p>1. <strong>前端</strong>：Hook封装逻辑、防抖节流优化、统一错误处理<br/>
+            2. <strong>后端</strong>：事务管理、统一响应格式、全局异常处理、接口文档<br/>
+            3. <strong>联调</strong>：先定接口契约、Mock数据并行开发、Swagger文档<br/>
+            4. <strong>性能</strong>：分页查询、索引优化、减少请求次数、按需加载<br/>
+            5. <strong>安全</strong>：参数验证、SQL防注入、XSS防护、Token认证<br/>
+            6. <strong>规范</strong>：命名统一、代码审查、Git提交规范、日志记录<br/>
+            7. <strong>组件库</strong>：优先使用Element Plus或Ant Design Vue，避免重复造轮子</p>
+        </div>
+
+        <div class="card">
+            <h3>🚀 6.10 虚拟列表与无限滚动</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">当数据量超过1000条时，使用虚拟滚动或无限滚动提升渲染性能。</p>
+            
+            <h4>无限滚动实现</h4>
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;div ref="scrollContainer" style="height: 600px; overflow: auto" @scroll="handleScroll"&gt;
+    &lt;div v-for="item in displayList" :key="item.id" class="list-item"&gt;
+      {{ item.name }}
+    &lt;/div&gt;
+    &lt;div v-if="loading" class="loading"&gt;加载中...&lt;/div&gt;
+    &lt;div v-if="noMore" class="no-more"&gt;没有更多数据了&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref, onMounted } from 'vue'
+
+const scrollContainer = ref()
+const list = ref([])
+const pageNum = ref(1)
+const loading = ref(false)
+const noMore = ref(false)
+
+const displayList = computed(() => list.value)
+
+const handleScroll = async (e: Event) => {
+  const target = e.target as HTMLElement
+  const scrollTop = target.scrollTop
+  const clientHeight = target.clientHeight
+  const scrollHeight = target.scrollHeight
+  
+  // 距离底部100px时加载下一页
+  if (scrollHeight - scrollTop - clientHeight &lt; 100 &amp;&amp; !loading.value &amp;&amp; !noMore.value) {
+    await loadMore()
+  }
+}
+
+const loadMore = async () => {
+  loading.value = true
+  try {
+    pageNum.value++
+    // const res = await getList({ pageNum: pageNum.value, pageSize: 20 })
+    // list.value.push(...res.data.list)
+    // if (res.data.list.length &lt; 20) noMore.value = true
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => loadMore())
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🎨 6.11 水印与富文本编辑器集成</h3>
+            
+            <h4>页面水印</h4>
+            <div class="code-block">
+                <code>
+// 使用watermark-dom库
+import watermark from 'watermark-dom'
+
+// 初始化水印
+watermark.load({
+  watermark_txt: '内部机密 - 张三',
+  watermark_x: 50,
+  watermark_y: 50,
+  watermark_rows: 20,
+  watermark_cols: 20,
+  watermark_font: '14px',
+  watermark_color: 'rgba(200, 200, 200, 0.3)'
+})
+
+// 或使用Element Plus Watermark组件
+import { ElWatermark } from 'element-plus'
+
+&lt;template&gt;
+  &lt;el-watermark content="内部机密"&gt;
+    &lt;div style="height: 600px"&gt;
+      页面内容...
+    &lt;/div&gt;
+  &lt;/el-watermark&gt;
+&lt;/template&gt;
+                </code>
+            </div>
+
+            <h4>富文本编辑器（WangEditor）</h4>
+            <div class="code-block">
+                <code>
+# 安装
+npm install @wangeditor/editor @wangeditor/editor-for-vue@next
+
+&lt;template&gt;
+  &lt;div style="border: 1px solid #ccc"&gt;
+    &lt;Toolbar
+      style="border-bottom: 1px solid #ccc"
+      :editor="editorRef"
+      :defaultConfig="toolbarConfig"
+      mode="default"
+    /&gt;
+    &lt;Editor
+      style="height: 500px; overflow-y: hidden"
+      v-model="valueHtml"
+      :defaultConfig="editorConfig"
+      mode="default"
+      @onCreated="handleCreated"
+    /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref, shallowRef, onBeforeUnmount } from 'vue'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import '@wangeditor/editor/dist/css/style.css'
+
+const editorRef = shallowRef()
+const valueHtml = ref('&lt;p&gt;请输入内容&lt;/p&gt;')
+
+const toolbarConfig = {}
+const editorConfig = {
+  placeholder: '请输入内容...',
+  MENU_CONF: {
+    uploadImage: {
+      server: '/api/upload/image',
+      fieldName: 'file',
+      maxFileSize: 2 * 1024 * 1024,
+      maxNumberOfImg: 10
+    }
+  }
+}
+
+const handleCreated = (editor) => {
+  editorRef.value = editor
+}
+
+onBeforeUnmount(() => {
+  const editor = editorRef.value
+  if (editor) editor.destroy()
+})
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔐 6.12 权限按钮控制</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">基于用户权限动态控制按钮显示，实现细粒度的权限管理。</p>
+            
+            <h4>方案1：自定义指令</h4>
+            <div class="code-block">
+                <code>
+// directives/permission.js
+import { useUserStore } from '@/stores/user'
+
+export const permission = {
+  mounted(el, binding) {
+    const { value } = binding
+    const userStore = useUserStore()
+    const permissions = userStore.permissions || []
+    
+    if (value &amp;&amp; value instanceof Array &amp;&amp; value.length > 0) {
+      const hasPermission = permissions.some(p => value.includes(p))
+      if (!hasPermission) {
+        el.parentNode?.removeChild(el)
+      }
+    }
+  }
+}
+
+// main.js 注册指令
+app.directive('permission', permission)
+
+// 使用
+&lt;el-button v-permission="['user:add']"&gt;新增&lt;/el-button&gt;
+&lt;el-button v-permission="['user:edit']"&gt;编辑&lt;/el-button&gt;
+&lt;el-button v-permission="['user:delete']"&gt;删除&lt;/el-button&gt;
+                </code>
+            </div>
+
+            <h4>方案2：函数判断</h4>
+            <div class="code-block">
+                <code>
+// composables/usePermission.ts
+import { useUserStore } from '@/stores/user'
+
+export function usePermission() {
+  const userStore = useUserStore()
+  
+  const hasPermission = (permission: string | string[]) => {
+    const perms = Array.isArray(permission) ? permission : [permission]
+    return userStore.permissions?.some(p => perms.includes(p)) ?? false
+  }
+  
+  const hasRole = (role: string | string[]) => {
+    const roles = Array.isArray(role) ? role : [role]
+    return userStore.roles?.some(r => roles.includes(r)) ?? false
+  }
+  
+  return { hasPermission, hasRole }
+}
+
+// 使用
+&lt;template&gt;
+  &lt;el-button v-if="hasPermission('user:add')"&gt;新增&lt;/el-button&gt;
+  &lt;el-button v-if="hasPermission('user:edit')"&gt;编辑&lt;/el-button&gt;
+  &lt;el-button v-if="hasRole('admin')"&gt;管理&lt;/el-button&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { usePermission } from '@/composables/usePermission'
+const { hasPermission, hasRole } = usePermission()
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📱 6.13 PWA 离线访问配置</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">将Vue应用配置为PWA，支持离线访问、桌面图标、推送通知。</p>
+            
+            <div class="code-block">
+                <code>npm install -D vite-plugin-pwa
+
+// vite.config.ts
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/api\..*/i,
+            handler: 'NetworkFirst',      // API优先网络请求
+            options: {
+              cacheName: 'api-cache',
+              expiration: { maxEntries: 100, maxAgeSeconds: 300 }
+            }
+          },
+          {
+            urlPattern: /\.(png|jpg|jpeg|svg|gif)$/,
+            handler: 'CacheFirst',        // 图片优先缓存
+            options: {
+              cacheName: 'image-cache',
+              expiration: { maxEntries: 200, maxAgeSeconds: 30 * 24 * 3600 }
+            }
+          }
+        ]
+      },
+      manifest: {
+        name: 'CRUD管理系统',
+        short_name: 'CRUD',
+        description: '全栈管理系统',
+        theme_color: '#6366f1',
+        icons: [
+          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' }
+        ]
+      }
+    })
+  ]
+})
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📝 6.14 Git工作流与提交规范</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">规范化的Git分支策略和提交信息格式，提升团队协作效率。</p>
+            
+            <h4>Git Flow分支策略</h4>
+            <div class="code-block">
+                <code>main        # 生产环境（只接受合并，不直接提交）
+├── develop   # 开发主线
+│   ├── feature/user-login    # 功能分支（从develop拉，合并回develop）
+│   ├── feature/user-crud
+│   └── feature/export-excel
+├── release/v1.1.0   # 发布分支（从develop拉，合并到main和develop）
+└── hotfix/xxx       # 紧急修复（从main拉，合并到main和develop）
+
+# 常用GitFlow命令
+git flow init           # 初始化
+git flow feature start user-crud
+git flow feature finish user-crud
+git flow release start 1.1.0
+git flow release finish 1.1.0
+                </code>
+            </div>
+
+            <h4>Commitlint提交规范</h4>
+            <div class="code-block">
+                <code>npm install -D @commitlint/cli @commitlint/config-conventional husky
+
+// commitlint.config.js
+export default {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [2, 'always', [
+      'feat',     // 新功能
+      'fix',      // 修复bug
+      'docs',     // 文档修改
+      'style',    // 代码格式（不影响功能）
+      'refactor', // 重构
+      'perf',     // 性能优化
+      'test',     // 测试相关
+      'chore',    // 构建/工具相关
+      'revert'    // 回滚
+    ]],
+    'subject-case': [0]  // 允许各种大小写
+  }
+}
+
+// .husky/commit-msg
+npx --no -- commitlint --edit "$1"
+npx husky add .husky/commit-msg 'npx --no -- commitlint --edit "$1"'
+
+// 提交示例
+git commit -m "feat(user): 添加用户列表搜索功能"
+git commit -m "fix(table): 修复分页后页码不重置的问题"
+git commit -m "refactor(api): 重构请求拦截器，统一错误处理"
+git commit -m "docs(readme): 更新部署文档"
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>⚙️ 6.15 Vite构建优化</h3>
+            <p style="color: var(--text-gray); margin-bottom: 15px;">优化Vite生产构建，减小打包体积、提升加载速度。</p>
+            
+            <div class="code-block">
+                <code>// vite.config.ts
+export default defineConfig({
+  build: {
+    target: 'es2015',
+    minify: 'terser',
+    terserOptions: { compress: { drop_console: true, drop_debugger: true } },
+    rollupOptions: {
+      output: {
+        // 手动分包
+        manualChunks: {
+          'vue-vendor': ['vue', 'vue-router', 'pinia'],
+          'element-plus': ['element-plus'],
+          'echarts': ['echarts'],
+          'utils': ['axios', 'lodash-es', 'dayjs']
+        },
+        // 输出文件命名
+        chunkFileNames: 'js/[name]-[hash].js',
+        entryFileNames: 'js/[name]-[hash].js',
+        assetFileNames: '[ext]/[name]-[hash].[ext]'
+      }
+    },
+    // 分包阈值
+    chunkSizeWarningLimit: 500
+  },
+  // 压缩插件
+  plugins: [
+    compression({ algorithm: 'gzip', ext: '.gz', threshold: 10240 })
+  ]
+})
+
+// 分析包体积
+npm install -D rollup-plugin-visualizer
+import { visualizer } from 'rollup-plugin-visualizer'
+plugins: [ visualizer({ open: true }) ]
+// 构建后自动打开 bundle-analysis.html
+                </code>
+            </div>
+        </div>
+
+        <div class="self-check">
+            <h3>🧠 费曼自测：你能解释给同学听吗？</h3>
+            <div class="q"><strong>Q1：防抖和节流有什么区别？（用电梯比喻）</strong><p>A：防抖 = 电梯等人——有人按按钮就重新计时，最后一个人进来后再关门。节流 = 地铁安检——无论多少人，安检口每隔固定时间放一个人。搜索框用防抖（等用户打完字），滚动用节流（固定频率检查）。</p></div>
+            <div class="q"><strong>Q2：为什么Git提交要规范？</strong><p>A：就像给快递贴标签。feat(user): 新增登录功能——一看就知道是"用户模块的花瓶"而不是"厨房的锅"。git log时能一目了然，回滚时知道去哪里找。</p></div>
+            <div class="q"><strong>Q3：Vite打包为什么要手动分包？</strong><p>A：假设你的快递公司每次送货都要把所有仓库货物重新装车——效率极低。分包就像预设好"vue专用箱"、"工具库专用箱"，每次只更新变化的部分，加载速度从5秒降到500毫秒。</p></div>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+        });
+    </script>
+    <script>
+        function convertCodeBlocks(lang) {
+            document.querySelectorAll('.code-block').forEach(block => {
+                const oldCode = block.querySelector('code');
+                if (!oldCode || oldCode.parentElement.tagName === 'PRE') return;
+                let html = oldCode.innerHTML;
+                let text = html.replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/gi, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.className = `language-${lang}`;
+                code.textContent = text;
+                pre.appendChild(code);
+                block.appendChild(pre);
+                oldCode.remove();
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            convertCodeBlocks('javascript');
+            if (window.Prism) Prism.highlightAll();
+        });
+    </script>
+</body>
+</html>

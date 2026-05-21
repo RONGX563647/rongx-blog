@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD全栈开发教程</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1; --secondary: #f59e0b; --bg-dark: #0f172a;
+            --bg-card: #1e293b; --text-light: #f8fafc; --text-gray: #94a3b8;
+            --border: #334155; --success: #22c55e; --vue2: #42b883; --vue3: #409eff; --java: #f89820;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); }
+        .app-container { display: flex; height: 100vh; overflow: hidden; }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
+            border-right: 1px solid var(--border);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .sidebar-header h1 {
+            font-size: 22px;
+            background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .sidebar-header p { color: var(--text-gray); font-size: 12px; }
+        .nav-section { margin-bottom: 15px; }
+        .nav-section-title {
+            padding: 10px 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            gap: 12px;
+        }
+        .nav-item:hover { background: rgba(99, 102, 241, 0.1); border-left-color: var(--primary); }
+        .nav-item.active { background: rgba(99, 102, 241, 0.15); border-left-color: var(--primary); }
+        .nav-item-icon { width: 24px; text-align: center; font-size: 16px; }
+        .nav-item-text { font-size: 14px; font-weight: 500; }
+
+        .main-content { margin-left: 280px; flex: 1; height: 100vh; }
+
+        .toc-bar {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border);
+            z-index: 50;
+        }
+        .toc-bar h3 { font-size: 14px; color: var(--text-gray); margin-bottom: 10px; }
+        .toc-links { display: flex; gap: 10px; flex-wrap: wrap; }
+        .toc-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        .toc-link:hover { background: rgba(99, 102, 241, 0.2); }
+
+        .content-frame {
+            width: 100%;
+            height: calc(100vh - 70px);
+            border: none;
+        }
+
+        @media (max-width: 1024px) { .sidebar { width: 240px; } .main-content { margin-left: 240px; } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>CRUD 教程</h1>
+                <p>全栈开发从原理到实战</p>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">基础入门</div>
+                <div class="nav-item active" onclick="loadChapter('chapter1-overview')">
+                    <span class="nav-item-icon">📖</span>
+                    <span class="nav-item-text">CRUD概述</span>
+                    <span style="background: #22c55e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">NEW</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">前端开发</div>
+                <div class="nav-item" onclick="loadChapter('chapter2-vue2-crud')">
+                    <span class="nav-item-icon">💚</span>
+                    <span class="nav-item-text">Vue2 CRUD实战</span>
+                    <span style="background: #22c55e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">NEW</span>
+                </div>
+                <div class="nav-item" onclick="loadChapter('chapter3-vue3-crud')">
+                    <span class="nav-item-icon">💙</span>
+                    <span class="nav-item-text">Vue3 CRUD实战</span>
+                    <span style="background: #22c55e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">NEW</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">后端开发</div>
+                <div class="nav-item" onclick="loadChapter('chapter4-java-backend')">
+                    <span class="nav-item-icon">☕</span>
+                    <span class="nav-item-text">Java后端CRUD</span>
+                    <span style="background: #22c55e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">NEW</span>
+                </div>
+                <div class="nav-item" onclick="loadChapter('chapter5-api-design')">
+                    <span class="nav-item-icon">🔌</span>
+                    <span class="nav-item-text">API接口设计</span>
+                    <span style="background: #22c55e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">NEW</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">进阶提升</div>
+                <div class="nav-item" onclick="loadChapter('chapter6-best-practices')">
+                    <span class="nav-item-icon">🚀</span>
+                    <span class="nav-item-text">最佳实践</span>
+                    <span style="background: #22c55e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">NEW</span>
+                </div>
+                <div class="nav-item" onclick="loadChapter('chapter7-scenarios')">
+                    <span class="nav-item-icon">🎯</span>
+                    <span class="nav-item-text">15个经典场景</span>
+                    <span style="background: #22c55e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">NEW</span>
+                </div>
+                <div class="nav-item" onclick="loadChapter('chapter8-complex-business')">
+                    <span class="nav-item-icon">🏢</span>
+                    <span class="nav-item-text">复杂业务实战</span>
+                    <span style="background: #22c55e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">NEW</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">部署运维</div>
+                <div class="nav-item" onclick="loadChapter('chapter9-debug-deploy')">
+                    <span class="nav-item-icon">🐳</span>
+                    <span class="nav-item-text">调试与部署</span>
+                    <span style="background: #22c55e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">NEW</span>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="toc-bar">
+                <h3>📑 当前章节</h3>
+                <div class="toc-links" id="toc-links">
+                    <a href="javascript:void(0)" class="toc-link" onclick="loadChapter('chapter1-overview')">CRUD概述</a>
+                </div>
+            </div>
+            <iframe class="content-frame" id="content-frame" src="chapter1-overview.html"></iframe>
+        </main>
+    </div>
+
+    <script>
+        const chapterMap = {
+            'chapter1-overview': 'chapter1-overview.html',
+            'chapter2-vue2-crud': 'chapter2-vue2-crud.html',
+            'chapter3-vue3-crud': 'chapter3-vue3-crud.html',
+            'chapter4-java-backend': 'chapter4-java-backend.html',
+            'chapter5-api-design': 'chapter5-api-design.html',
+            'chapter6-best-practices': 'chapter6-best-practices.html',
+            'chapter7-scenarios': 'chapter7-scenarios.html',
+            'chapter8-complex-business': 'chapter8-complex-business.html',
+            'chapter9-debug-deploy': 'chapter9-debug-deploy.html'
+        };
+
+        const chapterNames = {
+            'chapter1-overview': 'CRUD概述',
+            'chapter2-vue2-crud': 'Vue2 CRUD实战',
+            'chapter3-vue3-crud': 'Vue3 CRUD实战',
+            'chapter4-java-backend': 'Java后端CRUD',
+            'chapter5-api-design': 'API接口设计',
+            'chapter6-best-practices': '最佳实践',
+            'chapter7-scenarios': '10个经典场景',
+            'chapter8-complex-business': '复杂业务实战',
+            'chapter9-debug-deploy': '调试与部署'
+        };
+
+        function loadChapter(chapterId) {
+            const frame = document.getElementById('content-frame');
+            frame.src = chapterMap[chapterId];
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+            
+            const tocLinks = document.getElementById('toc-links');
+            tocLinks.innerHTML = `<a href="javascript:void(0)" class="toc-link">${chapterNames[chapterId]}</a>`;
+        }
+    </script>
+</body>
+</html>

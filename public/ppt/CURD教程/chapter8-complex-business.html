@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第八章：复杂业务场景实战 - CRUD全栈开发教程</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js" defer></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1; --secondary: #f59e0b; --bg-dark: #0f172a;
+            --bg-card: #1e293b; --text-light: #f8fafc; --text-gray: #94a3b8;
+            --border: #334155; --success: #22c55e; --danger: #ef4444; --info: #3b82f6;
+            --purple: #a855f7; --cyan: #06b6d4;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.8; }
+        .chapter { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .chapter-title { font-size: 36px; margin-bottom: 20px; background: linear-gradient(135deg, #a855f7 0%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .chapter-desc { color: var(--text-gray); font-size: 16px; margin-bottom: 40px; line-height: 1.8; padding: 20px; background: var(--bg-card); border-radius: 10px; border-left: 4px solid var(--purple); }
+        .card { background: var(--bg-card); border-radius: 15px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--border); }
+        .card h3 { font-size: 24px; margin-bottom: 20px; color: var(--purple); display: flex; align-items: center; gap: 10px; }
+        .card h4 { font-size: 20px; margin: 25px 0 15px; color: var(--cyan); border-bottom: 2px solid var(--cyan); padding-bottom: 8px; }
+        .card h5 { font-size: 16px; margin: 20px 0 10px; color: var(--secondary); }
+        .card p { color: var(--text-gray); margin-bottom: 15px; }
+        .card ul, .card ol { list-style: none; padding-left: 0; }
+        .card ul li, .card ol li { padding: 10px 0 10px 25px; position: relative; color: var(--text-gray); line-height: 1.7; }
+        .card ul li::before { content: '▸'; position: absolute; left: 0; color: var(--purple); font-weight: bold; }
+        .card ol { counter-reset: item; }
+        .card ol li { counter-increment: item; }
+        .card ol li::before { content: counter(item) "."; position: absolute; left: 0; color: var(--cyan); font-weight: bold; }
+        .scenario-box { background: linear-gradient(135deg, #581c87 0%, #7c3aed 100%); border-radius: 12px; padding: 25px; margin: 20px 0; }
+        .scenario-box h5 { color: #fff; margin-bottom: 12px; font-size: 18px; }
+        .scenario-box p { color: rgba(255,255,255,0.9); font-size: 15px; line-height: 1.7; }
+        .code-block { background: #0f0f1a; padding: 20px; border-radius: 10px; margin: 20px 0; overflow-x: auto; border: 1px solid var(--border); }
+        .code-block code { font-family: 'Courier New', monospace; font-size: 13px; color: var(--text-light); line-height: 1.7; white-space: pre; }
+        .highlight-box { background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%); border-left: 4px solid var(--purple); padding: 25px; border-radius: 0 12px 12px 0; margin: 30px 0; }
+        .highlight-box h4 { margin-bottom: 15px; color: var(--purple); font-size: 20px; }
+        .highlight-box p { color: var(--text-gray); line-height: 1.7; }
+        .warning-box { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border-left: 4px solid var(--danger); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .warning-box h4 { margin-bottom: 10px; color: var(--danger); }
+        .warning-box p { color: var(--text-gray); }
+        .info-box { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%); border-left: 4px solid var(--info); padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .info-box h4 { margin-bottom: 10px; color: var(--info); }
+        .info-box p { color: var(--text-gray); }
+        .table-wrapper { overflow-x: auto; margin: 25px 0; }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(168, 85, 247, 0.2); color: var(--purple); font-weight: 600; }
+        td { color: var(--text-gray); }
+        .mermaid-container { background: #fff; border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .mermaid-title { text-align: center; color: var(--text-gray); margin-bottom: 15px; font-size: 14px; }
+        .architecture-diagram { background: var(--bg-card); border: 2px dashed var(--purple); border-radius: 12px; padding: 30px; margin: 25px 0; }
+        .architecture-diagram h5 { color: var(--purple); margin-bottom: 15px; font-size: 18px; }
+        .step-container { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; }
+        .step-item { display: flex; gap: 15px; align-items: flex-start; padding: 15px; background: rgba(99, 102, 241, 0.05); border-radius: 8px; border-left: 4px solid var(--primary); }
+        .step-num { min-width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+        .step-content { flex: 1; }
+        .step-content h6 { color: var(--info); margin-bottom: 8px; font-size: 16px; }
+        .step-content p { color: var(--text-gray); margin: 0; line-height: 1.6; }
+        .back-nav { margin-top: 50px; padding: 20px; text-align: center; border-top: 1px solid var(--border); }
+        .back-nav a { color: var(--secondary); text-decoration: none; padding: 10px 25px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border); transition: all 0.3s; }
+        .back-nav a:hover { background: var(--secondary); color: var(--bg-dark); }
+        .key-point { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 15px; margin: 15px 0; }
+        .key-point strong { color: var(--secondary); }
+        .tech-tag { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; margin: 2px; }
+        .tech-tag.vue { background: rgba(66, 184, 131, 0.2); color: #42b883; }
+        .tech-tag.java { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .tech-tag.db { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .self-check { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .self-check h3 { color: var(--secondary); margin-bottom: 15px; font-size: 20px; }
+        .self-check .q { margin-bottom: 12px; padding: 10px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .self-check .q strong { color: var(--info); }
+        .self-check .q p { color: var(--text-gray); margin: 5px 0 0 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="chapter">
+        <h2 class="chapter-title">第八章：复杂业务实战 — 从玩具到产品的最后一公里</h2>
+        <div class="chapter-desc">
+            <strong>费曼学习法</strong>：写一个简单的CRUD页面只需要1小时，但让这个页面成为"生产级"产品，还需要审批流程、权限控制、日志审计、并发处理……<br><br>
+            本章带你跨越<strong>从"能跑"到"能用"</strong>的鸿沟。每一个场景都是企业级项目的缩影。<br><br>
+            <strong>本章目标</strong>：理解"为什么企业项目比个人项目复杂10倍"，并掌握应对方案。
+        </div>
+
+        <!-- 场景1：审批流程 -->
+        <div class="card">
+            <h3>🔄 场景1：审批流程引擎（请假审批）</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>企业内部的请假申请需要经过多级审批：员工提交 → 直属领导审批 → 部门经理审批 → HR备案。不同天数对应不同审批级别，需要实现动态流程、审批记录追踪、审批状态实时查看等功能。</p>
+            </div>
+
+            <h4>📐 架构设计</h4>
+            <div class="architecture-diagram">
+                <h5>审批流程架构图</h5>
+                <div class="mermaid-container">
+                    <div class="mermaid-title">图8-1：请假审批流程状态机</div>
+                    <pre class="mermaid">
+stateDiagram-v2
+    [*] --> 草稿
+    草稿 --> 待审批: 提交申请
+    待审批 --> 领导审批中: 直属领导通过(≤3天)
+    待审批 --> 经理审批中: 直属领导通过(>3天)
+    待审批 --> 已驳回: 直属领导驳回
+    领导审批中 --> 已完成: 领导审批通过
+    领导审批中 --> 已驳回: 领导驳回
+    经理审批中 --> 已完成: 经理审批通过
+    经理审批中 --> 已驳回: 经理驳回
+    已驳回 --> 草稿: 重新编辑
+    已完成 --> [*]
+    已驳回 --> [*]
+                    </pre>
+                </div>
+            </div>
+
+            <h4>📊 数据库设计</h4>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>表名</th><th>说明</th><th>核心字段</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>leave_application</td><td>请假申请表</td><td>id, user_id, leave_type, start_date, end_date, days, reason, status, current_approver_id</td></tr>
+                        <tr><td>approval_record</td><td>审批记录表</td><td>id, application_id, approver_id, action, comment, create_time</td></tr>
+                        <tr><td>approval_flow_config</td><td>审批流程配置</td><td>id, flow_name, min_days, max_days, approval_levels</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>🎨 前端实现（Vue3 + TypeScript）</h4>
+            <div class="code-block">
+                <code>
+&lt;!-- LeaveApplication.vue - 请假申请表单 --&gt;
+&lt;template&gt;
+  &lt;el-dialog v-model="visible" :title="isEdit ? '编辑请假申请' : '提交请假申请'" width="600px"&gt;
+    &lt;el-form ref="formRef" :model="form" :rules="rules" label-width="100px"&gt;
+      &lt;el-form-item label="请假类型" prop="leaveType"&gt;
+        &lt;el-select v-model="form.leaveType" placeholder="请选择"&gt;
+          &lt;el-option label="事假" value="personal" /&gt;
+          &lt;el-option label="病假" value="sick" /&gt;
+          &lt;el-option label="年假" value="annual" /&gt;
+          &lt;el-option label="调休" value="compensatory" /&gt;
+        &lt;/el-select&gt;
+      &lt;/el-form-item&gt;
+      
+      &lt;el-form-item label="请假时间" prop="dateRange"&gt;
+        &lt;el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          @change="handleDateChange"
+        /&gt;
+      &lt;/el-form-item&gt;
+      
+      &lt;el-form-item label="请假天数"&gt;
+        &lt;el-input-number v-model="form.days" :min="0.5" :step="0.5" disabled /&gt;
+        &lt;span class="tips"&gt;自动计算&lt;/span&gt;
+      &lt;/el-form-item&gt;
+      
+      &lt;el-form-item label="请假原因" prop="reason"&gt;
+        &lt;el-input v-model="form.reason" type="textarea" :rows="3" placeholder="请输入请假原因" /&gt;
+      &lt;/el-form-item&gt;
+      
+      &lt;el-form-item label="审批流程"&gt;
+        &lt;el-steps :active="currentStep" finish-status="success" simple&gt;
+          &lt;el-step v-for="step in approvalSteps" :key="step" :title="step" /&gt;
+        &lt;/el-steps&gt;
+        &lt;div class="flow-tips"&gt;预计审批人：{{ expectedApprovers }}&lt;/div&gt;
+      &lt;/el-form-item&gt;
+    &lt;/el-form&gt;
+    
+    &lt;template #footer&gt;
+      &lt;el-button @click="handleCancel"&gt;取消&lt;/el-button&gt;
+      &lt;el-button type="primary" :loading="submitting" @click="handleSubmit"&gt;
+        {{ isEdit ? '保存' : '提交审批' }}
+      &lt;/el-button&gt;
+    &lt;/template&gt;
+  &lt;/el-dialog&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref, computed, watch } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
+
+interface LeaveForm {
+  id?: number
+  leaveType: string
+  startDate: string
+  endDate: string
+  days: number
+  reason: string
+}
+
+const formRef = ref&lt;FormInstance&gt;()
+const visible = ref(false)
+const submitting = ref(false)
+const isEdit = ref(false)
+const dateRange = ref&lt;[string, string]&gt;()
+
+const form = ref&lt;LeaveForm&gt;({
+  leaveType: '',
+  startDate: '',
+  endDate: '',
+  days: 0,
+  reason: ''
+})
+
+const rules: FormRules = {
+  leaveType: [{ required: true, message: '请选择请假类型', trigger: 'change' }],
+  dateRange: [{ required: true, message: '请选择请假时间', trigger: 'change' }],
+  reason: [{ required: true, message: '请输入请假原因', trigger: 'blur' }]
+}
+
+// 自动计算天数
+const handleDateChange = (val: [string, string]) => {
+  if (val &amp;&amp; val.length === 2) {
+    form.value.startDate = val[0]
+    form.value.endDate = val[1]
+    // 计算工作日天数（简化版）
+    const start = new Date(val[0])
+    const end = new Date(val[1])
+    const diffTime = Math.abs(end.getTime() - start.getTime())
+    form.value.days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+  }
+}
+
+// 根据天数计算审批步骤
+const approvalSteps = computed(() =&gt; {
+  if (form.value.days &lt;= 3) return ['直属领导审批', '完成']
+  if (form.value.days &lt;= 7) return ['直属领导审批', '部门经理审批', '完成']
+  return ['直属领导审批', '部门经理审批', '总经理审批', '完成']
+})
+
+const currentStep = computed(() =&gt; form.value.days &lt;= 3 ? 1 : form.value.days &lt;= 7 ? 2 : 3)
+
+const expectedApprovers = computed(() =&gt; {
+  const approvers = ['张三（直属领导）']
+  if (form.value.days &gt; 3) approvers.push('李四（部门经理）')
+  if (form.value.days &gt; 7) approvers.push('王五（总经理）')
+  return approvers.join(' → ')
+})
+
+const handleSubmit = async () =&gt; {
+  await formRef.value?.validate()
+  submitting.value = true
+  try {
+    if (isEdit.value) {
+      await updateLeaveApplication(form.value)
+      ElMessage.success('更新成功')
+    } else {
+      await submitLeaveApplication(form.value)
+      ElMessage.success('提交成功，等待审批')
+    }
+    visible.value = false
+    emit('refresh')
+  } finally {
+    submitting.value = false
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h4>🎨 前端：审批记录时间线</h4>
+            <div class="code-block">
+                <code>
+&lt;!-- ApprovalTimeline.vue - 审批进度查看 --&gt;
+&lt;template&gt;
+  &lt;div class="approval-timeline"&gt;
+    &lt;el-timeline&gt;
+      &lt;el-timeline-item
+        v-for="(record, index) in records"
+        :key="index"
+        :timestamp="formatTime(record.createTime)"
+        placement="top"
+        :type="getTimelineType(record.action)"
+        :icon="getTimelineIcon(record.action)"
+      &gt;
+        &lt;el-card&gt;
+          &lt;h4&gt;{{ record.approverName }} - {{ getActionText(record.action) }}&lt;/h4&gt;
+          &lt;p v-if="record.comment"&gt;审批意见：{{ record.comment }}&lt;/p&gt;
+        &lt;/el-card&gt;
+      &lt;/el-timeline-item&gt;
+    &lt;/el-timeline&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+interface ApprovalRecord {
+  approverName: string
+  action: 'approve' | 'reject' | 'submit'
+  comment?: string
+  createTime: string
+}
+
+const getTimelineType = (action: string) =&gt; {
+  switch (action) {
+    case 'approve': return 'success'
+    case 'reject': return 'danger'
+    default: return 'primary'
+  }
+}
+
+const getActionText = (action: string) =&gt; {
+  switch (action) {
+    case 'approve': return '✅ 审批通过'
+    case 'reject': return '❌ 驳回申请'
+    case 'submit': return '📤 提交申请'
+    default: return action
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h4>☕ 后端：审批流程Service实现</h4>
+            <div class="code-block">
+                <code>
+// LeaveApplicationService.java
+@Service
+@RequiredArgsConstructor
+public class LeaveApplicationService extends ServiceImpl&lt;LeaveApplicationMapper, LeaveApplication&gt; {
+    
+    private final ApprovalRecordService approvalRecordService;
+    private final UserService userService;
+    
+    /**
+     * 提交请假申请
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void submitApplication(LeaveApplicationDTO dto, Long userId) {
+        // 1. 创建申请
+        LeaveApplication application = new LeaveApplication();
+        application.setUserId(userId);
+        application.setLeaveType(dto.getLeaveType());
+        application.setStartDate(dto.getStartDate());
+        application.setEndDate(dto.getEndDate());
+        application.setDays(dto.getDays());
+        application.setReason(dto.getReason());
+        application.setStatus("pending_first_approval");
+        
+        // 2. 根据天数确定第一级审批人
+        Long firstApproverId = getApproverByDays(userId, dto.getDays(), 1);
+        application.setCurrentApproverId(firstApproverId);
+        
+        this.save(application);
+        
+        // 3. 记录提交日志
+        approvalRecordService.saveRecord(
+            application.getId(), userId, "submit", "提交请假申请"
+        );
+        
+        // 4. 发送通知给审批人（消息队列/WebSocket）
+        notifyApprover(firstApproverId, application);
+    }
+    
+    /**
+     * 审批处理
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void approveApplication(Long applicationId, Long approverId, 
+                                   String action, String comment) {
+        LeaveApplication application = this.getById(applicationId);
+        if (application == null) {
+            throw new BusinessException("申请不存在");
+        }
+        
+        // 验证审批权限
+        if (!application.getCurrentApproverId().equals(approverId)) {
+            throw new BusinessException("无审批权限");
+        }
+        
+        // 记录审批
+        approvalRecordService.saveRecord(applicationId, approverId, action, comment);
+        
+        if ("approve".equals(action)) {
+            // 审批通过
+            handleApprovalPass(application);
+        } else if ("reject".equals(action)) {
+            // 驳回
+            application.setStatus("rejected");
+            this.updateById(application);
+            notifyApplicant(application.getUserId(), "您的请假申请已被驳回");
+        }
+    }
+    
+    /**
+     * 审批通过后的流转逻辑
+     */
+    private void handleApprovalPass(LeaveApplication application) {
+        int currentLevel = getCurrentApprovalLevel(application);
+        int totalLevels = getTotalApprovalLevels(application.getDays());
+        
+        if (currentLevel >= totalLevels) {
+            // 所有审批完成
+            application.setStatus("approved");
+            application.setCurrentApproverId(null);
+        } else {
+            // 流转到下一级审批人
+            int nextLevel = currentLevel + 1;
+            Long nextApproverId = getApproverByDays(
+                application.getUserId(), application.getDays(), nextLevel
+            );
+            application.setStatus("pending_" + getLevelName(nextLevel));
+            application.setCurrentApproverId(nextApproverId);
+            
+            // 通知下一级审批人
+            notifyApprover(nextApproverId, application);
+        }
+        
+        this.updateById(application);
+    }
+    
+    /**
+     * 根据天数获取对应级别的审批人
+     */
+    private Long getApproverByDays(Long applicantId, int days, int level) {
+        User applicant = userService.getById(applicantId);
+        
+        return switch (level) {
+            case 1 -> applicant.getManagerId();  // 直属领导
+            case 2 -> applicant.getDepartmentManagerId();  // 部门经理
+            case 3 -> getGeneralManagerId();  // 总经理
+            default -> throw new BusinessException("审批级别不存在");
+        };
+    }
+    
+    /**
+     * 获取总审批级别数
+     */
+    private int getTotalApprovalLevels(int days) {
+        if (days <= 3) return 1;
+        if (days <= 7) return 2;
+        return 3;
+    }
+}
+                </code>
+            </div>
+
+            <h4>☕ Controller层与撤销操作</h4>
+            <div class="code-block">
+                <pre><code class="language-java">// LeaveController.java
+@RestController
+@RequestMapping("/api/leave")
+@RequiredArgsConstructor
+public class LeaveController {
+
+    private final LeaveApplicationService leaveService;
+
+    /** 提交请假申请 */
+    @PostMapping
+    @AuditLog(value = "提交请假申请", module = "审批管理")
+    public Result&lt;Void&gt; submit(@RequestBody @Valid LeaveApplicationDTO dto) {
+        leaveService.submitApplication(dto, SecurityUtils.getCurrentUserId());
+        return Result.success();
+    }
+
+    /** 审批（通过/驳回） */
+    @PutMapping("/{id}/approve")
+    @AuditLog(value = "请假审批", module = "审批管理")
+    public Result&lt;Void&gt; approve(@PathVariable Long id, @RequestBody @Valid ApproveDTO dto) {
+        leaveService.approveApplication(id, SecurityUtils.getCurrentUserId(), dto.getAction(), dto.getComment());
+        return Result.success();
+    }
+
+    /** 撤销申请（只有"待审批"状态可以撤销） */
+    @PutMapping("/{id}/cancel")
+    @AuditLog(value = "撤销请假申请", module = "审批管理")
+    public Result&lt;Void&gt; cancel(@PathVariable Long id) {
+        leaveService.cancelApplication(id, SecurityUtils.getCurrentUserId());
+        return Result.success();
+    }
+
+    /** 查询我的请假记录 */
+    @GetMapping("/my")
+    public Result&lt;PageResult&lt;LeaveApplicationVO&gt;&gt; queryMyLeaves(LeaveQueryDTO query) {
+        query.setUserId(SecurityUtils.getCurrentUserId());
+        return Result.success(leaveService.queryPage(query));
+    }
+}
+
+// 撤销逻辑（Service层）
+@Transactional(rollbackFor = Exception.class)
+public void cancelApplication(Long applicationId, Long userId) {
+    LeaveApplication application = this.getById(applicationId);
+    if (application == null) {
+        throw new BusinessException("申请不存在");
+    }
+    if (!application.getUserId().equals(userId)) {
+        throw new BusinessException("只能撤销自己的申请");
+    }
+    if (!"pending_first_approval".equals(application.getStatus())) {
+        throw new BusinessException("只有待审批状态的申请才能撤销");
+    }
+
+    application.setStatus("cancelled");
+    this.updateById(application);
+    approvalRecordService.saveRecord(applicationId, userId, "cancel", "申请人主动撤销");
+}</code></pre>
+            </div>
+
+            <div class="info-box">
+                <h4>💡 审批流程最佳实践</h4>
+                <p>1. <strong>状态机设计</strong>：使用明确的状态值，避免状态混乱<br/>
+                2. <strong>权限校验</strong>：每次审批前验证当前审批人身份<br/>
+                3. <strong>事务管理</strong>：审批操作和状态更新必须在同一事务中<br/>
+                4. <strong>通知机制</strong>：审批流转后及时通知相关人员<br/>
+                5. <strong>审批记录</strong>：保留完整的审批历史，支持追溯<br/>
+                6. <strong>流程配置化</strong>：将审批规则配置化，支持动态调整<br/>
+                7. <strong>撤销机制</strong>：申请人可在审批完成前主动撤销，已审批的申请不可撤销</p>
+            </div>
+        </div>
+
+        <!-- 场景2：数据权限控制 -->
+        <div class="card">
+            <h3>🔐 场景2：数据权限控制（行级数据隔离）</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>企业内部系统中，不同角色的用户只能看到自己权限范围内的数据：普通员工只能看自己的数据，部门经理可以看到本部门所有数据，超级管理员可以看到全部数据。需要实现灵活的数据权限控制。</p>
+            </div>
+
+            <h4>📐 权限模型设计</h4>
+            <div class="architecture-diagram">
+                <h5>数据权限架构图</h5>
+                <div class="mermaid-container">
+                    <div class="mermaid-title">图8-2：数据权限控制流程</div>
+                    <pre class="mermaid">
+sequenceDiagram
+    participant U as 用户请求
+    participant I as 拦截器
+    participant P as 权限解析器
+    participant M as MyBatis拦截器
+    participant D as 数据库
+    
+    U->>I: 查询请求
+    I->>P: 获取用户角色和部门
+    P->>P: 构建数据权限SQL片段
+    P->>M: 注入WHERE条件
+    M->>D: 执行带权限的SQL
+    D->>U: 返回权限内数据
+                    </pre>
+                </div>
+            </div>
+
+            <h4>📊 数据库设计</h4>
+            <div class="code-block">
+                <code>
+-- 用户表
+CREATE TABLE sys_user (
+    id BIGINT PRIMARY KEY,
+    username VARCHAR(50),
+    department_id BIGINT,  -- 所属部门
+    role_code VARCHAR(50),  -- 角色编码
+    manager_id BIGINT  -- 直属领导
+);
+
+-- 部门表
+CREATE TABLE sys_department (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(100),
+    parent_id BIGINT  -- 上级部门
+);
+
+-- 数据权限配置表
+CREATE TABLE data_scope_config (
+    id BIGINT PRIMARY KEY,
+    role_code VARCHAR(50),  -- 角色编码
+    scope_type VARCHAR(20),  -- 权限类型：all/dept/dept_and_children/self/custom
+    custom_dept_ids JSON  -- 自定义部门范围
+);
+                </code>
+            </div>
+
+            <h4>☕ 后端：数据权限注解 + AOP实现</h4>
+            <div class="code-block">
+                <code>
+// 1. 自定义注解
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DataScope {
+    /**
+     * 表别名（默认""）
+     */
+    String tableAlias() default "";
+    
+    /**
+     * 部门字段名（默认"department_id"）
+     */
+    String deptField() default "department_id";
+    
+    /**
+     * 用户字段名（默认"user_id"）
+     */
+    String userField() default "user_id";
+}
+
+// 2. MyBatis拦截器实现数据权限过滤
+@Intercepts({
+    @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})
+})
+@Component
+@RequiredArgsConstructor
+public class DataScopeInterceptor implements Interceptor {
+    
+    private final UserService userService;
+    
+    @Override
+    public Object intercept(Invocation invocation) throws Throwable {
+        MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
+        Object parameter = invocation.getArgs()[1];
+        
+        // 获取方法上的@DataScope注解
+        DataScope dataScope = getDataScopeAnnotation(ms);
+        if (dataScope == null) {
+            return invocation.proceed();
+        }
+        
+        // 获取当前用户
+        LoginUser currentUser = SecurityUtils.getCurrentUser();
+        if (currentUser == null || currentUser.isAdmin()) {
+            return invocation.proceed();  // 管理员无限制
+        }
+        
+        // 获取用户数据权限范围
+        DataScopeInfo scopeInfo = getUserDataScope(currentUser.getId());
+        
+        // 构建权限SQL
+        String dataScopeSql = buildDataScopeSql(dataScope, scopeInfo);
+        
+        // 修改原始SQL，追加WHERE条件
+        BoundSql boundSql = ms.getBoundSql(parameter);
+        String originalSql = boundSql.getSql();
+        String newSql = originalSql + " " + dataScopeSql;
+        
+        // 重新设置SQL
+        MetaObject metaObject = SystemMetaObject.forObject(boundSql);
+        metaObject.setValue("sql", newSql);
+        
+        return invocation.proceed();
+    }
+    
+    /**
+     * 构建数据权限SQL片段
+     */
+    private String buildDataScopeSql(DataScope annotation, DataScopeInfo scopeInfo) {
+        String tableAlias = annotation.tableAlias();
+        String deptField = annotation.deptField();
+        String userField = annotation.userField();
+        
+        String alias = StringUtils.hasText(tableAlias) ? tableAlias + "." : "";
+        
+        return switch (scopeInfo.getScopeType()) {
+            case "all" -> "";  // 全部数据权限
+            case "dept" -> String.format("AND %s%s = %d", alias, deptField, scopeInfo.getDeptId());
+            case "dept_and_children" -> {
+                List&lt;Long&gt; deptIds = getChildrenDeptIds(scopeInfo.getDeptId());
+                deptIds.add(scopeInfo.getDeptId());
+                yield String.format("AND %s%s IN (%s)", alias, deptField, StringUtils.join(deptIds, ","));
+            }
+            case "self" -> String.format("AND %s%s = %d", alias, userField, scopeInfo.getUserId());
+            case "custom" -> String.format("AND %s%s IN (%s)", alias, deptField, scopeInfo.getCustomDeptIds());
+            default -> "AND 1=0";  // 无权限
+        };
+    }
+    
+    /**
+     * 获取用户的数据权限范围
+     */
+    private DataScopeInfo getUserDataScope(Long userId) {
+        User user = userService.getById(userId);
+        DataScopeConfig config = dataScopeConfigMapper.getByRoleCode(user.getRoleCode());
+        
+        DataScopeInfo info = new DataScopeInfo();
+        info.setUserId(userId);
+        info.setDeptId(user.getDepartmentId());
+        info.setScopeType(config.getScopeType());
+        info.setCustomDeptIds(config.getCustomDeptIds());
+        return info;
+    }
+}
+
+// 3. 在Mapper方法上使用
+public interface UserMapper extends BaseMapper&lt;User&gt; {
+    
+    @DataScope(tableAlias = "u", deptField = "department_id", userField = "user_id")
+    List&lt;User&gt; selectUserList(@Param("query") UserQueryDTO query);
+}
+                </code>
+            </div>
+
+            <h4>🎨 前端：权限显示控制</h4>
+            <div class="code-block">
+                <code>
+&lt;!-- DataPermissionDirective.vue - 数据权限指令 --&gt;
+&lt;script setup lang="ts"&gt;
+import { createVNode, ref } from 'vue'
+import { useUserStore } from '@/store/user'
+
+// 权限判断Hook
+export function useDataPermission() {
+  const userStore = useUserStore()
+  
+  // 判断是否有数据权限
+  const hasDataScope = (scopeType: string) =&gt; {
+    return userStore.dataScopeList.includes(scopeType)
+  }
+  
+  // 获取可见数据范围
+  const getDataScope = () =&gt; {
+    return {
+      canViewAll: userStore.dataScopeList.includes('all'),
+      canViewDept: userStore.dataScopeList.includes('dept'),
+      canViewSelf: userStore.dataScopeList.includes('self')
+    }
+  }
+  
+  return { hasDataScope, getDataScope }
+}
+
+// 使用示例
+const { hasDataScope } = useDataPermission()
+
+// 根据权限显示不同内容
+const showExportButton = computed(() =&gt; hasDataScope('all') || hasDataScope('dept'))
+const showDeleteButton = computed(() =&gt; userStore.isAdmin)
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- 只有有部门数据权限的人才能看到导出按钮 --&gt;
+  &lt;el-button v-if="showExportButton" @click="handleExport"&gt;导出数据&lt;/el-button&gt;
+  
+  &lt;!-- 只有管理员才能看到删除按钮 --&gt;
+  &lt;el-button v-if="showDeleteButton" type="danger" @click="handleDelete"&gt;删除&lt;/el-button&gt;
+&lt;/template&gt;
+                </code>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ 数据权限注意事项</h4>
+                <p>1. <strong>越权防护</strong>：后端必须做数据权限校验，前端只是UI展示控制<br/>
+                2. <strong>性能影响</strong>：数据权限SQL可能影响查询性能，需要优化索引<br/>
+                3. <strong>跨表查询</strong>：多表JOIN时需要正确处理表别名<br/>
+                4. <strong>缓存问题</strong>：权限变更时需要清理相关缓存</p>
+            </div>
+        </div>
+
+        <!-- 场景3：审计日志系统 -->
+        <div class="card">
+            <h3>📝 场景3：审计日志系统（操作记录追踪）</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>企业系统需要记录所有用户的操作日志，包括登录、增删改查、导出等关键操作，用于安全审计和问题追溯。需要记录操作人、操作时间、IP地址、操作内容、请求参数、响应结果等信息。</p>
+            </div>
+
+            <h4>📐 架构设计</h4>
+            <div class="architecture-diagram">
+                <h5>审计日志架构图</h5>
+                <div class="mermaid-container">
+                    <div class="mermaid-title">图8-3：审计日志异步记录流程</div>
+                    <pre class="mermaid">
+sequenceDiagram
+    participant C as Controller
+    participant A as AuditLog注解
+    participant Q as 消息队列
+    participant W as 异步Worker
+    participant D as 数据库/ES
+    
+    C->>C: 执行业务逻辑
+    C->>A: 返回结果
+    A->>A: 收集日志信息
+    A->>Q: 发送日志消息（异步）
+    A->>C: 返回结果（不阻塞）
+    Q->>W: 消费日志消息
+    W->>D: 持久化日志
+                    </pre>
+                </div>
+            </div>
+
+            <h4>📊 数据库设计</h4>
+            <div class="code-block">
+                <code>
+-- 操作日志表
+CREATE TABLE sys_audit_log (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT,  -- 操作人ID
+    username VARCHAR(50),  -- 操作人姓名
+    operation VARCHAR(100),  -- 操作描述
+    module VARCHAR(50),  -- 所属模块
+    method VARCHAR(20),  -- 请求方法 GET/POST/PUT/DELETE
+    request_url VARCHAR(255),  -- 请求URL
+    request_params TEXT,  -- 请求参数
+    response_result TEXT,  -- 响应结果
+    ip VARCHAR(50),  -- IP地址
+    user_agent VARCHAR(255),  -- 浏览器信息
+    status TINYINT,  -- 状态 0-失败 1-成功
+    cost_time BIGINT,  -- 耗时（毫秒）
+    error_msg TEXT,  -- 错误信息
+    create_time DATETIME,
+    
+    INDEX idx_user_id (user_id),
+    INDEX idx_module (module),
+    INDEX idx_create_time (create_time)
+);
+                </code>
+            </div>
+
+            <h4>☕ 后端：AOP + 自定义注解实现</h4>
+            <div class="code-block">
+                <code>
+// 1. 自定义审计日志注解
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AuditLog {
+    /**
+     * 操作描述
+     */
+    String value() default "";
+    
+    /**
+     * 所属模块
+     */
+    String module() default "";
+    
+    /**
+     * 是否记录请求参数
+     */
+    boolean recordParams() default true;
+    
+    /**
+     * 是否记录响应结果
+     */
+    boolean recordResult() default false;
+}
+
+// 2. AOP切面实现
+@Aspect
+@Component
+@Slf4j
+@RequiredArgsConstructor
+public class AuditLogAspect {
+    
+    private final AuditLogPublisher logPublisher;
+    
+    @Around("@annotation(auditLog)")
+    public Object around(ProceedingJoinPoint point, AuditLog auditLog) throws Throwable {
+        long startTime = System.currentTimeMillis();
+        
+        AuditLogEvent event = new AuditLogEvent();
+        event.setOperation(auditLog.value());
+        event.setModule(auditLog.module());
+        event.setMethod(getRequestMethod());
+        event.setRequestUrl(getRequestUrl());
+        event.setIp(getClientIp());
+        event.setUserAgent(getUserAgent());
+        event.setUserId(getCurrentUserId());
+        event.setUsername(getCurrentUsername());
+        
+        // 记录请求参数
+        if (auditLog.recordParams()) {
+            event.setRequestParams(JsonUtils.toJson(getRequestArgs(point)));
+        }
+        
+        Object result = null;
+        Throwable exception = null;
+        
+        try {
+            result = point.proceed();
+            event.setStatus(1);
+            
+            // 记录响应结果
+            if (auditLog.recordResult()) {
+                event.setResponseResult(JsonUtils.toJson(result));
+            }
+        } catch (Throwable e) {
+            exception = e;
+            event.setStatus(0);
+            event.setErrorMsg(e.getMessage());
+            throw e;
+        } finally {
+            long costTime = System.currentTimeMillis() - startTime;
+            event.setCostTime(costTime);
+            
+            // 异步发布日志事件
+            logPublisher.publish(event);
+        }
+        
+        return result;
+    }
+    
+    private Map&lt;String, Object&gt; getRequestArgs(ProceedingJoinPoint point) {
+        MethodSignature signature = (MethodSignature) point.getSignature();
+        String[] paramNames = signature.getParameterNames();
+        Object[] args = point.getArgs();
+        
+        Map&lt;String, Object&gt; params = new HashMap&lt;&gt;();
+        for (int i = 0; i &lt; paramNames.length; i++) {
+            // 过滤敏感对象（如HttpServletRequest、文件等）
+            if (!isSensitiveType(args[i])) {
+                params.put(paramNames[i], args[i]);
+            }
+        }
+        return params;
+    }
+}
+
+// 3. 使用Spring Event异步发布日志
+@Component
+public class AuditLogPublisher {
+    
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+    
+    public void publish(AuditLogEvent event) {
+        eventPublisher.publishEvent(event);
+    }
+}
+
+// 4. 事件监听器异步保存日志
+@Component
+@Slf4j
+public class AuditLogListener {
+    
+    @Autowired
+    private AuditLogMapper auditLogMapper;
+    
+    @Async("auditLogExecutor")
+    @EventListener
+    public void handleAuditLog(AuditLogEvent event) {
+        try {
+            AuditLogEntity logEntity = AuditLogConverter.toEntity(event);
+            auditLogMapper.insert(logEntity);
+        } catch (Exception e) {
+            log.error("保存审计日志失败", e);
+        }
+    }
+}
+
+// 5. 在Controller中使用
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+public class UserController {
+    
+    @PostMapping
+    @AuditLog(value = "新增用户", module = "用户管理", recordParams = true)
+    public Result&lt;Void&gt; create(@RequestBody @Valid UserCreateDTO dto) {
+        userService.createUser(dto);
+        return Result.success();
+    }
+    
+    @PutMapping("/{id}")
+    @AuditLog(value = "更新用户", module = "用户管理")
+    public Result&lt;Void&gt; update(@PathVariable Long id, @RequestBody UserUpdateDTO dto) {
+        userService.updateUser(id, dto);
+        return Result.success();
+    }
+    
+    @DeleteMapping("/{id}")
+    @AuditLog(value = "删除用户", module = "用户管理")
+    public Result&lt;Void&gt; delete(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return Result.success();
+    }
+    
+    @PostMapping("/export")
+    @AuditLog(value = "导出用户", module = "用户管理", recordResult = false)
+    public void export(@RequestBody UserExportDTO dto, HttpServletResponse response) {
+        userService.exportUsers(dto, response);
+    }
+}
+                </code>
+            </div>
+
+            <h4>🎨 前端：操作日志查看页面</h4>
+            <div class="code-block">
+                <code>
+&lt;!-- AuditLogView.vue - 审计日志查看 --&gt;
+&lt;template&gt;
+  &lt;div class="audit-log-container"&gt;
+    &lt;!-- 搜索条件 --&gt;
+    &lt;el-form :model="queryParams" inline&gt;
+      &lt;el-form-item label="操作人"&gt;
+        &lt;el-input v-model="queryParams.username" placeholder="请输入操作人" /&gt;
+      &lt;/el-form-item&gt;
+      &lt;el-form-item label="模块"&gt;
+        &lt;el-select v-model="queryParams.module" placeholder="全部"&gt;
+          &lt;el-option label="用户管理" value="用户管理" /&gt;
+          &lt;el-option label="角色管理" value="角色管理" /&gt;
+          &lt;el-option label="系统配置" value="系统配置" /&gt;
+        &lt;/el-select&gt;
+      &lt;/el-form-item&gt;
+      &lt;el-form-item label="状态"&gt;
+        &lt;el-select v-model="queryParams.status" placeholder="全部"&gt;
+          &lt;el-option label="成功" :value="1" /&gt;
+          &lt;el-option label="失败" :value="0" /&gt;
+        &lt;/el-select&gt;
+      &lt;/el-form-item&gt;
+      &lt;el-form-item label="时间范围"&gt;
+        &lt;el-date-picker v-model="dateRange" type="daterange" /&gt;
+      &lt;/el-form-item&gt;
+      &lt;el-form-item&gt;
+        &lt;el-button type="primary" @click="handleSearch"&gt;查询&lt;/el-button&gt;
+        &lt;el-button @click="handleReset"&gt;重置&lt;/el-button&gt;
+      &lt;/el-form-item&gt;
+    &lt;/el-form&gt;
+    
+    &lt;!-- 日志表格 --&gt;
+    &lt;el-table :data="logList" border&gt;
+      &lt;el-table-column prop="username" label="操作人" width="120" /&gt;
+      &lt;el-table-column prop="operation" label="操作描述" width="150" /&gt;
+      &lt;el-table-column prop="module" label="模块" width="120" /&gt;
+      &lt;el-table-column prop="ip" label="IP地址" width="140" /&gt;
+      &lt;el-table-column prop="status" label="状态" width="80"&gt;
+        &lt;template #default="{ row }"&gt;
+          &lt;el-tag :type="row.status === 1 ? 'success' : 'danger'"&gt;
+            {{ row.status === 1 ? '成功' : '失败' }}
+          &lt;/el-tag&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column prop="costTime" label="耗时" width="100"&gt;
+        &lt;template #default="{ row }"&gt;
+          {{ row.costTime }}ms
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column prop="createTime" label="操作时间" width="180" /&gt;
+      &lt;el-table-column label="操作" width="100"&gt;
+        &lt;template #default="{ row }"&gt;
+          &lt;el-button link type="primary" @click="showDetail(row)"&gt;详情&lt;/el-button&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+    &lt;/el-table&gt;
+    
+    &lt;!-- 详情对话框 --&gt;
+    &lt;el-dialog v-model="detailVisible" title="日志详情" width="700px"&gt;
+      &lt;el-descriptions :column="2" border&gt;
+        &lt;el-descriptions-item label="操作人"&gt;{{ currentLog.username }}&lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item label="操作描述"&gt;{{ currentLog.operation }}&lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item label="请求URL"&gt;{{ currentLog.requestUrl }}&lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item label="请求方法"&gt;{{ currentLog.method }}&lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item label="IP地址"&gt;{{ currentLog.ip }}&lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item label="耗时"&gt;{{ currentLog.costTime }}ms&lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item label="请求参数" :span="2"&gt;
+          &lt;pre class="json-pre"&gt;{{ formatJson(currentLog.requestParams) }}&lt;/pre&gt;
+        &lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item v-if="currentLog.responseResult" label="响应结果" :span="2"&gt;
+          &lt;pre class="json-pre"&gt;{{ formatJson(currentLog.responseResult) }}&lt;/pre&gt;
+        &lt;/el-descriptions-item&gt;
+        &lt;el-descriptions-item v-if="currentLog.errorMsg" label="错误信息" :span="2"&gt;
+          &lt;span class="error-text"&gt;{{ currentLog.errorMsg }}&lt;/span&gt;
+        &lt;/el-descriptions-item&gt;
+      &lt;/el-descriptions&gt;
+    &lt;/el-dialog&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref } from 'vue'
+
+const queryParams = ref({
+  username: '',
+  module: '',
+  status: undefined,
+  startDate: '',
+  endDate: ''
+})
+
+const logList = ref([])
+const detailVisible = ref(false)
+const currentLog = ref({})
+
+const showDetail = (row: any) =&gt; {
+  currentLog.value = row
+  detailVisible.value = true
+}
+
+const formatJson = (jsonStr: string) =&gt; {
+  try {
+    return JSON.stringify(JSON.parse(jsonStr), null, 2)
+  } catch {
+    return jsonStr
+  }
+}
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <div class="highlight-box">
+                <h4>💡 审计日志最佳实践</h4>
+                <p>1. <strong>异步记录</strong>：使用消息队列或Spring Event异步记录，不影响主业务流程<br/>
+                2. <strong>敏感信息脱敏</strong>：密码、Token等敏感字段不应记录<br/>
+                3. <strong>大数据量存储</strong>：日志数据量大时，考虑使用Elasticsearch存储<br/>
+                4. <strong>日志清理</strong>：定期清理过期日志（如保留180天）<br/>
+                5. <strong>性能优化</strong>：使用连接池、批量插入等方式优化写入性能</p>
+            </div>
+        </div>
+
+        <!-- 场景4：多表关联查询 -->
+        <div class="card">
+            <h3>🔗 场景4：多表关联查询与分页优化</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>订单列表需要展示订单基本信息、用户信息、商品信息、物流信息等多表关联数据，同时支持多条件筛选和分页查询。需要解决N+1查询问题、分页性能问题。</p>
+            </div>
+
+            <h4>📐 数据库设计</h4>
+            <div class="mermaid-container">
+                <div class="mermaid-title">图8-4：订单系统表关联关系</div>
+                <pre class="mermaid">
+erDiagram
+    ORDERS ||--|| USERS : "belongs to"
+    ORDERS ||--o{ ORDER_ITEMS : "contains"
+    ORDER_ITEMS }o--|| PRODUCTS : "references"
+    ORDERS ||--o| LOGISTICS : "ships via"
+    
+    ORDERS {
+        bigint id PK
+        bigint user_id FK
+        string order_no
+        decimal total_amount
+        int status
+        datetime create_time
+    }
+    
+    USERS {
+        bigint id PK
+        string username
+        string phone
+        bigint address_id
+    }
+    
+    ORDER_ITEMS {
+        bigint id PK
+        bigint order_id FK
+        bigint product_id FK
+        int quantity
+        decimal price
+    }
+    
+    PRODUCTS {
+        bigint id PK
+        string name
+        decimal price
+        string category
+    }
+    
+    LOGISTICS {
+        bigint id PK
+        bigint order_id FK
+        string tracking_no
+        string company
+        int status
+    }
+                </pre>
+            </div>
+
+            <h4>☕ 后端：高效多表查询实现</h4>
+            <div class="code-block">
+                <code>
+// 1. DTO设计
+@Data
+public class OrderVO {
+    // 订单基本信息
+    private Long id;
+    private String orderNo;
+    private BigDecimal totalAmount;
+    private Integer status;
+    private Date createTime;
+    
+    // 用户信息（关联）
+    private String username;
+    private String userPhone;
+    
+    // 订单商品列表（一对多）
+    private List&lt;OrderItemVO&gt; items;
+    
+    // 物流信息（一对一）
+    private LogisticsVO logistics;
+}
+
+@Data
+public class OrderItemVO {
+    private Long productId;
+    private String productName;
+    private String productImage;
+    private Integer quantity;
+    private BigDecimal price;
+}
+
+// 2. Service层实现（避免N+1查询）
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+    
+    private final OrderMapper orderMapper;
+    private final OrderItemMapper orderItemMapper;
+    private final UserMapper userMapper;
+    private final LogisticsMapper logisticsMapper;
+    
+    /**
+     * 分页查询订单列表（优化版）
+     */
+    public PageResult&lt;OrderVO&gt; queryOrderPage(OrderQueryDTO query) {
+        // 1. 分页查询订单主表（只查ID，避免JOIN影响分页）
+        Page&lt;Order&gt; orderPage = new Page&lt;&gt;(query.getPageNum(), query.getPageSize());
+        LambdaQueryWrapper&lt;Order&gt; wrapper = buildQueryWrapper(query);
+        Page&lt;Order&gt; result = orderMapper.selectPage(orderPage, wrapper);
+        
+        if (result.getRecords().isEmpty()) {
+            return new PageResult&lt;&gt;(new ArrayList&lt;&gt;(), 0);
+        }
+        
+        // 2. 批量查询关联数据（避免N+1问题）
+        List&lt;Long&gt; orderIds = result.getRecords().stream()
+            .map(Order::getId)
+            .collect(Collectors.toList());
+        
+        List&lt;Long&gt; userIds = result.getRecords().stream()
+            .map(Order::getUserId)
+            .distinct()
+            .collect(Collectors.toList());
+        
+        // 批量查询用户信息
+        Map&lt;Long, User&gt; userMap = userMapper.selectBatchIds(userIds).stream()
+            .collect(Collectors.toMap(User::getId, u -> u));
+        
+        // 批量查询订单项
+        List&lt;OrderItem&gt; allItems = orderItemMapper.selectList(
+            new LambdaQueryWrapper&lt;OrderItem&gt;().in(OrderItem::getOrderId, orderIds)
+        );
+        Map&lt;Long, List&lt;OrderItem&gt;&gt; itemsMap = allItems.stream()
+            .collect(Collectors.groupingBy(OrderItem::getOrderId));
+        
+        // 批量查询物流信息
+        Map&lt;Long, Logistics&gt; logisticsMap = logisticsMapper.selectList(
+            new LambdaQueryWrapper&lt;Logistics&gt;().in(Logistics::getOrderId, orderIds)
+        ).stream().collect(Collectors.toMap(Logistics::getOrderId, l -> l));
+        
+        // 3. 组装VO
+        List&lt;OrderVO&gt; orderVOList = result.getRecords().stream()
+            .map(order -&gt; {
+                OrderVO vo = new OrderVO();
+                BeanUtils.copyProperties(order, vo);
+                
+                // 设置用户信息
+                User user = userMap.get(order.getUserId());
+                if (user != null) {
+                    vo.setUsername(user.getUsername());
+                    vo.setUserPhone(user.getPhone());
+                }
+                
+                // 设置订单项
+                List&lt;OrderItem&gt; items = itemsMap.getOrDefault(order.getId(), new ArrayList&lt;&gt;());
+                vo.setItems(items.stream().map(item -&gt; {
+                    OrderItemVO itemVO = new OrderItemVO();
+                    BeanUtils.copyProperties(item, itemVO);
+                    return itemVO;
+                }).collect(Collectors.toList()));
+                
+                // 设置物流信息
+                Logistics logistics = logisticsMap.get(order.getId());
+                if (logistics != null) {
+                    vo.setLogistics(new LogisticsVO(logistics));
+                }
+                
+                return vo;
+            })
+            .collect(Collectors.toList());
+        
+        return new PageResult&lt;&gt;(orderVOList, result.getTotal());
+    }
+    
+    private LambdaQueryWrapper&lt;Order&gt; buildQueryWrapper(OrderQueryDTO query) {
+        LambdaQueryWrapper&lt;Order&gt; wrapper = new LambdaQueryWrapper&lt;&gt;();
+        
+        // 订单号搜索
+        if (StringUtils.hasText(query.getOrderNo())) {
+            wrapper.like(Order::getOrderNo, query.getOrderNo());
+        }
+        
+        // 状态筛选
+        if (query.getStatus() != null) {
+            wrapper.eq(Order::getStatus, query.getStatus());
+        }
+        
+        // 用户搜索
+        if (StringUtils.hasText(query.getUserKeyword())) {
+            // 先查询匹配的用户ID
+            List&lt;Long&gt; userIds = userMapper.selectList(
+                new LambdaQueryWrapper&lt;User&gt;()
+                    .like(User::getUsername, query.getUserKeyword())
+                    .or()
+                    .like(User::getPhone, query.getUserKeyword())
+            ).stream().map(User::getId).collect(Collectors.toList());
+            
+            if (!userIds.isEmpty()) {
+                wrapper.in(Order::getUserId, userIds);
+            } else {
+                wrapper.eq(Order::getUserId, -1L);  // 无匹配结果
+            }
+        }
+        
+        // 时间范围
+        wrapper.ge(query.getStartDate() != null, Order::getCreateTime, query.getStartDate());
+        wrapper.le(query.getEndDate() != null, Order::getCreateTime, query.getEndDate());
+        
+        wrapper.orderByDesc(Order::getCreateTime);
+        return wrapper;
+    }
+}
+                </code>
+            </div>
+
+            <div class="key-point">
+                <strong>🎯 关键优化点：</strong><br/>
+                1. <strong>分页不JOIN</strong>：先分页查主表ID，再批量查关联表，避免JOIN导致分页不准确<br/>
+                2. <strong>批量查询</strong>：使用IN查询批量获取关联数据，避免N+1问题<br/>
+                3. <strong>内存组装</strong>：在Java内存中组装VO，减少数据库压力<br/>
+                4. <strong>Map索引</strong>：将关联数据转为Map，提高查找效率
+            </div>
+        </div>
+
+        <!-- 场景5：并发控制 -->
+        <div class="card">
+            <h3>⚡ 场景5：并发控制与乐观锁</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>库存扣减、订单状态更新等场景存在并发问题，多个用户同时操作可能导致数据不一致。需要实现乐观锁、分布式锁、重试机制等并发控制手段。</p>
+            </div>
+
+            <h4>📐 并发问题场景</h4>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>场景</th><th>并发问题</th><th>解决方案</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>库存扣减</td><td>超卖问题</td><td>乐观锁 + 数据库约束</td></tr>
+                        <tr><td>订单状态更新</td><td>状态覆盖</td><td>乐观锁版本号</td></tr>
+                        <tr><td>秒杀活动</td><td>高并发抢购</td><td>Redis分布式锁 + 队列</td></tr>
+                        <tr><td>余额扣减</td><td>并发扣款</td><td>悲观锁（SELECT FOR UPDATE）</td></tr>
+                        <tr><td>表单重复提交</td><td>重复创建</td><td>Token机制 + 唯一索引</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>☕ 方案1：乐观锁（版本号机制）</h4>
+            <div class="code-block">
+                <code>
+// 1. 实体类添加version字段
+@Data
+@TableName("product")
+public class Product {
+    private Long id;
+    private String name;
+    private Integer stock;
+    
+    @Version  // MyBatis Plus乐观锁注解
+    private Integer version;
+    
+    private Date updateTime;
+}
+
+// 2. 配置乐观锁插件
+@Configuration
+public class MyBatisPlusConfig {
+    
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+        return interceptor;
+    }
+}
+
+// 3. Service层使用
+@Service
+@RequiredArgsConstructor
+public class ProductService extends ServiceImpl&lt;ProductMapper, Product&gt; {
+    
+    /**
+     * 扣减库存（乐观锁）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deductStock(Long productId, Integer quantity) {
+        // 使用重试机制
+        int maxRetries = 3;
+        for (int i = 0; i < maxRetries; i++) {
+            // 1. 查询当前库存和版本号
+            Product product = this.getById(productId);
+            if (product == null) {
+                throw new BusinessException("商品不存在");
+            }
+            if (product.getStock() < quantity) {
+                throw new BusinessException("库存不足");
+            }
+            
+            // 2. 更新库存（带版本号条件）
+            product.setStock(product.getStock() - quantity);
+            boolean success = this.updateById(product);
+            
+            if (success) {
+                return true;  // 更新成功
+            }
+            
+            // 3. 更新失败说明版本号已变更，重试
+            if (i == maxRetries - 1) {
+                throw new BusinessException("操作过于频繁，请稍后重试");
+            }
+            
+            // 短暂等待后重试
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        
+        return false;
+    }
+}
+                </code>
+            </div>
+
+            <h4>☕ 方案2：Redis分布式锁</h4>
+            <div class="code-block">
+                <code>
+// Redis分布式锁工具类
+@Component
+@RequiredArgsConstructor
+public class RedisLock {
+    
+    private final StringRedisTemplate redisTemplate;
+    
+    /**
+     * 尝试获取锁
+     */
+    public boolean tryLock(String key, String value, long expireSeconds) {
+        Boolean success = redisTemplate.opsForValue()
+            .setIfAbsent(key, value, expireSeconds, TimeUnit.SECONDS);
+        return Boolean.TRUE.equals(success);
+    }
+    
+    /**
+     * 释放锁（Lua脚本保证原子性）
+     */
+    public void releaseLock(String key, String value) {
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then " +
+                       "return redis.call('del', KEYS[1]) " +
+                       "else return 0 end";
+        redisTemplate.execute(
+            new DefaultRedisScript&lt;&gt;(script, Long.class),
+            Collections.singletonList(key),
+            value
+        );
+    }
+    
+    /**
+     * 带重试的锁获取
+     */
+    public boolean tryLockWithRetry(String key, String value, 
+                                   long expireSeconds, int retryCount, long retryInterval) {
+        for (int i = 0; i < retryCount; i++) {
+            if (tryLock(key, value, expireSeconds)) {
+                return true;
+            }
+            try {
+                Thread.sleep(retryInterval);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        return false;
+    }
+}
+
+// 使用示例：秒杀场景
+@Service
+@RequiredArgsConstructor
+public class SeckillService {
+    
+    private final RedisLock redisLock;
+    private final ProductService productService;
+    private final StringRedisTemplate redisTemplate;
+    
+    /**
+     * 秒杀扣减库存
+     */
+    public boolean seckill(Long productId, String userId) {
+        String lockKey = "seckill:lock:" + productId;
+        String lockValue = UUID.randomUUID().toString();
+        
+        try {
+            // 1. 尝试获取分布式锁
+            if (!redisLock.tryLock(lockKey, lockValue, 10)) {
+                throw new BusinessException("系统繁忙，请稍后重试");
+            }
+            
+            // 2. 检查用户是否已购买（幂等性）
+            String purchaseKey = "seckill:purchase:" + productId + ":" + userId;
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(purchaseKey))) {
+                throw new BusinessException("您已购买过该商品");
+            }
+            
+            // 3. 扣减库存
+            boolean success = productService.deductStock(productId, 1);
+            if (!success) {
+                throw new BusinessException("库存不足");
+            }
+            
+            // 4. 记录购买状态
+            redisTemplate.opsForValue().set(purchaseKey, "1", 24, TimeUnit.HOURS);
+            
+            return true;
+        } finally {
+            // 5. 释放锁
+            redisLock.releaseLock(lockKey, lockValue);
+        }
+    }
+}
+                </code>
+            </div>
+
+            <h4>☕ 方案3：防重复提交</h4>
+            <div class="code-block">
+                <code>
+// 1. 自定义防重复提交注解
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface NoRepeatSubmit {
+    /**
+     * 锁定时长（秒）
+     */
+    int lockTime() default 5;
+}
+
+// 2. AOP实现
+@Aspect
+@Component
+@RequiredArgsConstructor
+public class NoRepeatSubmitAspect {
+    
+    private final StringRedisTemplate redisTemplate;
+    
+    @Around("@annotation(noRepeatSubmit)")
+    public Object around(ProceedingJoinPoint point, NoRepeatSubmit noRepeatSubmit) throws Throwable {
+        HttpServletRequest request = getRequest();
+        String token = request.getHeader("X-Submit-Token");
+        
+        if (StringUtils.isEmpty(token)) {
+            throw new BusinessException("缺少防重复提交Token");
+        }
+        
+        String key = "no_repeat_submit:" + token;
+        
+        // 尝试设置，如果已存在说明重复提交
+        Boolean success = redisTemplate.opsForValue()
+            .setIfAbsent(key, "1", noRepeatSubmit.lockTime(), TimeUnit.SECONDS);
+        
+        if (Boolean.FALSE.equals(success)) {
+            throw new BusinessException("请勿重复提交");
+        }
+        
+        try {
+            return point.proceed();
+        } catch (Exception e) {
+            // 业务异常时删除锁，允许重试
+            redisTemplate.delete(key);
+            throw e;
+        }
+    }
+}
+
+// 3. 前端实现：生成并提交Token
+// useSubmitToken.ts
+import { ref } from 'vue'
+
+export function useSubmitToken() {
+  const submitToken = ref('')
+  
+  // 生成新Token
+  const generateToken = () => {
+    submitToken.value = Date.now().toString(36) + Math.random().toString(36).substr(2)
+    return submitToken.value
+  }
+  
+  // 获取请求头
+  const getHeaders = () => {
+    return {
+      'X-Submit-Token': submitToken.value
+    }
+  }
+  
+  return { generateToken, getHeaders }
+}
+
+// 使用示例
+const { generateToken, getHeaders } = useSubmitToken()
+
+const handleSubmit = async () => {
+  generateToken()  // 每次提交前生成新Token
+  await api.createOrder(formData, { headers: getHeaders() })
+}
+                </code>
+            </div>
+
+            <h4>☕ 方案4：数据库唯一约束</h4>
+            <div class="code-block">
+                <code>
+-- 使用唯一索引防止重复创建
+CREATE UNIQUE INDEX uk_order_no ON orders(order_no);
+
+-- 使用唯一索引防止重复点赞
+CREATE UNIQUE INDEX uk_user_article_like ON user_likes(user_id, article_id);
+
+-- 使用唯一索引防止重复报名
+CREATE UNIQUE INDEX uk_user_course ON user_courses(user_id, course_id);
+                </code>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ 并发控制注意事项</h4>
+                <p>1. <strong>死锁预防</strong>：避免嵌套锁，按固定顺序获取锁<br/>
+                2. <strong>锁超时</strong>：所有锁必须设置超时时间，防止死锁<br/>
+                3. <strong>幂等性</strong>：关键操作必须保证幂等，重试不会产生副作用<br/>
+                4. <strong>性能权衡</strong>：悲观锁性能差但安全，乐观锁性能好但需要重试机制<br/>
+                5. <strong>Redis锁可靠性</strong>：Redis单点故障可能导致锁失效，生产环境建议使用Redisson</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🏢 场景6：多租户系统架构设计</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>SaaS系统需要支持多租户，每个租户拥有独立的数据、配置、用户体系。需要实现数据隔离、租户切换、租户级别限制等功能。</p>
+            </div>
+
+            <h4>多租户数据隔离方案对比</h4>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>方案</th>
+                        <th>隔离级别</th>
+                        <th>成本</th>
+                        <th>适用场景</th>
+                    </tr>
+                    <tr>
+                        <td>独立数据库</td>
+                        <td>物理隔离</td>
+                        <td>高</td>
+                        <td>金融、医疗等高安全要求</td>
+                    </tr>
+                    <tr>
+                        <td>共享库独立表</td>
+                        <td>逻辑隔离</td>
+                        <td>中</td>
+                        <td>中小型企业SaaS</td>
+                    </tr>
+                    <tr>
+                        <td>共享库共享表</td>
+                        <td>字段隔离</td>
+                        <td>低</td>
+                        <td>初创项目、演示环境</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h4>共享库共享表实现（tenant_id字段）</h4>
+            <div class="code-block">
+                <code>
+// 1. 实体类添加tenantId字段
+@Data
+@TableName("user")
+public class User {
+    private Long id;
+    private String username;
+    private Long tenantId;  // 租户ID
+    private Date createTime;
+}
+
+// 2. MyBatis Plus租户插件
+@Configuration
+public class MyBatisPlusConfig {
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        
+        // 租户拦截器
+        TenantLineInnerInterceptor tenantInterceptor = new TenantLineInnerInterceptor();
+        tenantInterceptor.setTenantLineHandler(new TenantLineHandler() {
+            @Override
+            public Expression getTenantId() {
+                // 从ThreadLocal获取当前租户ID
+                Long tenantId = TenantContext.getCurrentTenantId();
+                return new LongValue(tenantId);
+            }
+            
+            @Override
+            public String getTenantIdColumn() {
+                return "tenant_id";
+            }
+            
+            @Override
+            public boolean ignoreTable(String tableName) {
+                // 某些表不需要租户隔离（如系统配置表）
+                return Arrays.asList("sys_config", "sys_tenant").contains(tableName);
+            }
+        });
+        
+        interceptor.addInnerInterceptor(tenantInterceptor);
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+        return interceptor;
+    }
+}
+
+// 3. 租户上下文
+public class TenantContext {
+    private static final ThreadLocal&lt;Long&gt; CURRENT_TENANT = new ThreadLocal&lt;&gt;();
+    
+    public static void setCurrentTenantId(Long tenantId) {
+        CURRENT_TENANT.set(tenantId);
+    }
+    
+    public static Long getCurrentTenantId() {
+        return CURRENT_TENANT.get();
+    }
+    
+    public static void clear() {
+        CURRENT_TENANT.remove();
+    }
+}
+
+// 4. 拦截器设置租户ID
+@Component
+public class TenantInterceptor implements HandlerInterceptor {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        // 从请求头或Token中获取租户ID
+        String tenantId = request.getHeader("X-Tenant-ID");
+        if (StringUtils.hasText(tenantId)) {
+            TenantContext.setCurrentTenantId(Long.parseLong(tenantId));
+        }
+        return true;
+    }
+    
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        TenantContext.clear();  // 清理ThreadLocal
+    }
+}
+
+// 5. 前端设置租户ID
+// axios拦截器
+axios.interceptors.request.use(config => {
+  const tenantId = localStorage.getItem('tenantId')
+  if (tenantId) {
+    config.headers['X-Tenant-ID'] = tenantId
+  }
+  return config
+})
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>⏰ 场景7：定时任务管理系统</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>系统需要执行各种定时任务：数据备份、报表生成、消息推送、过期数据清理等。需要支持动态配置、失败重试、执行日志等功能。</p>
+            </div>
+
+            <h4>方案1：Spring @Scheduled（简单场景）</h4>
+            <div class="code-block">
+                <code>
+// 启用定时任务
+@EnableScheduling
+@SpringBootApplication
+public class Application { }
+
+// 定时任务实现
+@Component
+@Slf4j
+public class DataBackupTask {
+    
+    @Scheduled(cron = "0 0 2 * * ?")  // 每天凌晨2点执行
+    public void backupData() {
+        log.info("开始执行数据备份...");
+        try {
+            // 备份逻辑
+            backupDatabase();
+            log.info("数据备份完成");
+        } catch (Exception e) {
+            log.error("数据备份失败", e);
+        }
+    }
+    
+    @Scheduled(fixedRate = 3600000)  // 每小时执行一次
+    public void cleanExpiredData() {
+        log.info("开始清理过期数据...");
+        // 清理逻辑
+    }
+    
+    @Scheduled(fixedDelay = 60000, initialDelay = 10000)  // 上次执行完成后1分钟再执行
+    public void syncExternalData() {
+        // 同步逻辑
+    }
+}
+                </code>
+            </div>
+
+            <h4>方案2：XXL-JOB（分布式任务调度）</h4>
+            <div class="code-block">
+                <code>
+# 1. 引入依赖
+&lt;dependency&gt;
+    &lt;groupId&gt;com.xuxueli&lt;/groupId&gt;
+    &lt;artifactId&gt;xxl-job-core&lt;/artifactId&gt;
+    &lt;version&gt;2.4.0&lt;/version&gt;
+&lt;/dependency&gt;
+
+# 2. 配置xxl-job
+xxl:
+  job:
+    admin:
+      addresses: http://127.0.0.1:8080/xxl-job-admin
+    executor:
+      appname: my-task-executor
+      port: 9999
+      logpath: /data/applogs/xxl-job/jobhandler
+
+# 3. 配置类
+@Configuration
+public class XxlJobConfig {
+    @Value("${xxl.job.admin.addresses}")
+    private String adminAddresses;
+    
+    @Value("${xxl.job.executor.appname}")
+    private String appName;
+    
+    @Value("${xxl.job.executor.port}")
+    private int port;
+    
+    @Bean
+    public XxlJobSpringExecutor xxlJobExecutor() {
+        XxlJobSpringExecutor executor = new XxlJobSpringExecutor();
+        executor.setAdminAddresses(adminAddresses);
+        executor.setAppname(appName);
+        executor.setPort(port);
+        return executor;
+    }
+}
+
+# 4. 任务处理器
+@Component
+public class TaskHandler {
+    
+    @XxlJob("dataBackupHandler")
+    public ReturnT&lt;String&gt; dataBackupHandler(String param) {
+        XxlJobHelper.log("开始执行数据备份, 参数: {}", param);
+        try {
+            // 备份逻辑
+            backupDatabase();
+            XxlJobHelper.log("数据备份完成");
+            return ReturnT.SUCCESS;
+        } catch (Exception e) {
+            XxlJobHelper.log("数据备份失败: {}", e.getMessage());
+            return ReturnT.FAIL;
+        }
+    }
+    
+    @XxlJob("reportGenerateHandler")
+    public ReturnT&lt;String&gt; reportGenerateHandler(String param) {
+        // 报表生成逻辑
+        generateDailyReport();
+        return ReturnT.SUCCESS;
+    }
+}
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔔 场景8：消息通知系统</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>系统需要支持多种通知方式：站内消息、邮件、短信、企业微信/钉钉机器人等。需要支持消息模板、发送记录、失败重试等功能。</p>
+            </div>
+
+            <h4>消息通知架构设计</h4>
+            <div class="code-block">
+                <code>
+// 1. 消息通知接口定义
+public interface NotificationService {
+    /**
+     * 发送通知
+     */
+    NotificationResult send(NotificationRequest request);
+    
+    /**
+     * 批量发送
+     */
+    List&lt;NotificationResult&gt; batchSend(List&lt;NotificationRequest&gt; requests);
+}
+
+// 2. 站内消息实现
+@Service("站内消息")
+public class InAppNotificationService implements NotificationService {
+    @Autowired
+    private MessageMapper messageMapper;
+    
+    @Override
+    public NotificationResult send(NotificationRequest request) {
+        Message message = new Message();
+        message.setUserId(request.getUserId());
+        message.setTitle(request.getTitle());
+        message.setContent(request.getContent());
+        message.setType(request.getType());
+        message.setStatus(0);  // 未读
+        messageMapper.insert(message);
+        
+        // WebSocket推送实时通知
+        WebSocketServer.sendMessage(request.getUserId(), message);
+        
+        return NotificationResult.success(message.getId());
+    }
+}
+
+// 3. 邮件通知实现
+@Service("邮件通知")
+public class EmailNotificationService implements NotificationService {
+    @Autowired
+    private JavaMailSender mailSender;
+    
+    @Override
+    public NotificationResult send(NotificationRequest request) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom("system@example.com", "系统通知");
+            helper.setTo(request.getEmail());
+            helper.setSubject(request.getTitle());
+            helper.setText(request.getContent(), true);  // HTML格式
+            
+            mailSender.send(message);
+            return NotificationResult.success();
+        } catch (Exception e) {
+            return NotificationResult.fail("邮件发送失败: " + e.getMessage());
+        }
+    }
+}
+
+// 4. 统一消息发送服务
+@Service
+public class UnifiedNotificationService {
+    @Autowired
+    private Map&lt;String, NotificationService&gt; notificationServices;
+    
+    public void sendMultiChannel(NotificationRequest request, List&lt;String&gt; channels) {
+        channels.forEach(channel -> {
+            NotificationService service = notificationServices.get(channel);
+            if (service != null) {
+                // 异步发送
+                CompletableFuture.runAsync(() -> service.send(request));
+            }
+        });
+    }
+}
+
+// 5. 前端：消息中心
+&lt;template&gt;
+  &lt;el-badge :value="unreadCount" class="message-badge"&gt;
+    &lt;el-button @click="showMessages"&gt;
+      &lt;el-icon&gt;&lt;Bell /&gt;&lt;/el-icon&gt;
+      消息
+    &lt;/el-button&gt;
+  &lt;/el-badge&gt;
+
+  &lt;el-drawer v-model="visible" title="消息中心" size="500px"&gt;
+    &lt;el-tabs v-model="activeTab"&gt;
+      &lt;el-tab-pane label="全部" name="all"&gt;
+        &lt;el-timeline&gt;
+          &lt;el-timeline-item 
+            v-for="msg in messageList" 
+            :key="msg.id"
+            :timestamp="msg.createTime"
+            :type="msg.status === 0 ? 'primary' : 'info'"
+          &gt;
+            &lt;el-card @click="markAsRead(msg)" :class="{ 'unread': msg.status === 0 }"&gt;
+              &lt;h4&gt;{{ msg.title }}&lt;/h4&gt;
+              &lt;p&gt;{{ msg.content }}&lt;/p&gt;
+            &lt;/el-card&gt;
+          &lt;/el-timeline-item&gt;
+        &lt;/el-timeline&gt;
+      &lt;/el-tab-pane&gt;
+    &lt;/el-tabs&gt;
+  &lt;/el-drawer&gt;
+&lt;/template&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📊 场景9：数据大屏与可视化</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>企业需要将业务数据以图表形式展示在大屏上，支持实时刷新、多图表联动、自适应布局等。常用于监控中心、指挥中心等场景。</p>
+            </div>
+
+            <h4>ECharts大屏实现</h4>
+            <div class="code-block">
+                <code>
+&lt;template&gt;
+  &lt;div class="dashboard" :style="{ transform: `scale(${scale})` }"&gt;
+    &lt;div class="dashboard-header"&gt;
+      &lt;h1&gt;数据监控大屏&lt;/h1&gt;
+      &lt;div class="header-time"&gt;{{ currentTime }}&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class="dashboard-content"&gt;
+      &lt;!-- 左侧图表 --&gt;
+      &lt;div class="left-panel"&gt;
+        &lt;div ref="chart1" class="chart-box" style="height: 300px"&gt;&lt;/div&gt;
+        &lt;div ref="chart2" class="chart-box" style="height: 300px"&gt;&lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- 中间地图/核心指标 --&gt;
+      &lt;div class="center-panel"&gt;
+        &lt;div class="stat-cards"&gt;
+          &lt;div class="stat-card" v-for="item in stats" :key="item.label"&gt;
+            &lt;div class="stat-value"&gt;{{ item.value }}&lt;/div&gt;
+            &lt;div class="stat-label"&gt;{{ item.label }}&lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div ref="mapChart" class="chart-box" style="height: 400px"&gt;&lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- 右侧图表 --&gt;
+      &lt;div class="right-panel"&gt;
+        &lt;div ref="chart3" class="chart-box" style="height: 300px"&gt;&lt;/div&gt;
+        &lt;div ref="chart4" class="chart-box" style="height: 300px"&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import * as echarts from 'echarts'
+
+const charts = ref([])
+const currentTime = ref('')
+const stats = ref([
+  { label: '今日订单', value: 1234 },
+  { label: '今日收入', value: '¥56,789' },
+  { label: '新增用户', value: 123 },
+  { label: '活跃用户', value: 456 }
+])
+
+// 初始化图表
+const initChart1 = () => {
+  const chart = echarts.init(chart1.value)
+  chart.setOption({
+    title: { text: '订单趋势', textStyle: { color: '#fff' } },
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'], axisLabel: { color: '#fff' } },
+    yAxis: { type: 'value', axisLabel: { color: '#fff' } },
+    series: [{ data: [120, 200, 150, 80, 70, 110, 130], type: 'line', smooth: true, areaStyle: {} }]
+  })
+  charts.value.push(chart)
+}
+
+// 定时刷新数据
+let refreshTimer = null
+onMounted(() => {
+  initChart1()
+  // 其他图表初始化...
+  
+  // 每30秒刷新数据
+  refreshTimer = setInterval(async () => {
+    // const res = await getDashboardData()
+    // 更新图表数据
+  }, 30000)
+  
+  // 更新时间
+  setInterval(() => {
+    currentTime.value = new Date().toLocaleString()
+  }, 1000)
+})
+
+onBeforeUnmount(() => {
+  charts.value.forEach(c => c.dispose())
+  clearInterval(refreshTimer)
+})
+&lt;/script&gt;
+
+&lt;style scoped&gt;
+.dashboard {
+  width: 1920px;
+  height: 1080px;
+  background: #0a1929;
+  color: #fff;
+  overflow: hidden;
+}
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 40px;
+  background: linear-gradient(90deg, transparent, #00d4ff20, transparent);
+}
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: linear-gradient(135deg, #00d4ff10, #00d4ff05);
+  border: 1px solid #00d4ff30;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+.stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #00d4ff;
+}
+.stat-label {
+  font-size: 14px;
+  color: #8ba4b9;
+  margin-top: 10px;
+}
+&lt;/style&gt;
+                </code>
+            </div>
+        </div>
+
+        <!-- 总结 -->
+        <div class="highlight-box">
+            <h4>🎓 本章核心要点总结</h4>
+            <p><strong>1. 审批流程引擎</strong>：状态机设计、多级审批、权限校验、流程配置化<br/>
+            <strong>2. 数据权限控制</strong>：行级隔离、AOP + MyBatis拦截器、动态SQL注入、前后端双重控制<br/>
+            <strong>3. 审计日志系统</strong>：AOP注解、异步记录、敏感信息脱敏、大数据量存储方案<br/>
+            <strong>4. 多表关联查询</strong>：避免N+1、分页不JOIN、批量查询、内存组装VO<br/>
+            <strong>5. 并发控制</strong>：乐观锁、分布式锁、防重复提交、唯一约束、重试机制<br/>
+            <strong>6. 多租户架构</strong>：tenant_id字段隔离、MyBatis Plus租户插件、ThreadLocal上下文<br/>
+            <strong>7. 定时任务</strong>：@Scheduled简单任务、XXL-JOB分布式调度、失败重试<br/>
+            <strong>8. 消息通知</strong>：多渠道统一接口、站内消息+邮件+短信、WebSocket实时推送<br/>
+            <strong>9. 数据大屏</strong>：ECharts图表、自适应布局、实时刷新、大屏缩放</p>
+        </div>
+
+        <div class="info-box">
+            <h4>📚 扩展学习</h4>
+            <p>1. <strong>工作流引擎</strong>：Flowable/Activiti（适合复杂审批流程）<br/>
+            2. <strong>权限框架</strong>：Spring Security + RBAC模型<br/>
+            3. <strong>日志方案</strong>：ELK（Elasticsearch + Logstash + Kibana）<br/>
+            4. <strong>分布式锁</strong>：Redisson、ZooKeeper、etcd<br/>
+            5. <strong>消息队列</strong>：RabbitMQ、Kafka（用于异步解耦）<br/>
+            6. <strong>数据大屏</strong>：DataV、FineBI、阿里云QuickBI<br/>
+            7. <strong>定时任务</strong>：XXL-JOB、PowerJob、Elastic-Job<br/>
+            8. <strong>读写分离</strong>：ShardingSphere-JDBC、Dynamic-Datasource<br/>
+            9. <strong>数据加密</strong>：Jasypt配置加密、数据库字段AES加密<br/>
+            10. <strong>OAuth2</strong>：Spring Security OAuth2 Client、JustAuth</p>
+        </div>
+
+        <div class="card">
+            <h3>🔀 场景10：MySQL读写分离</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>高并发场景下，使用主从数据库实现读写分离，写操作走主库，读操作走从库。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>&lt;!-- pom.xml --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.baomidou&lt;/groupId&gt;
+    &lt;artifactId&gt;dynamic-datasource-spring-boot-starter&lt;/artifactId&gt;
+    &lt;version&gt;4.2.0&lt;/version&gt;
+&lt;/dependency&gt;
+
+# application.yml
+spring:
+  datasource:
+    dynamic:
+      primary: master
+      strict: false
+      datasource:
+        master:
+          url: jdbc:mysql://master-db:3306/blog_db
+          username: root
+          password: ${MASTER_PASSWORD}
+        slave1:
+          url: jdbc:mysql://slave1-db:3306/blog_db
+          username: root
+          password: ${SLAVE_PASSWORD}
+        slave2:
+          url: jdbc:mysql://slave2-db:3306/blog_db
+          username: root
+          password: ${SLAVE_PASSWORD}
+
+// Service层使用@DS注解
+@Service
+public class UserService {
+    
+    @DS("slave")  // 指定从库（读操作）
+    public PageResult&lt;UserVO&gt; list(QueryDTO dto) {
+        return userMapper.selectPage(dto);
+    }
+    
+    @DS("master")  // 指定主库（写操作）
+    @Transactional
+    public UserVO create(UserDTO dto) {
+        User user = convertToEntity(dto);
+        userMapper.insert(user);
+        return user.toVO();
+    }
+    
+    @DS("slave")  // 查询详情走从库
+    public UserVO getById(Long id) {
+        return userMapper.selectById(id).toVO();
+    }
+}
+
+// 负载均衡策略（slave组中随机选择）
+# @DS("slave") 会自动在slave1/slave2中负载均衡
+spring:
+  datasource:
+    dynamic:
+      strategy: load_balance  # 轮询/随机
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔐 场景11：敏感数据加密</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>保护用户敏感数据（手机号、身份证、银行卡号等），存入数据库前加密，读取时解密。</p>
+            </div>
+            
+            <div class="code-block">
+                <code>// 1. MyBatis Plus TypeHandler自动加解密
+@Component
+public class EncryptTypeHandler extends BaseTypeHandler&lt;String&gt; {
+    private static final String AES_KEY = "1234567890123456";  // 16位AES密钥
+    
+    @Override
+    public void setNonNullParameter(PreparedStatement ps, int i, String param, JdbcType jdbcType) 
+        throws SQLException {
+        ps.setString(i, AESUtils.encrypt(param, AES_KEY));  // 加密写入
+    }
+    
+    @Override
+    public String getNullableResult(ResultSet rs, String columnName) throws SQLException {
+        return AESUtils.decrypt(rs.getString(columnName), AES_KEY);  // 解密读取
+    }
+}
+
+// 实体类使用
+@Data
+@TableName("user")
+public class User {
+    @TableField(typeHandler = EncryptTypeHandler.class)
+    private String phone;     // 自动加解密
+    
+    @TableField(typeHandler = EncryptTypeHandler.class)
+    private String idCard;    // 自动加解密
+}
+
+// 2. 配置文件敏感信息加密（Jasypt）
+&lt;dependency&gt;
+    &lt;groupId&gt;com.github.ulisesbocchio&lt;/groupId&gt;
+    &lt;artifactId&gt;jasypt-spring-boot-starter&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+# 生成密文
+java -cp jasypt.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI \
+  input="root123" password="SALT_KEY" algorithm=PBEWithMD5AndDES
+
+# 配置文件中使用密文
+spring:
+  datasource:
+    password: ENC(encrypted_password_here)
+
+# 启动时传入密钥
+java -jar app.jar --jasypt.encryptor.password=SALT_KEY
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🛑 场景12：Spring Boot优雅停机</h3>
+            <div class="scenario-box">
+                <h5>📝 业务背景</h5>
+                <p>应用关闭时确保正在处理的请求完成、线程池关闭、资源释放，避免数据丢失。</p>
+            </div>
+            
+            <div class="code-block">
+                <code># application.yml
+server:
+  shutdown: graceful  # 优雅停机
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s  # 等待时间
+
+# Spring Boot 2.3+ 默认支持优雅停机
+# 收到SIGTERM信号后：
+# 1. 不再接受新请求
+# 2. 等待已有请求处理完（最多30s）
+# 3. 销毁Bean，释放资源
+
+// 自定义关闭回调
+@Component
+public class GracefulShutdown implements DisposableBean {
+    
+    @Override
+    public void destroy() {
+        log.info("开始优雅关闭...");
+        // 1. 通知注册中心下线
+        nacosServiceRegistry.deregister();
+        
+        // 2. 等待任务队列处理完
+        executorService.shutdown();
+        executorService.awaitTermination(30, TimeUnit.SECONDS);
+        
+        // 3. 刷新缓冲区
+        logBuffer.flush();
+        
+        log.info("优雅关闭完成");
+    }
+}
+
+// docker-compose中的stop_grace_period
+services:
+  backend:
+    stop_grace_period: 30s  # 给30秒优雅停机时间
+                </code>
+            </div>
+        </div>
+
+        <div class="self-check">
+            <h3>🧠 费曼自测：你能解释给同学听吗？</h3>
+            <div class="q"><strong>Q1：乐观锁到底是什么？（用抢车位比喻）</strong><p>A：你开车去停车场抢车位，先假设没人跟你抢（乐观），开到车位前发现已经被占了，那就换一个（版本号不匹配，重试）。悲观锁则相反——你直接锁住整个停车场不让别人进——效率低但不会冲突。</p></div>
+            <div class="q"><strong>Q2：多租户系统为什么要隔离数据？</strong><p>A：就像公寓楼——每个租户只能进自己的房间。你绝对不能看到邻居的账单。tenant_id就是房间钥匙，MyBatis拦截器自动帮你加上"where tenant_id=?"条件。</p></div>
+            <div class="q"><strong>Q3：审计日志和普通日志有什么区别？</strong><p>A：普通日志 = 监控摄像头（出事了翻录像）；审计日志 = 签字画押（每笔操作必须留下不可篡改的证据）。审计日志通常独立存储（甚至存ES），用于合规审查。</p></div>
+        </div>
+
+        <div class="back-nav">
+            <a href="chapter7-scenarios.html">← 第七章：10个经典实用场景题</a>
+            <a href="chapter9-debug-deploy.html">第九章：调试技巧与项目部署 →</a>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default', 
+            securityLevel: 'loose', 
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+            sequenceDiagram: { useMaxWidth: true },
+            er: { useMaxWidth: true }
+        });
+    </script>
+    <script>
+        function convertCodeBlocks(lang) {
+            document.querySelectorAll('.code-block').forEach(block => {
+                const oldCode = block.querySelector('code');
+                if (!oldCode || oldCode.parentElement.tagName === 'PRE') return;
+                let html = oldCode.innerHTML;
+                let text = html.replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/gi, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.className = `language-${lang}`;
+                code.textContent = text;
+                pre.appendChild(code);
+                block.appendChild(pre);
+                oldCode.remove();
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            convertCodeBlocks('javascript');
+            if (window.Prism) Prism.highlightAll();
+        });
+    </script>
+</body>
+</html>
